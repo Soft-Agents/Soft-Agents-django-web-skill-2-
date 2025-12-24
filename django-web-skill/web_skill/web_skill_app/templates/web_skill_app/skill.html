@@ -1,0 +1,256 @@
+{% extends 'web_skill_app/base.html' %}
+{% load static %}
+
+{% block title %}Pizarra de Práctica - Soft Agents{% endblock %}
+
+{% block content %}
+  {% include 'web_skill_app/partials/navigation.html' with currentPage='skill' %}
+
+  <script>
+    const CURRENT_USER_ID = "{{ user.user_id }}";
+    console.log("🆔 User ID cargado:", CURRENT_USER_ID);
+  </script>
+
+  <style>
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .chat-message {
+      animation: fadeIn 0.3s ease-in;
+      display: flex;
+      margin-bottom: 0.75rem;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    
+    .typing-indicator .message-bubble {
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    /* Mensajes del Agente (Coach y Criker) */
+    .agent-message {
+      justify-content: flex-start;
+    }
+    
+    .agent-message .message-bubble {
+      /* Fondo oscuro translúcido con borde púrpura sutil */
+      background: rgba(30, 41, 59, 0.8); /* slate-800 con opacidad */
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(168, 85, 247, 0.3); /* purple-500/30 */
+      color: #e2e8f0;
+      border-top-left-radius: 4px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Mensajes del Usuario */
+    .user-message {
+      justify-content: flex-end;
+    }
+
+    .user-message .message-bubble {
+      /* Gradiente azul/cyan como en Knowledge para mantener consistencia del usuario */
+      background: linear-gradient(135deg, #1d4ed8, #0891b2);
+      color: white;
+      border-top-right-radius: 4px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Estilo base de la burbuja */
+    .message-bubble {
+      padding: 12px 16px;
+      border-radius: 18px;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      max-width: 85%;
+      word-wrap: break-word;
+      white-space: normal;
+      transition: all 0.2s ease;
+    }
+    
+    .message-bubble:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .message-bubble p { margin: 0; padding: 0; }
+    .message-bubble hr {
+      border-color: #475569; 
+      margin-top: 8px; margin-bottom: 8px;
+    }
+
+    /* Flecha de la burbuja en la pizarra */
+    .speech-bubble::after {
+      content: "";
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-width: 10px;
+      border-style: solid;
+      border-color: rgba(30, 41, 59, 0.8) transparent transparent transparent;
+    }
+    
+    /* Scrollbar personalizada */
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: rgba(30, 41, 59, 0.5); }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(107, 114, 128, 0.5); border-radius: 3px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(168, 85, 247, 0.6); }
+  </style>
+
+  <div class="flex flex-col h-screen bg-slate-900 text-slate-200">
+    
+    <div class="flex flex-col lg:flex-row flex-1 overflow-hidden mt-16">
+      
+      <div class="w-full lg:w-[400px] bg-slate-800/90 backdrop-blur-md border-r lg:border-r border-b lg:border-b-0 border-purple-500/30 flex flex-col flex-shrink-0 max-h-64 lg:max-h-none z-10">
+        
+        <div class="p-4 border-b border-purple-500/30 bg-slate-800">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-gradient-to-br from-purple-600 to-pink-600 rounded-full flex items-center justify-center shadow-lg shadow-purple-500/20">
+              <span class="text-xl">🧠</span>
+            </div>
+            <div>
+              <div class="text-purple-300 font-bold">Coach</div>
+              <div class="text-xs text-slate-400">Teoría & Conocimiento</div>
+            </div>
+          </div>
+        </div>
+        
+        <div id="chat-messages-coach" class="flex-1 p-4 overflow-y-auto bg-slate-900/50 space-y-3 custom-scrollbar">
+          <div class="text-center text-slate-400 text-sm p-4 bg-slate-800/50 rounded-lg border border-purple-500/20">
+            💡 Haz preguntas sobre la teoría de las 15 lecciones.
+          </div>
+        </div>
+        
+        <div class="p-4 border-t border-purple-500/30 bg-slate-800">
+          <div class="flex gap-2">
+            <input
+              type="text"
+              id="message-input-coach"
+              placeholder="Pregunta al Coach..."
+              class="flex-1 bg-slate-700/50 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all"
+            />
+            <button 
+              id="send-button-coach"
+              class="bg-gradient-to-r from-purple-600 to-pink-600 hover:opacity-90 text-white px-4 py-2 rounded-lg transition-all duration-200 shadow-lg shadow-purple-900/20"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex-1 flex flex-col p-6 overflow-y-auto bg-gradient-to-br from-slate-900 via-[#1a1033] to-slate-900 relative custom-scrollbar">
+
+        <a href="{% url 'dashboard' %}" 
+           class="group inline-flex items-center gap-2 px-4 py-2 bg-slate-800/80 text-slate-300 font-semibold rounded-lg border border-transparent hover:border-purple-500/50 hover:text-white hover:shadow-lg hover:shadow-purple-500/20 transition-all duration-200 ease-in-out mb-6 self-start">
+          <span class="text-xl">🏠</span>
+          <span>Regresar</span>
+        </a>
+
+        <div class="max-w-4xl mx-auto w-full mb-6 text-center">
+          <h2 class="text-purple-400 text-3xl font-bold mb-2 tracking-wide">Soft Agents Practice</h2>
+          <p class="text-slate-400 text-sm">Entrenamiento inmersivo de pensamiento crítico</p>
+        </div>
+
+        <div class="flex-1 bg-slate-800/40 backdrop-blur-sm border border-white/10 rounded-2xl shadow-2xl max-w-6xl w-full mx-auto min-h-[500px] flex flex-col overflow-hidden relative">
+          
+          <div id="pantalla-bienvenida" class="flex flex-col items-center justify-center h-full text-slate-400 text-center p-8">
+            <div class="w-24 h-24 mb-6 bg-slate-800/80 border border-purple-500/30 rounded-full flex items-center justify-center shadow-xl shadow-black/20 animate-pulse">
+              <span class="text-5xl">🎯</span>
+            </div>
+            <h2 class="text-2xl font-bold mb-3 text-white">Pizarra de Práctica</h2>
+            <p class="text-lg text-slate-300 max-w-md mx-auto">
+              Habla con <strong class="text-pink-400">Criker</strong> (panel derecho) para iniciar un caso de simulación.
+            </p>
+          </div>
+
+          <div id="area-caso-uso" class="hidden p-8 overflow-y-auto flex-1 custom-scrollbar">
+            
+            <div id="prologo-container" class="text-center p-6 bg-slate-800/60 backdrop-blur-md rounded-xl mb-8 shadow-lg border border-purple-500/20">
+              <h3 id="titulo-caso" class="text-2xl font-bold text-purple-300 mb-2"></h3>
+              <p id="prologo-texto" class="text-slate-300 text-base leading-relaxed"></p>
+            </div>
+
+            <div class="flex justify-around items-start pt-4 gap-8">
+              
+              <div id="personaje-1" class="flex flex-col items-center w-5/12 group">
+                <div class="speech-bubble relative bg-slate-700/80 backdrop-blur-sm border border-slate-600 p-4 rounded-2xl min-h-[80px] w-full shadow-lg text-slate-200 mb-5 transition-all group-hover:border-purple-400/50" id="bubble-1"></div>
+                <div class="w-24 h-24 rounded-full bg-gradient-to-br from-slate-700 to-slate-600 border-4 border-slate-800 flex items-center justify-center shadow-2xl ring-2 ring-purple-500/30">
+                  <span id="logo-1" class="text-4xl">👤</span>
+                </div>
+                <div id="name-1" class="mt-3 text-lg font-semibold text-purple-300"></div>
+              </div>
+
+              <div id="personaje-2" class="flex flex-col items-center w-5/12 group">
+                <div class="speech-bubble relative bg-slate-700/80 backdrop-blur-sm border border-slate-600 p-4 rounded-2xl min-h-[80px] w-full shadow-lg text-slate-200 mb-5 transition-all group-hover:border-pink-400/50" id="bubble-2"></div>
+                <div class="w-24 h-24 rounded-full bg-gradient-to-br from-slate-700 to-slate-600 border-4 border-slate-800 flex items-center justify-center shadow-2xl ring-2 ring-pink-500/30">
+                  <span id="logo-2" class="text-4xl">👤</span>
+                </div>
+                <div id="name-2" class="mt-3 text-lg font-semibold text-pink-300"></div>
+              </div>
+            </div>
+
+            <div id="preguntas-container" class="mt-12 p-6 bg-slate-800/80 backdrop-blur-md rounded-xl border border-pink-500/20 shadow-lg">
+              <h4 class="font-bold text-xl text-white mb-4 flex items-center gap-2">
+                <span class="text-2xl">🤔</span> Preguntas de Análisis:
+              </h4>
+              <ul id="lista-preguntas" class="list-disc list-inside text-slate-300 space-y-3 pl-2"></ul>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="w-full lg:w-[400px] bg-slate-800/90 backdrop-blur-md border-l lg:border-l border-t lg:border-t-0 border-pink-500/30 flex flex-col flex-shrink-0 max-h-64 lg:max-h-none z-10">
+        
+        <div class="p-4 border-b border-pink-500/30 bg-slate-800">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-gradient-to-br from-pink-600 to-purple-600 rounded-full flex items-center justify-center shadow-lg shadow-pink-500/20">
+              <span class="text-xl">🤖</span>
+            </div>
+            <div>
+              <div class="text-pink-300 font-bold">Criker</div>
+              <div class="text-xs text-slate-400">Práctica & Casos</div>
+            </div>
+          </div>
+        </div>
+        
+        <div id="chat-messages-criker" class="flex-1 p-4 overflow-y-auto bg-slate-900/50 space-y-3 custom-scrollbar">
+          <div class="text-center text-slate-400 text-sm p-4 bg-slate-800/50 rounded-lg border border-pink-500/20">
+            🎯 Solicita casos de uso prácticos aquí.
+          </div>
+        </div>
+        
+        <div class="p-4 border-t border-pink-500/30 bg-slate-800">
+          <div class="flex gap-2">
+            <input
+              type="text"
+              id="message-input-criker"
+              placeholder="Pide un caso a Criker..."
+              class="flex-1 bg-slate-700/50 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-pink-500 focus:ring-1 focus:ring-pink-500 transition-all"
+            />
+            <button 
+              id="send-button-criker"
+              class="bg-gradient-to-r from-pink-600 to-purple-600 hover:opacity-90 text-white px-4 py-2 rounded-lg transition-all duration-200 shadow-lg shadow-pink-900/20"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="{% static 'web_skill_app/js/skill.js' %}?v={{ timestamp }}"></script>
+
+{% endblock %}

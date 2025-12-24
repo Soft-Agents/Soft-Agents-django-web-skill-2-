@@ -1,0 +1,816 @@
+{% extends 'web_skill_app/base.html' %}
+{% load static %}
+
+{% block title %}Estante de Libros - SofAgent{% endblock %}
+
+{% block content %}
+    {% include 'web_skill_app/partials/navigation.html' with currentPage='home' %}
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        #main-content-area {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column; /* Arreglo para alinear verticalmente */
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, rgba(26, 26, 46, 0.9) 0%, rgba(22, 33, 62, 0.9) 100%),
+                url('{% static "web_skill_app/img/biblioteca.png" %}') center/cover no-repeat;
+            font-family: 'Inter', sans-serif;
+            padding-bottom: 150px; 
+        }
+
+        /* --- INICIO ESTILOS BIBLIOTECA --- */
+        .bookshelf {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            gap: 60px;
+            padding: 60px;
+            position: relative;
+            z-index: 1;
+            transition: opacity 0.5s, filter 0.5s;
+        }
+
+        .bookshelf.blurred {
+            opacity: 0.3;
+            filter: blur(10px);
+            pointer-events: none;
+        }
+
+        @media (max-width: 768px) {
+            .bookshelf {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto;
+                gap: 40px;
+                padding: 30px 20px;
+                max-height: 100vh;
+                overflow-y: auto;
+            }
+
+            /* ==============================================================
+              INICIO DE LA CORRECCIÓN RESPONSIVE
+              ==============================================================
+              
+              Aquí le decimos a CSS que cuando el libro esté activo (.active)
+              en una pantalla pequeña (max-width: 768px),
+              en lugar de aplicar scale(1) (tamaño completo),
+              aplique scale(0.85) (85% del tamaño).
+              
+              Esto achica el libro entero, manteniendo el 3D.
+            */
+            .book-expanded-container.active .book-container {
+                opacity: 1;
+                transform: scale(0.85); /* <-- ESTA ES LA LÍNEA CORREGIDA */
+            }
+            /* ==============================================================
+              FIN DE LA CORRECCIÓN RESPONSIVE
+              ==============================================================
+            */
+        }
+
+        .book-mini {
+            width: 200px;
+            height: 280px;
+            perspective: 1500px;
+            cursor: pointer;
+            transition: transform 0.3s, filter 0.3s;
+            position: relative;
+        }
+
+        .book-mini:hover {
+            transform: translateY(-15px) scale(1.05);
+            filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.8));
+        }
+
+        .book-mini::after {
+            content: 'Click para abrir';
+            position: absolute;
+            bottom: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.85rem;
+            color: white;
+            opacity: 0;
+            transition: opacity 0.3s;
+            white-space: nowrap;
+        }
+
+        .book-mini:hover::after {
+            opacity: 0.8;
+        }
+
+        .book-mini-inner {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            border-radius: 0 8px 8px 0;
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .book-spine {
+            position: absolute;
+            width: 30px;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            left: -30px;
+            border-radius: 8px 0 0 8px;
+        }
+
+        .book-cover-mini {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+            border-radius: 0 8px 8px 0;
+            color: white;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            line-height: 1.3;
+            text-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .book-colaboracion .book-cover-mini,
+        .book-comunicacion .book-cover-mini {
+            font-size: 1.2rem;
+        }
+
+        .book-pensamiento .book-cover-mini {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .book-colaboracion .book-cover-mini {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .book-creatividad .book-cover-mini {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+
+        .book-comunicacion .book-cover-mini {
+            background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
+        }
+
+        .book-expanded-container {
+            position: fixed; /* FIJO a la pantalla */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+
+        .book-expanded-container.active {
+            display: flex;
+        }
+
+        .book-backdrop {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            cursor: pointer;
+        }
+
+        .book-container {
+            width: 400px;
+            height: 550px;
+            perspective: 2500px;
+            position: relative;
+            z-index: 101;
+            opacity: 0;
+            transform: scale(0.3);
+            transition: opacity 0.5s, transform 0.5s;
+        }
+        
+        /* HE ELIMINADO EL @media (max-width: 768px) 
+           QUE ESTABA AQUÍ Y MODIFICABA EL .book-container, 
+           .front, .page-title, etc. 
+           
+           Ya no es necesario porque la nueva regla que añadí 
+           más arriba se encarga de escalar todo.
+        */
+
+        .book-expanded-container.active .book-container {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .book {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            filter: drop-shadow(0 15px 30px rgba(0, 0, 0, 0.5));
+        }
+
+        .page {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            transform-style: preserve-3d;
+            transform-origin: left;
+            transition: transform 1.2s cubic-bezier(0.4, 0, 0.2, 1),
+                z-index 0s 0.55s;
+        }
+
+        .front,
+        .back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 40px 35px;
+            border-radius: 0 12px 12px 0;
+            cursor: pointer;
+        }
+
+        .front h1, .front h2 { margin-bottom: 15px; }
+        .front p, .front ul { line-height: 1.6; font-size: 0.95rem; }
+        .front ul { text-align: left; padding-left: 20px; margin-top: 10px; }
+        .front ul li { margin-bottom: 8px; }
+
+        .cover { z-index: 10; }
+        .cover .front {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: inset -5px 0 20px rgba(0, 0, 0, 0.3);
+        }
+        .cover .front h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3rem;
+            font-weight: 900;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            text-shadow: 0 6px 15px rgba(0, 0, 0, 0.6);
+            line-height: 1.3;
+            margin: 0;
+        }
+        .cover .back { background: #f8f9fa; transform: rotateY(180deg); }
+        #cover-empty .back { background: #ffffff; transform: rotateY(180deg); }
+
+        .page-1 { z-index: 9; }
+        .page-2 { z-index: 8; }
+        .page-3 { z-index: 7; }
+        .page-4 { z-index: 6; }
+        .page-5 { z-index: 5; }
+        .page-6 { z-index: 4; }
+        .page-7 { z-index: 3; }
+
+        .page-1 .front, .page-2 .front, .page-3 .front, .page-4 .front, .page-5 .front, .page-6 .front, .page-7 .front {
+            background: #ffffff; color: #2d3436; border-left: 2px solid #e0e0e0;
+        }
+        .page-1 .back, .page-2 .back, .page-3 .back, .page-4 .back, .page-5 .back, .page-6 .back, .page-7 .back {
+            background: #ffffff; color: #2d3436; border-left: 2px solid #e0e0e0; transform: rotateY(180deg);
+        }
+
+        .page-title { font-size: 1.6rem; font-weight: 700; color: #667eea; margin-bottom: 20px; }
+        .page-content { font-size: 0.9rem; line-height: 1.7; text-align: justify; }
+        .back-cover { z-index: 1; background: linear-gradient(135deg, #434343 0%, #000000 100%); border-radius: 0 12px 12px 0; cursor: default !important; }
+
+        .final-btn {
+            padding: 18px 40px; font-size: 1.3rem; font-family: 'Orbitron', sans-serif; font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none; border-radius: 8px; cursor: pointer; transition: all 0.3s;
+            text-transform: uppercase; letter-spacing: 2px; box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        .final-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6); }
+
+        .page.flipped { transform: rotateY(-180deg); }
+        .cover.flipped { z-index: 2 !important; transition: transform 1.2s cubic-bezier(0.4, 0, 0.2, 1), z-index 0s 0.55s; }
+        #cover-empty.flipped { z-index: 2 !important; transition: transform 1.2s cubic-bezier(0.4, 0, 0.2, 1), z-index 0s 0.55s; }
+        .cover:not(.flipped), #cover-empty:not(.flipped) { transition: transform 1.2s cubic-bezier(0.4, 0, 0.2, 1), z-index 0s 0s; }
+        .page-1.flipped, .page-2.flipped, .page-3.flipped, .page-4.flipped, .page-5.flipped, .page-6.flipped, .page-7.flipped {
+            z-index: 11 !important; transition: transform 1.2s cubic-bezier(0.4, 0, 0.2, 1), z-index 0s 0.55s;
+        }
+        .cover:not(.flipped), .page-1:not(.flipped), .page-2:not(.flipped), .page-3:not(.flipped), .page-4:not(.flipped), .page-5:not(.flipped), .page-6:not(.flipped), .page-7:not(.flipped) {
+            transition: transform 1.2s cubic-bezier(0.4, 0, 0.2, 1), z-index 0s 0s;
+        }
+        .emoji { font-size: 1.5rem; margin: 0 5px; }
+        strong { color: #667eea; }
+        .coming-soon { font-size: 2rem; color: #999; font-weight: 600; }
+        /* --- FIN ESTILOS BIBLIOTECA --- */
+
+
+        /* --- INICIO ESTILOS ACCESO RÁPIDO (ARREGLADO) --- */
+        .quick-access-bar {
+            position: relative; 
+            width: 100%;
+            text-align: center;
+            z-index: 5;
+            padding: 40px 20px 20px 20px; 
+        }
+        .quick-access-bar h2 {
+            font-family: 'Orbitron', sans-serif; font-size: 1.5rem; color: #ffffff;
+            margin-bottom: 20px; text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+        .quick-access-buttons { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; }
+        .qa-button {
+            padding: 18px 40px; font-size: 1.1rem; border-radius: 12px;
+            background: linear-gradient(to bottom, #5a8bc2 0%, #3e6a94 100%);
+            color: #ffffff; border: 3px solid #000000;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6), inset 0 1px 2px rgba(255, 255, 255, 0.3);
+            text-shadow: 0 1px 1px rgba(0, 0, 0, 0.7);
+            font-family: 'Inter', sans-serif; font-weight: 600; text-transform: uppercase;
+            letter-spacing: 0.5px; text-decoration: none; cursor: pointer; transition: all 0.3s ease;
+        }
+        
+        /* HOVER (Fondo blanco, letras negras) */
+        .qa-button:hover {
+            background: #ffffff;
+            color: #000000;
+            border-color: #000000;
+            text-shadow: none;
+            box-shadow: 0 4px 15px rgba(255, 255, 255, 0.3);
+            transform: translateY(-5px) scale(1.03);
+        }
+        /* --- FIN ESTILOS ACCESO RÁPIDO --- */
+
+         /* --- INICIO ESTILOS AVATAR SOFIA --- */
+        #avatar-flotante {
+            position: fixed; 
+            top: 50px;
+            left: 50px;
+            width: 460px; /* Tamaño Desktop */
+            height: 460px; /* Tamaño Desktop */
+            background-image: url('{% static "web_skill_app/img/sofia.png" %}');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center bottom;
+            background-color: transparent;
+            z-index: 9999;
+            cursor: grab;
+            user-select: none;
+            transition: transform 0.2s ease, filter 0.2s ease;
+            outline: none;
+        }
+        
+        /* --- AÑADIDO: MEDIA QUERY PARA AVATAR EN MÓVIL --- */
+        @media (max-width: 768px) {
+            #avatar-flotante {
+                width: 260px;  /* Tamaño Móvil */
+                height: 260px; /* Tamaño Móvil */
+                top: 100px; /* Posición inicial ajustada */
+                left: 10px;
+            }
+        }
+        /* --- FIN DE MEDIA QUERY --- */
+        
+        #avatar-flotante:active {
+            cursor: grabbing; transform: scale(1.02); filter: drop-shadow(0 8px 15px rgba(0, 0, 0, 0.4));
+        }
+
+        /* --- FIN ESTILOS AVATAR SOFIA --- */
+
+
+        /* =====================================
+        --- INICIO ESTILOS CHAT SOFIA ---
+        =====================================
+        */
+        
+        #bocadillo-texto {
+            position: absolute; 
+            bottom: 100%; 
+            left: 50%;
+            transform: translateX(-50%) translateY(-10px);
+            
+            width: 300px; /* Ancho del chat */
+            height: 320px; /* Alto del chat */
+            padding: 0; /* Quitamos padding viejo */
+            
+            background-color: #ffffff; /* Fondo blanco */
+            color: #000000; /* Texto negro */
+            border: 2px solid #000000; /* Borde negro */
+            border-radius: 12px;
+            
+            font-size: 0.95em; /* Ajustamos tamaño de fuente */
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            
+            /* Control de visibilidad (igual que antes) */
+            opacity: 0; 
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
+            pointer-events: none; 
+            z-index: 10000;
+
+            /* Organizador interno */
+            display: flex;
+            flex-direction: column;
+        }
+
+        #bocadillo-texto.visible {
+            opacity: 1; 
+            visibility: visible; 
+            transform: translateX(-50%) translateY(0); 
+            pointer-events: auto;
+        }
+
+        /* El "pico" del bocadillo, ahora blanco con borde negro */
+        #bocadillo-texto::after {
+            content: ''; 
+            position: absolute; 
+            left: 50%; 
+            top: 100%; /* Abajo del bocadillo */
+            transform: translateX(-50%);
+            
+            border-width: 12px; 
+            border-style: solid;
+            border-color: #000000 transparent transparent transparent; /* Borde exterior */
+        }
+        
+        /* Truco para el borde: un pseudo-elemento más pequeño por encima */
+        #bocadillo-texto::before {
+            content: ''; 
+            position: absolute; 
+            left: 50%; 
+            top: calc(100% - 2px); /* 2px (ancho del borde) más arriba */
+            transform: translateX(-50%);
+            
+            border-width: 10px;
+            border-style: solid;
+            border-color: #ffffff transparent transparent transparent; /* Relleno blanco */
+            z-index: 1; /* Por encima del borde negro */
+        }
+
+
+        /* Historial de chat */
+        #sofia-chat-history {
+            flex: 1; /* Ocupa todo el espacio disponible */
+            overflow-y: auto; /* Scroll si hay muchos mensajes */
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px; /* Espacio entre mensajes */
+        }
+
+        .sofia-message {
+            padding: 8px 12px;
+            border-radius: 10px;
+            max-width: 90%;
+            line-height: 1.4;
+        }
+
+        .sofia-message.agent {
+            background-color: #f1f1f1; /* Gris claro para Sofía */
+            border-bottom-left-radius: 2px;
+            align-self: flex-start; /* Alinea a la izquierda */
+        }
+        
+        .sofia-message.agent-typing {
+            background-color: #f1f1f1;
+            align-self: flex-start;
+            font-style: italic;
+            color: #555;
+        }
+
+        .sofia-message.user {
+            background-color: #d1e7fd; /* Azul claro para Usuario */
+            border-bottom-right-radius: 2px;
+            align-self: flex-end; /* Alinea a la derecha */
+            text-align: right;
+        }
+
+
+        /* Área de input */
+        #sofia-input-area {
+            display: flex;
+            padding: 10px;
+            border-top: 1px solid #ccc;
+        }
+
+        #sofia-text-input {
+            flex: 1; /* Ocupa todo el espacio */
+            border: 1px solid #000000; /* Borde negro */
+            border-radius: 20px;
+            padding: 8px 12px;
+            font-size: 0.9em;
+            margin-right: 8px;
+        }
+        #sofia-text-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 5px rgba(102,126,234,0.5);
+        }
+
+        #sofia-send-btn {
+            background: #667eea; /* Color principal */
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 38px;
+            height: 38px;
+            font-size: 1.5em;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            padding: 0;
+            line-height: 38px; /* Centra el icono */
+        }
+        #sofia-send-btn:hover {
+            background: #5a6fcf;
+        }
+        /* --- FIN ESTILOS CHAT SOFIA --- */
+
+    </style>
+
+    <div class="flex flex-1 overflow-hidden mt-16">
+        <div id="main-content-area" class="flex-1 overflow-y-auto">
+            
+            <div class="bookshelf" id="bookshelf">
+                <div class="book-mini book-pensamiento" data-book="pensamiento">
+                    <div class="book-mini-inner">
+                        <div class="book-spine"></div>
+                        <div class="book-cover-mini">PENSAMIENTO<br>CRÍTICO</div>
+                    </div>
+                </div>
+                <div class="book-mini book-colaboracion" data-book="colaboracion">
+                    <div class="book-mini-inner">
+                        <div class="book-spine"></div>
+                        <div class="book-cover-mini">COLABORACIÓN</div>
+                    </div>
+                </div>
+                <div class="book-mini book-creatividad" data-book="creatividad">
+                    <div class="book-mini-inner">
+                        <div class="book-spine"></div>
+                        <div class="book-cover-mini">CREATIVIDAD</div>
+                    </div>
+                </div>
+                <div class="book-mini book-comunicacion" data-book="comunicacion">
+                    <div class="book-mini-inner">
+                        <div class="book-spine"></div>
+                        <div class="book-cover-mini">COMUNICACIÓN</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="quick-access-bar">
+                <h2>Acceso Rápido</h2>
+                <div class="quick-access-buttons">
+                    <a href="{% url 'dashboard' %}" class="qa-button">Pensamiento Crítico</a>
+                    <a href="{% url 'creatividad' %}" class="qa-button">Creatividad</a>
+                    <a href="{% url 'colaboracion' %}" class="qa-button">ColaborACIÓN</a>
+                    <a href="{% url 'comunicacion' %}" class="qa-button">Comunicación</a>
+                </div>
+            </div>
+
+        </div> </div> <div class="book-expanded-container" id="bookExpandedContainer">
+        <div class="book-backdrop" id="bookBackdrop"></div>
+        <div class="book-container" id="bookContainer">
+            </div>
+    </div>
+    <div id="avatar-flotante">
+        <div id="bocadillo-texto">
+            <div id="sofia-chat-history">
+                <div class="sofia-message agent">
+                    ¡Hola! Soy Sofía. ¿En qué puedo ayudarte hoy?
+                </div>
+            </div>
+            
+            <div id="sofia-input-area">
+                <input type="text" id="sofia-text-input" placeholder="Escribe tu pregunta...">
+                <button id="sofia-send-btn" aria-label="Enviar">➔</button>
+            </div>
+        </div>
+    </div>
+    <script src="{% static 'web_skill_app/js/sofia-host.js' %}"></script>
+
+    <script>
+        // --- SCRIPT ORIGINAL DE LOS LIBROS ---
+        // (Este script se queda aquí, ya que es específico de esta página)
+        
+        const bookshelf = document.getElementById('bookshelf');
+        const bookExpandedContainer = document.getElementById('bookExpandedContainer');
+        const bookBackdrop = document.getElementById('bookBackdrop');
+        const bookContainer = document.getElementById('bookContainer');
+        const bookMinis = document.querySelectorAll('.book-mini');
+
+        // Contenido de los libros
+        const pensamientoContent = `
+            <div class="book">
+                <div class="page cover" id="cover">
+                    <div class="front"><h1>PENSAMIENTO<br>CRÍTICO</h1></div>
+                    <div class="back"></div>
+                </div>
+                <div class="page page-1" id="page1">
+                    <div class="front">
+                        <h2 class="page-title">¿Qué es el Pensamiento Crítico?</h2>
+                        <p class="page-content">Es la habilidad de <strong>analizar información objetivamente</strong>, separando hechos de opiniones para tomar mejores decisiones.<br><br>Hoy estamos rodeados por más información que nunca. Si no pensamos con lógica, podemos caer en errores y manipulaciones.<br><br><strong>El pensamiento crítico fortalece tu mente</strong> y te ayuda a descubrir la verdad detrás de las apariencias.</p>
+                    </div>
+                    <div class="back"></div>
+                </div>
+                <div class="page page-2" id="page2">
+                    <div class="front">
+                        <h2 class="page-title">¿Por qué es esencial?</h2>
+                        <p class="page-content">Cada decisión impacta tu vida: qué estudiar, en qué trabajar, en quién confiar.<br><br><strong>El pensamiento crítico te ayuda a:</strong></p>
+                        <ul><li>Evaluar mejor tus opciones</li><li>Expresarte con claridad</li><li>EvITAR manipulaciones emocionales</li><li>Trabajar con mejores argumentos</li><li>Ser más independiente al decidir</li></ul>
+                        <p class="page-content" style="margin-top: 15px;">En un mundo de opiniones, <strong>razonar con lógica es una ventaja enorme</strong>.</p>
+                    </div>
+                    <div class="back"></div>
+                </div>
+                <div class="page page-3" id="page3">
+                    <div class="front">
+                        <h2 class="page-title">Estructura del Programa</h2>
+                        <p class="page-content">Este programa desarrolla tu habilidad de pensar con inteligencia y autonomía.<br><br><strong>Dividido en 2 fases:</strong><br><br><span class="emoji">1️⃣</span> <strong>Inducción</strong> → Conocerás conceptos clave para pensar con claridad<br><br><span class="emoji">2️⃣</span> <strong>Aplicación</strong> → Pondrás en acción todo lo aprendido<br><br>El objetivo es que la teoría se convierta en una <strong>habilidad real y práctica</strong> en tu vida diaria.</p>
+                    </div>
+                    <div class="back"></div>
+                </div>
+                <div class="page page-4" id="page4">
+                    <div class="front">
+                        <h2 class="page-title">Fase 1: Inducción</h2>
+                        <p class="page-content">Entrenaremos tu mente en conceptos fundamentales:</p>
+                        <ul><li>Razonamiento lógico básico</li><li>Sesgos cognitivos (errores comunes)</li><li>Distinguir hechos de opiniones</li><li>Qué es una evidencia y cómo evaluarla</li><li>Identificar argumentos válidos y falacias</li><li>Analizar información compleja</li></ul>
+                        <p class="page-content" style="margin-top: 15px;">Esta fase te dará las <strong>bases para pensar con claridad</strong> y justicia intelectual.</p>
+                    </div>
+                    <div class="back"></div>
+                </div>
+                <div class="page page-5" id="page5">
+                    <div class="front">
+                        <h2 class="page-title">Mejora tu interior</h2>
+                        <p class="page-content">Pensar críticamente también es <strong>mirar dentro de ti</strong>.<br><br>Aprenderás a:</p>
+                        <ul><li>Detectar tus propios prejuicios</li><li>Reconocer cuándo las emociones nublan tu criterio</li><li>Cuestionar creencias limitantes</li><li>Escuchar activamente a los demás</li><li>Defender ideas sin atacar personas</li></ul>
+                        <p class="page-content" style="margin-top: 15px;">No solo mejora <strong>lo que piensas</strong>, también <strong>quién eres</strong> cuando piensas.</p>
+                    </div>
+                    <div class="back"></div>
+                </div>
+                <div class="page page-6" id="page6">
+                    <div class="front">
+                        <h2 class="page-title">Qué lograrás al finalizar</h2>
+                        <p class="page-content">Al completar ambas fases, serás capaz de:</p>
+                        <ul><li>Analizar cualquier situación con objetividad</li><li>Evitar manipulaciones o engaños</li><li>Hacer preguntas más profundas</li><li>Tomar mejores decisiones bajo presión</li><li>Resolver problemas con creatividad y lógica</li><li>Argumentar con respeto y fundamentos</li></ul>
+                        <p class="page-content" style="margin-top: 15px;">Terminarás con una forma de pensar <strong>más libre, fuerte e independiente</strong>.</p>
+                    </div>
+                    <div class="back"></div>
+                </div>
+                <div class="page page-7" id="page7">
+                    <div class="front">
+                        <h2 class="page-title">Tu viaje comienza ahora</h2>
+                        <p class="page-content">El pensamiento crítico no es una materia escolar. Es una <strong>habilidad para toda la vida</strong>.<br><br>Durante este programa:</p>
+                        <ul><li>No buscaremos respuestas rápidas</li><li>Valoraremos la reflexión y el análisis</li><li>El error será herramienta de aprendizaje</li><li>Tu mente será tu mayor recurso</li></ul>
+                        <p class="page-content" style="margin-top: 20px;"><span class="emoji">👉</span> Tu misión: abrir tu mente<br><span class="emoji">🧠</span> Nuestro objetivo: fortalecerla<br><span class="emoji">🚀</span> El viaje comienza ahora</p>
+                    </div>
+                    <div class="back">
+                        <a href="{% url 'dashboard' %}" class="final-link">
+                        <button 
+                            class="
+                            bg-blue-600                       /* Fondo azul base */
+                            text-white                        /* Texto blanco */
+                            font-extrabold                    /* Texto extra negrita */
+                            text-2xl                          /* ¡Un 50% más grande! (text-2xl es aprox. 24px) */
+                            py-4 px-10                        /* Mucho más padding para hacerlo grande */
+                            rounded-xl                        /* Bordes redondeados */
+                            shadow-lg                         /* Sombra inicial */
+                            border-2 border-blue-400          /* Borde inicial azul claro */
+                            transition-all duration-300 ease-in-out /* Transición suave para todos los cambios */
+                            
+                            /* ESTILOS AL HACER HOVER */
+                            hover:bg-blue-800                 /* Más azul oscuro al pasar el ratón */
+                            hover:shadow-blue-500/70          /* Sombra del color del borde que "brilla" */
+                            hover:shadow-2xl                  /* Sombra más grande y brillante */
+                            hover:border-blue-200             /* Borde más claro para simular el brillo */
+                            hover:scale-105                   /* Ligeramente más grande al pasar el ratón */
+                            hover:brightness-125              /* Aumenta el brillo general del botón */
+                            "
+                        >
+                            Empecemos
+                        </button>
+                        </a>
+                    </div>
+                </div>
+                <div class="page back-cover"></div>
+            </div>
+        `;
+
+        const comingSoonContent = (title, color) => `
+            <div class="book">
+                <div class="page cover" id="cover-empty">
+                    <div class="front" style="background: ${color};"><h1>${title}</h1></div>
+                    <div class="back"><p class="coming-soon">📚<br><br>Próximamente</p></div>
+                </div>
+                <div class="page back-cover"></div>
+            </div>
+        `;
+
+        // Lógica para abrir libros
+        bookMinis.forEach(trigger => {
+            trigger.addEventListener('click', () => {
+                const bookType = trigger.dataset.book;
+                bookshelf.classList.add('blurred');
+                bookExpandedContainer.classList.add('active');
+
+                if (bookType === 'pensamiento') {
+                    bookContainer.innerHTML = pensamientoContent;
+                    initBookPages();
+                } else if (bookType === 'colaboracion') {
+                    bookContainer.innerHTML = comingSoonContent('COLABORACIÓN', 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)');
+                    initEmptyBook();
+                } else if (bookType === 'creatividad') {
+                    bookContainer.innerHTML = comingSoonContent('CREATIVIDAD', 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)');
+                    initEmptyBook();
+                } else if (bookType === 'comunicacion') {
+                    bookContainer.innerHTML = comingSoonContent('COMUNICACIÓN', 'linear-gradient(135deg, #30cfd0 0%, #330867 100%)');
+                    initEmptyBook();
+                }
+            });
+        });
+
+        // Lógica para cerrar el libro modal
+        bookBackdrop.addEventListener('click', () => {
+            bookExpandedContainer.classList.remove('active');
+            bookshelf.classList.remove('blurred');
+            setTimeout(() => {
+                bookContainer.innerHTML = '';
+            }, 500);
+        });
+
+        // Lógica para voltear páginas (libro completo)
+        function initBookPages() {
+            const pages = [
+                document.getElementById('cover'),
+                document.getElementById('page1'), document.getElementById('page2'),
+                document.getElementById('page3'), document.getElementById('page4'),
+                document.getElementById('page5'), document.getElementById('page6'),
+                document.getElementById('page7')
+            ];
+
+            function openPage(index) {
+                const page = pages[index];
+                const front = page.querySelector('.front');
+                front.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    let canOpen = true;
+                    for (let i = 0; i < index; i++) {
+                        if (!pages[i].classList.contains('flipped')) {
+                            canOpen = false; break;
+                        }
+                    }
+                    if (canOpen) page.classList.add('flipped');
+                });
+            }
+
+            function closePage(index) {
+                const page = pages[index];
+                const back = page.querySelector('.back');
+                back.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    let canClose = true;
+                    for (let i = index + 1; i < pages.length; i++) {
+                        if (pages[i].classList.contains('flipped')) {
+                            canClose = false; break;
+                        }
+                    }
+                    if (canClose) page.classList.remove('flipped');
+                });
+            }
+
+            pages.forEach((page, index) => {
+                openPage(index);
+                closePage(index);
+            });
+        }
+
+        // Lógica para voltear páginas (libro "próximamente")
+        function initEmptyBook() {
+            const cover = document.getElementById('cover-empty');
+            const front = cover.querySelector('.front');
+            front.addEventListener('click', (e) => {
+                e.stopPropagation();
+                cover.classList.add('flipped');
+            });
+            const back = cover.querySelector('.back');
+            back.addEventListener('click', (e) => {
+                e.stopPropagation();
+                cover.classList.remove('flipped');
+            });
+        }
+    </script>
+
+{% endblock %}

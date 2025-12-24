@@ -1,0 +1,21 @@
+venv
+.venv
+__pycache__
+*.pyc
+
+# Archivos de la base de datos local y configuración de entorno
+.env
+db.sqlite3 
+.vscode/
+
+# Ignorar archivos temporales y de configuración de desarrollo
+# django-tailwind genera node_modules y archivos dist, que se ignoran
+node_modules
+npm-debug.log
+npm-cache
+dist
+
+# Archivos de sistema y control de versiones
+.git
+.gitignore
+.DS_Store

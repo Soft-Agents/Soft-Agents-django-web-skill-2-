@@ -1,0 +1,359 @@
+{% extends 'web_skill_app/base.html' %}
+{% load static %}
+
+{% block title %}Dashboard de {{ selected_user.first_name }} - Admin{% endblock %}
+
+{% block content %}
+{% include 'web_skill_app/partials/navigation-admin.html' %}
+<style>
+  .dashboard-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15), 0 0 20px rgba(147, 51, 234, 0.1);
+    border: 1px solid rgba(147, 51, 234, 0.1);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    transition: all 0.3s ease;
+  }
+  
+  .dashboard-card:hover {
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.2), 0 0 30px rgba(147, 51, 234, 0.2);
+    transform: translateY(-2px);
+  }
+
+  .metric-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3), 0 0 20px rgba(118, 75, 162, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+  }
+  
+  .metric-card:hover {
+    box-shadow: 0 12px 35px rgba(102, 126, 234, 0.4), 0 0 30px rgba(118, 75, 162, 0.3);
+    transform: translateY(-3px);
+  }
+
+  .chart-container {
+    text-align: center;
+    margin: 1rem 0;
+  }
+
+  .chart-container img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15), 0 0 15px rgba(147, 51, 234, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.8);
+    transition: all 0.3s ease;
+  }
+  
+  .chart-container img:hover {
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.2), 0 0 25px rgba(147, 51, 234, 0.2);
+    transform: scale(1.02);
+  }
+
+  .progress-bar {
+    background: #e5e7eb;
+    border-radius: 10px;
+    height: 20px;
+    overflow: hidden;
+    margin: 0.5rem 0;
+  }
+
+  .progress-fill {
+    height: 100%;
+    border-radius: 10px;
+    transition: width 0.3s ease;
+  }
+
+  .level-basic {
+    background: linear-gradient(90deg, #ef4444, #f87171);
+  }
+  .level-intermediate {
+    background: linear-gradient(90deg, #f59e0b, #fbbf24);
+  }
+  .level-advanced {
+    background: linear-gradient(90deg, #10b981, #34d399);
+  }
+  
+  .dashboard-card h1, .dashboard-card h2, .dashboard-card h3, .dashboard-card h4 {
+    font-weight: 800 !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .dashboard-card p, .dashboard-card span, .dashboard-card div {
+    font-weight: 600 !important;
+  }
+  
+  .metric-card h1, .metric-card h2, .metric-card h3, .metric-card h4 {
+    font-weight: 900 !important;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  }
+  
+  .metric-card p, .metric-card span {
+    font-weight: 700 !important;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+  }
+</style>
+
+<div class="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 py-8 pt-20">
+  
+  <div class="max-w-7xl mx-auto px-4">
+    <div class="grid grid-cols-12 gap-8">
+
+        <!-- Sidebar con historial -->
+        <div class="col-span-12 lg:col-span-4">
+          <div class="bg-white/90 rounded-2xl shadow-xl p-6 sticky top-8">
+            <!-- Header del sidebar -->
+            <div class="flex items-center gap-3 mb-6">
+              <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-blue-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                {{ selected_user.first_name|first|upper }}
+              </div>
+              <div>
+                <h3 class="font-bold text-gray-900">{{ selected_user.first_name }} {{ selected_user.last_name }}</h3>
+                <p class="text-sm text-gray-600">{{ selected_user.email }}</p>
+              </div>
+            </div>
+
+            <!-- Botón Volver -->
+            <div class="mb-6">
+              <a href="{% url 'admin_users_list' %}" class="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition duration-200">
+                ← Volver a Lista de Usuarios
+              </a>
+            </div>
+
+            <!-- Historial de Evaluaciones -->
+            <div class="mb-6">
+              <h4 class="font-bold text-gray-900 mb-3 flex items-center gap-2">
+                📋 Historial de Evaluaciones
+              </h4>
+              
+              {% if historial %}
+                <div class="space-y-3 max-h-96 overflow-y-auto">
+                  {% for item in historial %}
+                  <a href="?dashboard_id={{ item.dashboard_id }}" 
+                     class="block p-3 rounded-lg border transition-all duration-200 hover:shadow-md
+                            {% if item.dashboard_id == current_dashboard_id %}
+                              bg-purple-50 border-purple-200 shadow-sm
+                            {% else %}
+                              bg-gray-50 border-gray-200 hover:bg-gray-100
+                            {% endif %}">
+                    <div class="flex justify-between items-start mb-2">
+                      <span class="text-xs font-medium 
+                                   {% if item.dashboard_id == current_dashboard_id %}text-purple-600{% else %}text-gray-500{% endif %}">
+                        {{ item.timestamp|slice:":10" }}
+                      </span>
+                      <span class="px-2 py-1 text-xs rounded-full font-medium
+                                   {% if item.nivel_evaluado == 'Básico' %}bg-red-100 text-red-700
+                                   {% elif item.nivel_evaluado == 'Intermedio' %}bg-yellow-100 text-yellow-700
+                                   {% else %}bg-green-100 text-green-700{% endif %}">
+                        {{ item.nivel_evaluado }}
+                      </span>
+                    </div>
+                    <div class="text-sm font-semibold 
+                                {% if item.dashboard_id == current_dashboard_id %}text-purple-900{% else %}text-gray-900{% endif %}">
+                      {{ item.promedio_global|floatformat:0 }}/100
+                    </div>
+                    <div class="text-xs 
+                                {% if item.dashboard_id == current_dashboard_id %}text-purple-600{% else %}text-gray-600{% endif %} mt-1">
+                      {{ item.contexto_usuario }}
+                    </div>
+                    {% if item.dashboard_id == current_dashboard_id %}
+                    <div class="text-xs text-purple-600 mt-2 font-medium">
+                      ✓ Evaluación actual
+                    </div>
+                    {% endif %}
+                  </a>
+                  {% endfor %}
+                </div>
+              {% else %}
+                <p class="text-gray-500 text-sm">No hay evaluaciones disponibles</p>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <div class="col-span-12 lg:col-span-8">
+
+          <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-white mb-2">🧠 Dashboard Evaluación</h1>
+            <p class="text-xl text-purple-300">
+              Análisis Completo de {{ selected_user.first_name }} {{ selected_user.last_name }}
+            </p>
+            <p class="text-sm text-white font-semibold mt-2">
+              Sesión: {{ dashboard_id|slice:":8" }}... | {{ resultados.timestamp }}
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="metric-card">
+              <div class="text-3xl font-bold">
+                {{ resultados.promedio_global|floatformat:0 }}/100
+              </div>
+              <div class="text-sm opacity-90">Promedio General</div>
+              <div class="text-xs mt-1">Nivel {{ resultados.nivel_evaluado }}</div>
+            </div>
+
+            <div class="metric-card">
+              <div class="text-lg font-bold">💪 Fortaleza</div>
+              <div class="text-sm opacity-90">
+                {{ resultados.fortaleza|slice:"4:" }}
+              </div>
+            </div>
+
+            <div class="metric-card">
+              <div class="text-lg font-bold">🎯 Oportunidad</div>
+              <div class="text-sm opacity-90">
+                {{ resultados.oportunidad|slice:"4:" }}
+              </div>
+            </div>
+
+            <div class="metric-card">
+              <div class="text-lg font-bold">📊 Pilares</div>
+              <div class="text-sm opacity-90">5 Evaluados</div>
+              <div class="text-xs mt-1">Pensamiento Crítico</div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            {% if graficos.radar %}
+            <div class="dashboard-card">
+              <h3 class="text-xl font-black text-gray-900 mb-4 text-center">
+                Perfil NB-X Completo
+              </h3>
+              <div class="chart-container">
+                <img
+                  src="data:image/png;base64,{{ graficos.radar }}"
+                  alt="Gráfico Radar NB-X"
+                />
+              </div>
+              <p class="text-sm text-gray-800 font-semibold text-center mt-2">
+                Perfil de {{ selected_user.first_name }} en cada uno de los 5 pilares del
+                pensamiento crítico
+              </p>
+            </div>
+            {% endif %}
+
+            {% if graficos.barras %}
+            <div class="dashboard-card">
+              <h3 class="text-xl font-black text-gray-900 mb-4 text-center">
+                Comparación por Pilares
+              </h3>
+              <div class="chart-container">
+                <img
+                  src="data:image/png;base64,{{ graficos.barras }}"
+                  alt="Gráfico de Barras NB-X"
+                />
+              </div>
+              <p class="text-sm text-gray-800 font-semibold text-center mt-2">
+                Puntuaciones individuales con códigos de color según el nivel de
+                dominio
+              </p>
+            </div>
+            {% endif %}
+          </div>
+
+          <div class="dashboard-card mb-8">
+            <h3 class="text-xl font-black text-gray-900 mb-4">
+              📋 Resumen de Puntuaciones
+            </h3>
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead>
+                  <tr class="border-b">
+                    <th class="text-left py-2 font-black text-gray-900">Pilar</th>
+                    <th class="text-center py-2 font-black text-gray-900">Puntuación</th>
+                    <th class="text-left py-2 font-black text-gray-900">Progreso</th>
+                    <th class="text-left py-2 font-black text-gray-900">Descripción</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="border-b">
+                    <td class="py-3 font-black text-gray-900">NB-1: Análisis</td>
+                    <td class="text-center py-3 font-black text-gray-900">{{ perfil.nb1|floatformat:0 }}/100</td>
+                    <td class="py-3">
+                      <div class="progress-bar">
+                        <div
+                          class="progress-fill level-{% if perfil.nb1 >= 80 %}advanced{% elif perfil.nb1 >= 60 %}intermediate{% else %}basic{% endif %}"
+                          style="width: {{ perfil.nb1 }}%"
+                        ></div>
+                      </div>
+                    </td>
+                    <td class="py-3 text-gray-800 font-semibold">
+                      Capacidad para identificar y examinar información
+                    </td>
+                  </tr>
+                  <tr class="border-b">
+                    <td class="py-3 font-black text-gray-900">NB-2: Evaluación</td>
+                    <td class="text-center py-3 font-black text-gray-900">{{ perfil.nb2|floatformat:0 }}/100</td>
+                    <td class="py-3">
+                      <div class="progress-bar">
+                        <div
+                          class="progress-fill level-{% if perfil.nb2 >= 80 %}advanced{% elif perfil.nb2 >= 60 %}intermediate{% else %}basic{% endif %}"
+                          style="width: {{ perfil.nb2 }}%"
+                        ></div>
+                      </div>
+                    </td>
+                    <td class="py-3 text-gray-800 font-semibold">
+                      Habilidad para juzgar la credibilidad de información
+                    </td>
+                  </tr>
+                  <tr class="border-b">
+                    <td class="py-3 font-black text-gray-900">NB-3: Inferencia</td>
+                    <td class="text-center py-3 font-black text-gray-900">{{ perfil.nb3|floatformat:0 }}/100</td>
+                    <td class="py-3">
+                      <div class="progress-bar">
+                        <div
+                          class="progress-fill level-{% if perfil.nb3 >= 80 %}advanced{% elif perfil.nb3 >= 60 %}intermediate{% else %}basic{% endif %}"
+                          style="width: {{ perfil.nb3 }}%"
+                        ></div>
+                      </div>
+                    </td>
+                    <td class="py-3 text-gray-800 font-semibold">
+                      Capacidad para sacar conclusiones lógicas
+                    </td>
+                  </tr>
+                  <tr class="border-b">
+                    <td class="py-3 font-black text-gray-900">NB-4: Explicación</td>
+                    <td class="text-center py-3 font-black text-gray-900">{{ perfil.nb4|floatformat:0 }}/100</td>
+                    <td class="py-3">
+                      <div class="progress-bar">
+                        <div
+                          class="progress-fill level-{% if perfil.nb4 >= 80 %}advanced{% elif perfil.nb4 >= 60 %}intermediate{% else %}basic{% endif %}"
+                          style="width: {{ perfil.nb4 }}%"
+                        ></div>
+                      </div>
+                    </td>
+                    <td class="py-3 text-gray-800 font-semibold">
+                      Habilidad para comunicar razonamientos
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="py-3 font-black text-gray-900">NB-5: Flexibilidad</td>
+                    <td class="text-center py-3 font-black text-gray-900">{{ perfil.nb5|floatformat:0 }}/100</td>
+                    <td class="py-3">
+                      <div class="progress-bar">
+                        <div
+                          class="progress-fill level-{% if perfil.nb5 >= 80 %}advanced{% elif perfil.nb5 >= 60 %}intermediate{% else %}basic{% endif %}"
+                          style="width: {{ perfil.nb5 }}%"
+                        ></div>
+                      </div>
+                    </td>
+                    <td class="py-3 text-gray-800 font-semibold">
+                      Capacidad para considerar múltiples perspectivas
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div> 
+    </div> 
+  </div>
+</div>
+{% endblock %}

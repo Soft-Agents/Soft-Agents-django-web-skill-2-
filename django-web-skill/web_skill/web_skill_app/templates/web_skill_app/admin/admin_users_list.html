@@ -1,0 +1,77 @@
+{% extends 'web_skill_app/base.html' %}
+{% load static %}
+
+{% block title %}Lista de Usuarios - Admin{% endblock %}
+
+{% block content %}
+{% include 'web_skill_app/partials/navigation-admin.html' %}
+<div class="min-h-screen bg-gray-100 py-8 pt-20">
+    <div class="max-w-6xl mx-auto px-4">
+        <!-- Header -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center gap-4">
+                    <a href="{% url 'admin_dashboard' %}" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-red-600 border border-black rounded-lg shadow-sm hover:text-black hover:bg-red-700 hover:shadow-lg transition duration-150 ease-in-out">
+                        ← Volver
+                    </a>
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-800">Lista de Trabajadores</h1>
+                        <p class="text-gray-600">Total: {{ total_users }} trabajador{{ total_users|pluralize:"es" }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Messages -->
+        {% if messages %}
+        <div class="mb-6">
+            {% for message in messages %}
+            <div class="p-4 rounded-lg {% if message.tags == 'error' %}bg-red-100 border border-red-400 text-red-700{% else %}bg-green-100 border border-green-400 text-green-700{% endif %}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Users List -->
+        {% if users %}
+        <div class="bg-white rounded-lg shadow-md overflow-hidden">
+            <table class="w-full">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Trabajador</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Fecha Registro</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    {% for user_item in users %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4">
+                            <div class="font-medium text-gray-900">{{ user_item.first_name }} {{ user_item.last_name }}</div>
+                        </td>
+                        <td class="px-6 py-4 text-gray-600">{{ user_item.email }}</td>
+                        <td class="px-6 py-4 text-gray-600">
+                            {% if user_item.created_at %}{{ user_item.created_at|date:"d/m/Y" }}{% else %}N/A{% endif %}
+                        </td>
+                        <td class="px-6 py-4">
+                            <a href="{% url 'admin_user_evaluations' user_item.id %}" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-lg">
+                                Ver Evaluaciones
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <!-- Empty State -->
+        <div class="bg-white rounded-lg shadow-md p-12 text-center">
+            <h3 class="text-xl font-semibold text-gray-800 mb-2">No hay trabajadores registrados</h3>
+            <p class="text-gray-600">Aún no se han registrado trabajadores en el sistema.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,151 @@
+{% extends 'web_skill_app/base.html' %}
+{% load static %}
+
+{% block title %}Iniciar Sesión - Knowledge{% endblock %}
+
+{% block content %}
+{% include 'web_skill_app/partials/navigation.html' with currentPage='pizarrabot' %}
+
+<div class="flex-grow flex items-center justify-center relative w-full h-[850px]">
+    <div class="absolute inset-0 bg-gradient-to-br from-blue-950 via-blue-900 to-blue-800 z-0"></div>
+
+    <!-- Ajuste de ancho responsivo -->
+    <div class="w-full max-w-lg bg-white/90 rounded-2xl shadow-xl p-8 relative z-10">
+        <div class="w-full" id="form-container">
+            
+            {% if messages %}
+                <ul class="mb-4">
+                    {% for message in messages %}
+                        <li class="p-2 text-sm text-center {% if message.tags %} alert-{{ message.tags }}{% endif %}
+                            {% if message.tags == 'error' %}bg-red-200 text-red-800{% else %}bg-green-200 text-green-800{% endif %} rounded-md">
+                            {{ message }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+
+            <!-- FORMULARIO DE REGISTRO -->
+            <div id="register-form">
+                <h2 class="text-3xl font-bold text-gray-900 mb-2">Create an account</h2>
+                <p class="text-gray-700 mb-8">
+                    Already have an account? 
+                    <a class="font-medium text-blue-600 hover:underline cursor-pointer" id="show-login">Log in</a>
+                </p>
+                <form method="POST" action="{% url 'register_view' %}">
+                    {% csrf_token %}
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <input class="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="First name" type="text" name="first_name" required />
+                        <input class="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Last name" type="text" name="last_name" required />
+                    </div>
+                    <div class="mb-4">
+                        <input class="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Email" type="email" name="email" required />
+                    </div>
+                    <div class="relative mb-4">
+                        <input class="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter your password" type="password" name="password" required />
+                        <button class="absolute inset-y-0 right-0 px-4 flex items-center text-gray-500" type="button">
+                            <span class="material-icons">visibility_off</span>
+                        </button>
+                    </div>
+                    <div class="flex items-center mb-6">
+                        <input class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" id="terms" type="checkbox" />
+                        <label class="ml-2 text-sm text-gray-700" for="terms">I agree to the <a class="text-blue-600 hover:underline" href="#">Terms & Conditions</a></label>
+                    </div>
+                    <button class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-4 rounded-lg transition duration-300" type="submit">
+                        Create account
+                    </button>
+                    <div class="my-6 flex items-center">
+                        <div class="flex-grow border-t border-gray-300"></div>
+                        <span class="mx-4 text-sm text-gray-500">Or register with</span>
+                        <div class="flex-grow border-t border-gray-300"></div>
+                    </div>
+                    <button class="w-full bg-pink-600 hover:bg-pink-500 text-white font-bold py-3 px-4 rounded-lg transition duration-300" id="switch-to-login" type="button">
+                        Log in
+                    </button>
+                </form>
+            </div>
+
+            <!-- FORMULARIO DE LOGIN -->
+            <div class="hidden" id="login-form">
+                <h2 class="text-3xl font-bold text-gray-900 mb-2">Log in</h2>
+                <p class="text-gray-700 mb-8">
+                    Don't have an account? 
+                    <a class="font-medium text-blue-600 hover:underline cursor-pointer" id="show-register">Create an account</a>
+                </p>
+                <form method="POST" action="{% url 'login_page' %}">
+                    {% csrf_token %}
+                    <div class="mb-4">
+                        <input class="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Email" type="email" name="email" required />
+                    </div>
+                    <div class="relative mb-6">
+                        <input class="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Password" type="password" name="password" required />
+                        <button class="absolute inset-y-0 right-0 px-4 flex items-center text-gray-500" type="button">
+                            <span class="material-icons">visibility_off</span>
+                        </button>
+                    </div>
+                    <button class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-4 rounded-lg transition duration-300" type="submit">
+                        Log in
+                    </button>
+                    <div class="my-6 flex items-center">
+                        <div class="flex-grow border-t border-gray-300"></div>
+                        <span class="mx-4 text-sm text-gray-500">Or log in with</span>
+                        <div class="flex-grow border-t border-gray-300"></div>
+                    </div>
+                    <button class="w-full bg-pink-600 hover:bg-pink-500 text-white font-bold py-3 px-4 rounded-lg transition duration-300" id="switch-to-register" type="button">
+                        Create account
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const registerForm = document.getElementById('register-form');
+    const loginForm = document.getElementById('login-form');
+
+    const showLoginLink = document.getElementById('show-login'); 
+    const switchToLoginButton = document.getElementById('switch-to-login'); 
+
+    const showRegisterLink = document.getElementById('show-register'); 
+    const switchToRegisterButton = document.getElementById('switch-to-register'); 
+
+    function showLogin() {
+        registerForm.classList.add('hidden');
+        loginForm.classList.remove('hidden');
+    }
+
+    function showRegister() {
+        loginForm.classList.add('hidden');
+        registerForm.classList.remove('hidden');
+    }
+
+    if (showLoginLink) {
+        showLoginLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            showLogin();
+        });
+    }
+
+    if (switchToLoginButton) {
+        switchToLoginButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            showLogin();
+        });
+    }
+
+    if (showRegisterLink) {
+        showRegisterLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            showRegister();
+        });
+    }
+
+    if (switchToRegisterButton) {
+        switchToRegisterButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            showRegister();
+        });
+    }
+</script>
+
+{% endblock %}

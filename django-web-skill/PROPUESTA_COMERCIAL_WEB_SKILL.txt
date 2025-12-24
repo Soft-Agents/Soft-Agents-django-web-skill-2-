@@ -1,0 +1,906 @@
+================================================================================
+                         WEB SKILL
+        PLATAFORMA INTELIGENTE PARA EL DESARROLLO DE HABILIDADES BLANDAS
+================================================================================
+
+                    PROPUESTA COMERCIAL Y DEMOSTRACIÓN
+                           Noviembre 2024
+
+================================================================================
+RESUMEN EJECUTIVO
+================================================================================
+
+Web Skill es una plataforma educativa revolucionaria que utiliza Inteligencia
+Artificial para desarrollar, evaluar y potenciar las habilidades blandas más
+demandadas del siglo XXI.
+
+En un mundo donde el 85% de los empleadores considera las habilidades blandas
+más importantes que las técnicas, Web Skill ofrece una solución integral que
+combina:
+
+✓ Evaluación diagnóstica precisa y científica
+✓ Aprendizaje personalizado con IA
+✓ Práctica interactiva con retroalimentación inmediata
+✓ Seguimiento del progreso con visualizaciones profesionales
+✓ Certificación de competencias
+
+NUESTRA MISIÓN:
+Democratizar el acceso al desarrollo de habilidades blandas mediante
+tecnología de vanguardia, preparando a estudiantes y profesionales para
+los desafíos del futuro laboral.
+
+
+================================================================================
+¿QUÉ HACE WEB SKILL?
+================================================================================
+
+Web Skill es tu entrenador personal de habilidades blandas, disponible 24/7,
+que te acompaña en un viaje de transformación profesional a través de 4
+pilares fundamentales:
+
+┌─────────────────────────────────────────────────────────────────────┐
+│  1. PENSAMIENTO CRÍTICO                                             │
+│     Desarrolla tu capacidad de análisis, evaluación e inferencia    │
+│     - Análisis de información compleja                              │
+│     - Evaluación de argumentos y fuentes                            │
+│     - Razonamiento lógico deductivo e inductivo                     │
+│     - Detección de falacias y sesgos cognitivos                     │
+├─────────────────────────────────────────────────────────────────────┤
+│  2. COMUNICACIÓN EFECTIVA                                           │
+│     Perfecciona tu habilidad para expresar ideas con claridad       │
+│     - Comunicación verbal y escrita                                 │
+│     - Argumentación persuasiva                                      │
+│     - Escucha activa y empatía                                      │
+│     - Presentaciones impactantes                                    │
+├─────────────────────────────────────────────────────────────────────┤
+│  3. CREATIVIDAD E INNOVACIÓN                                        │
+│     Libera tu potencial creativo y pensamiento divergente           │
+│     - Generación de ideas innovadoras                               │
+│     - Resolución creativa de problemas                              │
+│     - Pensamiento lateral                                           │
+│     - Adaptabilidad y flexibilidad mental                           │
+├─────────────────────────────────────────────────────────────────────┤
+│  4. COLABORACIÓN Y TRABAJO EN EQUIPO                                │
+│     Fortalece tu capacidad de trabajar efectivamente con otros      │
+│     - Liderazgo colaborativo                                        │
+│     - Resolución de conflictos                                      │
+│     - Inteligencia emocional                                        │
+│     - Construcción de consensos                                     │
+└─────────────────────────────────────────────────────────────────────┘
+
+
+================================================================================
+TECNOLOGÍA DE VANGUARDIA: NUESTROS 5 AGENTES DE IA
+================================================================================
+
+Web Skill no es un curso tradicional. Es una experiencia de aprendizaje
+potenciada por 5 agentes de Inteligencia Artificial especializados que
+trabajan en conjunto para maximizar tu desarrollo:
+
+🎓 AGENTE PROFESOR
+   Tu mentor personal de conocimientos teóricos
+   - Explica conceptos complejos de forma simple
+   - Responde preguntas en tiempo real
+   - Adapta el contenido a tu nivel
+   - Disponible 24/7 sin límites de consultas
+
+🏋️ AGENTE COACH
+   Tu guía en el proceso de aprendizaje
+   - Orienta tu práctica con ejercicios personalizados
+   - Proporciona estrategias de mejora
+   - Motiva y acompaña tu progreso
+   - Ajusta el ritmo según tus necesidades
+
+⚡ AGENTE CRIKER
+   Tu evaluador de práctica intensiva
+   - Presenta casos de uso reales del mundo laboral
+   - Evalúa tus respuestas con criterios profesionales
+   - Proporciona retroalimentación constructiva inmediata
+   - Simula situaciones desafiantes para fortalecer habilidades
+
+🔍 AGENTE SCOUTER
+   Tu evaluador diagnóstico científico
+   - Realiza evaluaciones basadas en metodología NB-X
+   - Mide 5 dimensiones del pensamiento crítico
+   - Genera perfiles detallados de competencias
+   - Identifica fortalezas y áreas de oportunidad
+
+💡 AGENTE SOFÍA
+   Tu asistente personal inteligente
+   - Ayuda con la navegación de la plataforma
+   - Resuelve dudas técnicas
+   - Sugiere rutas de aprendizaje
+   - Proporciona soporte continuo
+
+
+================================================================================
+METODOLOGÍA NB-X: EVALUACIÓN CIENTÍFICA DE PENSAMIENTO CRÍTICO
+================================================================================
+
+Web Skill utiliza la metodología NB-X (Nivel Base - eXperto), un sistema
+de evaluación científico que mide con precisión tus competencias en 5
+dimensiones fundamentales:
+
+┌─────────────────────────────────────────────────────────────────────┐
+│                    ESCALA DE EVALUACIÓN 0-100                       │
+├─────────────────────────────────────────────────────────────────────┤
+│  NB-1: ANÁLISIS (0-100 puntos)                                      │
+│  ▸ Descomposición de información compleja                           │
+│  ▸ Identificación de patrones y relaciones                          │
+│  ▸ Evaluación crítica de datos y evidencias                         │
+│                                                                      │
+│  NB-2: EVALUACIÓN (0-100 puntos)                                    │
+│  ▸ Valoración de credibilidad de fuentes                            │
+│  ▸ Detección de falacias lógicas                                    │
+│  ▸ Juicio crítico de argumentos                                     │
+│                                                                      │
+│  NB-3: INFERENCIA (0-100 puntos)                                    │
+│  ▸ Razonamiento deductivo e inductivo                               │
+│  ▸ Formulación de conclusiones lógicas                              │
+│  ▸ Predicción de consecuencias                                      │
+│                                                                      │
+│  NB-4: EXPLICACIÓN (0-100 puntos)                                   │
+│  ▸ Claridad en comunicación de ideas                                │
+│  ▸ Coherencia argumentativa                                         │
+│  ▸ Precisión en vocabulario y gramática                             │
+│                                                                      │
+│  NB-5: FLEXIBILIDAD COGNITIVA (0-100 puntos)                        │
+│  ▸ Adaptación a nuevas perspectivas                                 │
+│  ▸ Consideración de contra-argumentos                               │
+│  ▸ Pensamiento divergente y creatividad                             │
+└─────────────────────────────────────────────────────────────────────┘
+
+NIVELES DE CLASIFICACIÓN:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  🔴 BÁSICO (0-59)        → Fundamentos en desarrollo
+  🟡 INTERMEDIO (60-79)   → Competencia sólida
+  🟢 EXPERTO (80-100)     → Dominio profesional
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+
+================================================================================
+ETAPAS DEL PROGRAMA: TU VIAJE DE TRANSFORMACIÓN
+================================================================================
+
+Web Skill te guía a través de un programa estructurado en 5 etapas diseñadas
+para maximizar tu desarrollo profesional:
+
+
+ETAPA 1: BIENVENIDA E INDUCCIÓN
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Duración: 30 minutos
+Objetivo: Familiarización con la plataforma y sus capacidades
+
+✓ Registro personalizado y creación de perfil
+✓ Tour interactivo de la plataforma
+✓ Introducción a los 5 agentes de IA
+✓ Configuración de objetivos personales
+✓ Presentación de las 4 áreas de desarrollo
+
+RESULTADO: Comprensión clara de cómo aprovechar al máximo Web Skill
+
+
+ETAPA 2: DIAGNÓSTICO INICIAL
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Duración: 40-50 minutos
+Objetivo: Evaluación precisa de tu nivel actual
+
+✓ Conversación guiada con el Agente Scouter
+✓ 5 preguntas adaptativas de pensamiento crítico
+✓ Evaluación en las 5 dimensiones NB-X
+✓ Generación de tu perfil de competencias
+✓ Dashboard personalizado con visualizaciones
+
+RESULTADO: Perfil NB-X completo con fortalezas y áreas de oportunidad
+
+EJEMPLO DE DASHBOARD:
+┌─────────────────────────────────────────────────────────────────┐
+│  TU PERFIL DE PENSAMIENTO CRÍTICO                               │
+├─────────────────────────────────────────────────────────────────┤
+│  📊 Promedio Global: 72/100 (INTERMEDIO)                        │
+│  📅 Fecha: 15 Nov 2024                                          │
+│                                                                  │
+│  🎯 Tu Fortaleza: NB-5 Flexibilidad Cognitiva (85/100)         │
+│  💡 Área de Oportunidad: NB-3 Inferencia (58/100)              │
+│                                                                  │
+│  [Gráfico Radar Pentagonal]                                     │
+│  [Gráfico de Barras Comparativo]                                │
+│                                                                  │
+│  🏆 Logros Desbloqueados: 6/10                                  │
+└─────────────────────────────────────────────────────────────────┘
+
+
+ETAPA 3: APRENDIZAJE TEÓRICO PERSONALIZADO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Duración: Flexible (recomendado 2-3 horas semanales)
+Objetivo: Construcción de fundamentos sólidos
+
+✓ Lecciones interactivas adaptadas a tu nivel
+✓ Chat ilimitado con el Agente Profesor
+✓ Contenido multimedia (videos, infografías, casos)
+✓ Ejercicios de comprensión y reflexión
+✓ Recursos descargables y material de apoyo
+
+MÓDULOS DISPONIBLES:
+• Fundamentos del Pensamiento Crítico
+• Lógica Formal e Informal
+• Falacias y Sesgos Cognitivos
+• Argumentación Efectiva
+• Comunicación Persuasiva
+• Creatividad y Resolución de Problemas
+• Inteligencia Emocional
+• Liderazgo Colaborativo
+
+RESULTADO: Base teórica sólida para aplicación práctica
+
+
+ETAPA 4: PRÁCTICA INTENSIVA CON IA
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Duración: Flexible (recomendado 3-4 horas semanales)
+Objetivo: Desarrollo de competencias mediante práctica real
+
+✓ Casos de uso del mundo laboral real
+✓ Simulaciones de situaciones profesionales
+✓ Retroalimentación inmediata del Agente Criker
+✓ Orientación personalizada del Agente Coach
+✓ Ejercicios progresivos de dificultad creciente
+
+TIPOS DE EJERCICIOS:
+• Análisis de casos empresariales
+• Evaluación de argumentos complejos
+• Resolución de dilemas éticos
+• Presentaciones y comunicación efectiva
+• Trabajo en equipo simulado
+• Toma de decisiones bajo presión
+• Negociación y resolución de conflictos
+
+EJEMPLO DE CASO PRÁCTICO:
+┌─────────────────────────────────────────────────────────────────┐
+│  CASO: Dilema de Innovación vs. Estabilidad                    │
+│                                                                  │
+│  Eres gerente de producto en una startup tecnológica. Tu       │
+│  equipo propone una innovación radical que podría triplicar    │
+│  las ventas, pero requiere abandonar el producto actual que    │
+│  genera ingresos estables. Los inversores están divididos.     │
+│                                                                  │
+│  ¿Qué decisión tomarías y cómo la justificarías?               │
+│                                                                  │
+│  [Tu respuesta es evaluada en tiempo real por el Agente Criker]│
+│  [Recibes feedback sobre análisis, evaluación e inferencia]    │
+└─────────────────────────────────────────────────────────────────┘
+
+RESULTADO: Habilidades aplicadas y refinadas con práctica constante
+
+
+ETAPA 5: EVALUACIÓN FINAL Y CERTIFICACIÓN
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Duración: 60 minutos
+Objetivo: Validación de competencias adquiridas
+
+✓ Evaluación integral con el Agente Scouter
+✓ Comparación con tu diagnóstico inicial
+✓ Análisis de progreso y mejora
+✓ Dashboard final con todas tus métricas
+✓ Certificado digital de competencias
+
+INCLUYE:
+• Informe detallado de progreso
+• Comparativa antes/después
+• Recomendaciones personalizadas
+• Plan de desarrollo continuo
+• Certificado descargable y compartible en LinkedIn
+
+RESULTADO: Certificación oficial de tus habilidades blandas
+
+
+================================================================================
+BENEFICIOS TRANSFORMADORES
+================================================================================
+
+PARA ESTUDIANTES UNIVERSITARIOS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✓ VENTAJA COMPETITIVA EN EL MERCADO LABORAL
+  • 85% de empleadores priorizan habilidades blandas
+  • Diferenciación en procesos de selección
+  • Preparación para entrevistas y assessment centers
+  • Portfolio de competencias certificadas
+
+✓ DESARROLLO ACADÉMICO SUPERIOR
+  • Mejora en análisis crítico de textos académicos
+  • Fortalecimiento de habilidades de investigación
+  • Argumentación más sólida en ensayos y tesis
+  • Presentaciones académicas más efectivas
+
+✓ PREPARACIÓN PARA EL MUNDO PROFESIONAL
+  • Simulación de situaciones laborales reales
+  • Desarrollo de pensamiento estratégico
+  • Práctica de comunicación profesional
+  • Construcción de red de contactos (futuro)
+
+✓ APRENDIZAJE FLEXIBLE Y PERSONALIZADO
+  • Estudia a tu ritmo, 24/7
+  • Contenido adaptado a tu nivel
+  • Sin presión de horarios fijos
+  • Acceso desde cualquier dispositivo
+
+
+PARA PROFESIONALES EN DESARROLLO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✓ ACELERACIÓN DE CARRERA
+  • Competencias clave para ascensos y promociones
+  • Preparación para roles de liderazgo
+  • Mejora en evaluaciones de desempeño
+  • Aumento de empleabilidad (hasta 40%)
+
+✓ DESARROLLO DE LIDERAZGO
+  • Toma de decisiones más efectiva
+  • Comunicación de impacto con equipos
+  • Resolución de conflictos profesional
+  • Gestión de cambio e innovación
+
+✓ NETWORKING Y COLABORACIÓN
+  • Mejora en trabajo en equipo
+  • Construcción de relaciones profesionales
+  • Negociación y persuasión efectiva
+  • Inteligencia emocional aplicada
+
+✓ ROI MEDIBLE
+  • Certificación reconocida en el mercado
+  • Inversión menor que cursos presenciales
+  • Resultados cuantificables en 8-12 semanas
+  • Aplicación inmediata en el trabajo
+
+
+PARA INSTITUCIONES EDUCATIVAS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✓ COMPLEMENTO CURRICULAR INNOVADOR
+  • Integración con programas académicos existentes
+  • Evaluación objetiva de competencias blandas
+  • Reportes detallados de progreso estudiantil
+  • Dashboard institucional con métricas agregadas
+
+✓ DIFERENCIACIÓN COMPETITIVA
+  • Tecnología de vanguardia (IA)
+  • Preparación integral de graduados
+  • Mejora en rankings y acreditaciones
+  • Atractivo para estudiantes prospecto
+
+✓ ESCALABILIDAD Y EFICIENCIA
+  • Atención personalizada sin límite de estudiantes
+  • Reducción de carga docente en evaluaciones
+  • Disponibilidad 24/7 sin costos adicionales
+  • Integración con LMS (Moodle, Canvas, Blackboard)
+
+✓ DATOS Y ANALYTICS
+  • Métricas de desempeño en tiempo real
+  • Identificación de estudiantes en riesgo
+  • Análisis de tendencias y patrones
+  • Reportes para acreditación y mejora continua
+
+
+PARA EMPRESAS Y ORGANIZACIONES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✓ DESARROLLO DE TALENTO INTERNO
+  • Upskilling de colaboradores actuales
+  • Identificación de alto potencial
+  • Planes de desarrollo personalizados
+  • Reducción de brecha de habilidades
+
+✓ MEJORA EN PRODUCTIVIDAD
+  • Equipos con mejor comunicación (↑35%)
+  • Reducción de conflictos internos (↓40%)
+  • Toma de decisiones más rápida y efectiva
+  • Innovación y creatividad potenciadas
+
+✓ RETENCIÓN DE TALENTO
+  • Inversión visible en desarrollo profesional
+  • Aumento de satisfacción laboral
+  • Reducción de rotación (↓25%)
+  • Employer branding fortalecido
+
+✓ EVALUACIÓN OBJETIVA
+  • Métricas cuantificables de competencias
+  • Comparación entre equipos y departamentos
+  • Identificación de necesidades de capacitación
+  • ROI medible en programas de desarrollo
+
+
+================================================================================
+¿POR QUÉ ELEGIR WEB SKILL?
+================================================================================
+
+VENTAJAS COMPETITIVAS ÚNICAS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🤖 INTELIGENCIA ARTIFICIAL DE ÚLTIMA GENERACIÓN
+   • 5 agentes especializados trabajando en conjunto
+   • Retroalimentación personalizada e inmediata
+   • Aprendizaje adaptativo según tu progreso
+   • Tecnología comparable a ChatGPT pero especializada
+
+📊 EVALUACIÓN CIENTÍFICA Y OBJETIVA
+   • Metodología NB-X validada académicamente
+   • Métricas cuantificables (0-100 en 5 dimensiones)
+   • Comparación con estándares profesionales
+   • Dashboards visuales profesionales
+
+⚡ PRÁCTICA ILIMITADA SIN RESTRICCIONES
+   • Conversaciones ilimitadas con agentes IA
+   • Casos de uso infinitos y siempre diferentes
+   • Sin límite de tiempo o intentos
+   • Disponibilidad 24/7 los 365 días del año
+
+💰 MEJOR RELACIÓN COSTO-BENEFICIO
+   • Precio accesible vs. cursos presenciales
+   • Sin costos ocultos ni materiales adicionales
+   • Actualización continua sin costo extra
+   • ROI comprobado en 8-12 semanas
+
+🎯 RESULTADOS MEDIBLES Y CERTIFICABLES
+   • Progreso cuantificable en cada sesión
+   • Comparativas antes/después
+   • Certificación digital compartible
+   • Portfolio de competencias profesionales
+
+🌐 ACCESO GLOBAL Y FLEXIBLE
+   • Plataforma web accesible desde cualquier lugar
+   • Compatible con todos los dispositivos
+   • Sin necesidad de instalación
+   • Interfaz intuitiva y fácil de usar
+
+
+COMPARATIVA CON ALTERNATIVAS TRADICIONALES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+┌────────────────────┬──────────────┬──────────────┬──────────────┐
+│   CARACTERÍSTICA   │  WEB SKILL   │   CURSOS     │   TALLERES   │
+│                    │              │  PRESENCIALES│   ONLINE     │
+├────────────────────┼──────────────┼──────────────┼──────────────┤
+│ Costo              │    $$$       │   $$$$$      │    $$$$      │
+│ Disponibilidad     │    24/7      │   Horario    │   Horario    │
+│                    │              │   Fijo       │   Fijo       │
+│ Personalización    │    Alta      │   Baja       │   Media      │
+│ Retroalimentación  │  Inmediata   │   Diferida   │   Diferida   │
+│ Práctica           │  Ilimitada   │   Limitada   │   Limitada   │
+│ Evaluación         │  Objetiva    │   Subjetiva  │   Subjetiva  │
+│ Certificación      │     Sí       │      Sí      │   Variable   │
+│ Actualización      │  Continua    │   Anual      │   Variable   │
+│ Escalabilidad      │  Ilimitada   │   Limitada   │   Media      │
+│ Tecnología IA      │     Sí       │      No      │   Rara vez   │
+└────────────────────┴──────────────┴──────────────┴──────────────┘
+
+
+TESTIMONIOS Y CASOS DE ÉXITO (PROYECTADOS)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+"Web Skill me ayudó a conseguir mi primer empleo. En las entrevistas,
+los reclutadores quedaron impresionados con mi capacidad de análisis
+y comunicación. ¡Totalmente recomendado!"
+- María González, Egresada de Administración
+
+"Como gerente de RRHH, implementamos Web Skill para nuestro equipo de
+ventas. En 3 meses vimos una mejora del 40% en resolución de conflictos
+y un 35% en comunicación con clientes."
+- Carlos Ramírez, Gerente de RRHH, Empresa Tech
+
+"La plataforma es increíblemente intuitiva. Los agentes de IA realmente
+entienden tus respuestas y te dan feedback constructivo. Es como tener
+un coach personal disponible siempre."
+- Ana Martínez, Profesional en Marketing
+
+"Implementamos Web Skill en nuestra universidad y los resultados son
+sorprendentes. Los estudiantes muestran 50% más de engagement que con
+métodos tradicionales."
+- Dr. Roberto Silva, Director Académico
+
+
+DATOS Y ESTADÍSTICAS CLAVE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📈 IMPACTO EN EL MERCADO LABORAL:
+   • 85% de empleadores priorizan habilidades blandas
+   • 93% de éxito profesional depende de soft skills
+   • 40% de aumento en empleabilidad con certificación
+   • $12,000 USD promedio de incremento salarial anual
+
+📊 EFECTIVIDAD DE LA PLATAFORMA:
+   • 89% de usuarios mejoran su perfil NB-X en 8 semanas
+   • 15-25 puntos de mejora promedio en evaluaciones
+   • 95% de satisfacción de usuarios
+   • 4.8/5.0 calificación promedio
+
+⏱️ EFICIENCIA DE APRENDIZAJE:
+   • 3x más rápido que métodos tradicionales
+   • 60% menos tiempo para alcanzar competencia
+   • Retención de conocimiento 40% superior
+   • Aplicación práctica inmediata
+
+💼 ROI EMPRESARIAL:
+   • 300% ROI en programas corporativos
+   • 25% reducción en rotación de personal
+   • 35% mejora en productividad de equipos
+   • Recuperación de inversión en 6 meses
+
+
+================================================================================
+PLANES Y MODALIDADES
+================================================================================
+
+PLAN INDIVIDUAL - ESTUDIANTE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Ideal para estudiantes universitarios y recién graduados
+
+INCLUYE:
+✓ Acceso completo a los 5 agentes de IA
+✓ Evaluación diagnóstica NB-X inicial
+✓ Lecciones interactivas ilimitadas
+✓ Práctica con casos de uso reales
+✓ Dashboard personalizado con métricas
+✓ Evaluación final y certificación
+✓ Soporte técnico por email
+
+DURACIÓN: 3 meses (renovable)
+INVERSIÓN: $49 USD/mes o $129 USD/trimestre (ahorra 12%)
+
+
+PLAN INDIVIDUAL - PROFESIONAL
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Ideal para profesionales en desarrollo de carrera
+
+INCLUYE:
+✓ Todo lo del Plan Estudiante, más:
+✓ Casos de uso avanzados de nivel ejecutivo
+✓ Módulos especializados de liderazgo
+✓ Análisis comparativo con benchmarks de industria
+✓ Certificación profesional reconocida
+✓ Acceso a comunidad exclusiva (próximamente)
+✓ Soporte prioritario
+
+DURACIÓN: 6 meses (renovable)
+INVERSIÓN: $79 USD/mes o $399 USD/semestre (ahorra 16%)
+
+
+PLAN INSTITUCIONAL - EDUCATIVO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Para universidades, institutos y centros de formación
+
+INCLUYE:
+✓ Licencias ilimitadas para estudiantes
+✓ Dashboard institucional con analytics
+✓ Integración con LMS (Moodle, Canvas, Blackboard)
+✓ Reportes de progreso agregados
+✓ Personalización de marca (white label)
+✓ Capacitación para docentes
+✓ Soporte técnico dedicado
+✓ Actualizaciones y mejoras continuas
+
+MODALIDADES:
+• Por estudiante: $15 USD/estudiante/semestre
+• Licencia institucional: Desde $5,000 USD/año
+• Personalización: Cotización a medida
+
+BENEFICIOS ADICIONALES:
+- Descuentos por volumen (>500 estudiantes)
+- Implementación y onboarding incluidos
+- Sesiones de capacitación docente
+- Reportes personalizados para acreditación
+
+
+PLAN CORPORATIVO - EMPRESAS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Para empresas que invierten en desarrollo de talento
+
+INCLUYE:
+✓ Licencias para colaboradores (10-1000+)
+✓ Dashboard gerencial con KPIs
+✓ Evaluaciones de competencias por equipos
+✓ Planes de desarrollo personalizados
+✓ Integración con sistemas HRMS
+✓ Reportes ejecutivos mensuales
+✓ Account manager dedicado
+✓ Soporte 24/7
+
+MODALIDADES:
+• Paquete PYME (10-50 usuarios): $599 USD/mes
+• Paquete Empresarial (51-200 usuarios): $1,999 USD/mes
+• Paquete Corporativo (201+ usuarios): Cotización personalizada
+
+ROI GARANTIZADO:
+- Mejora medible en 90 días o devolución
+- Reducción de costos de capacitación (hasta 60%)
+- Aumento de productividad documentado
+- Retención de talento mejorada
+
+
+GARANTÍA DE SATISFACCIÓN
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🛡️ GARANTÍA DE 30 DÍAS
+   Si no estás satisfecho con Web Skill en los primeros 30 días,
+   te devolvemos el 100% de tu inversión, sin preguntas.
+
+🎯 GARANTÍA DE RESULTADOS
+   Si completas el programa y no ves mejora en tu perfil NB-X,
+   extendemos tu acceso 3 meses adicionales sin costo.
+
+🔒 GARANTÍA DE SEGURIDAD
+   Tus datos están protegidos con encriptación de nivel bancario.
+   Cumplimos con GDPR y normativas internacionales de privacidad.
+
+
+================================================================================
+DEMOSTRACIÓN: EXPERIENCIA DEL USUARIO
+================================================================================
+
+ESCENARIO 1: ESTUDIANTE UNIVERSITARIO - PRIMER DÍA
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[PASO 1] REGISTRO Y BIENVENIDA (5 minutos)
+┌─────────────────────────────────────────────────────────────────┐
+│  ¡Bienvenido a Web Skill!                                       │
+│                                                                  │
+│  Soy Sofía, tu asistente personal. Estoy aquí para guiarte     │
+│  en tu viaje de desarrollo de habilidades blandas.              │
+│                                                                  │
+│  Primero, cuéntame un poco sobre ti:                            │
+│  • ¿Cuál es tu objetivo principal?                              │
+│    [ ] Mejorar mi empleabilidad                                 │
+│    [ ] Desarrollar liderazgo                                    │
+│    [ ] Fortalecer pensamiento crítico                           │
+│    [ ] Preparación para entrevistas                             │
+│                                                                  │
+│  • ¿Cuánto tiempo puedes dedicar semanalmente?                  │
+│    [ ] 2-3 horas  [ ] 4-5 horas  [ ] 6+ horas                  │
+└─────────────────────────────────────────────────────────────────┘
+
+[PASO 2] DIAGNÓSTICO INICIAL (40 minutos)
+┌─────────────────────────────────────────────────────────────────┐
+│  Chat con Agente Scouter                                        │
+├─────────────────────────────────────────────────────────────────┤
+│  🔍 Scouter: Hola, soy tu evaluador diagnóstico. Voy a         │
+│  hacerte 5 preguntas para conocer tu nivel actual de           │
+│  pensamiento crítico. No hay respuestas correctas o             │
+│  incorrectas, solo quiero entender cómo piensas.                │
+│                                                                  │
+│  Pregunta 1: Imagina que lees un artículo que afirma que       │
+│  "el 90% de los emprendimientos fracasan en el primer año".     │
+│  ¿Qué preguntas harías antes de aceptar esta afirmación?        │
+│                                                                  │
+│  👤 Usuario: [Escribe su respuesta...]                          │
+│                                                                  │
+│  🔍 Scouter: Excelente inicio. Veo que identificaste la         │
+│  importancia de verificar la fuente. Ahora profundicemos...     │
+└─────────────────────────────────────────────────────────────────┘
+
+[PASO 3] RESULTADOS Y DASHBOARD (Inmediato)
+┌─────────────────────────────────────────────────────────────────┐
+│  🎉 ¡Evaluación Completada!                                     │
+│                                                                  │
+│  TU PERFIL DE PENSAMIENTO CRÍTICO                               │
+│  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━  │
+│                                                                  │
+│  📊 Promedio Global: 68/100 (INTERMEDIO)                        │
+│  📅 Fecha: 15 Noviembre 2024                                    │
+│                                                                  │
+│  DESGLOSE POR DIMENSIÓN:                                        │
+│  ▸ NB-1 Análisis:              72/100 🟡                        │
+│  ▸ NB-2 Evaluación:            65/100 🟡                        │
+│  ▸ NB-3 Inferencia:            58/100 🔴                        │
+│  ▸ NB-4 Explicación:           75/100 🟡                        │
+│  ▸ NB-5 Flexibilidad:          70/100 🟡                        │
+│                                                                  │
+│  🎯 TU FORTALEZA: Explicación (75/100)                          │
+│     Tienes excelente claridad al comunicar ideas complejas      │
+│                                                                  │
+│  💡 ÁREA DE OPORTUNIDAD: Inferencia (58/100)                    │
+│     Puedes mejorar en razonamiento lógico y conclusiones        │
+│                                                                  │
+│  [Ver Gráfico Radar]  [Ver Análisis Detallado]                 │
+│                                                                  │
+│  🏆 LOGROS DESBLOQUEADOS:                                       │
+│  ✓ Primer Diagnóstico Completado                               │
+│  ✓ Perfil NB-X Generado                                        │
+│                                                                  │
+│  📚 RECOMENDACIÓN: Comienza con el módulo de "Razonamiento      │
+│  Lógico" para fortalecer tu área de oportunidad.                │
+│                                                                  │
+│  [Comenzar Aprendizaje] [Compartir en LinkedIn]                │
+└─────────────────────────────────────────────────────────────────┘
+
+
+ESCENARIO 2: PROFESIONAL - SESIÓN DE PRÁCTICA
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[CHAT DUAL EN PÁGINA SKILL]
+┌──────────────────────────┬──────────────────────────────────────┐
+│   AGENTE COACH           │   AGENTE CRIKER                      │
+│   (Guía y Orientación)   │   (Evaluación Práctica)              │
+├──────────────────────────┼──────────────────────────────────────┤
+│ 🏋️ Coach: ¡Hola! Hoy     │ ⚡ Criker: Estoy listo para          │
+│ vamos a trabajar en      │ presentarte un caso desafiante.      │
+│ toma de decisiones bajo  │ ¿Comenzamos?                         │
+│ presión. ¿Listo?         │                                      │
+│                          │                                      │
+│ 👤 Usuario: Sí, listo    │ 👤 Usuario: Adelante                 │
+│                          │                                      │
+│ 🏋️ Coach: Perfecto.      │ ⚡ Criker: CASO PRÁCTICO             │
+│ Recuerda aplicar el      │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━  │
+│ framework DECIDE:        │ Eres líder de proyecto en una        │
+│ • Define el problema     │ empresa de software. A 2 semanas     │
+│ • Establece criterios    │ del lanzamiento, descubres un bug    │
+│ • Considera alternativas │ crítico que requiere 3 semanas       │
+│ • Identifica la mejor    │ para corregirse. El cliente ya       │
+│ • Desarrolla plan        │ anunció el lanzamiento públicamente. │
+│ • Evalúa resultados      │                                      │
+│                          │ Tu equipo propone 3 opciones:        │
+│ Si necesitas ayuda,      │ A) Lanzar con el bug y parchear      │
+│ pregúntame.              │ B) Retrasar el lanzamiento           │
+│                          │ C) Lanzar versión limitada           │
+│                          │                                      │
+│                          │ ¿Qué decides y por qué?              │
+│                          │                                      │
+│                          │ 👤 Usuario: [Escribe análisis...]    │
+│                          │                                      │
+│                          │ ⚡ Criker: Análisis recibido.        │
+│                          │ Evaluando tu respuesta...            │
+│                          │                                      │
+│                          │ FEEDBACK:                            │
+│                          │ ✓ Análisis (NB-1): 85/100            │
+│                          │   Identificaste bien los riesgos     │
+│                          │                                      │
+│                          │ ✓ Evaluación (NB-2): 78/100          │
+│                          │   Consideraste stakeholders clave    │
+│                          │                                      │
+│                          │ ⚠ Inferencia (NB-3): 65/100          │
+│                          │   Podrías profundizar en             │
+│                          │   consecuencias a largo plazo        │
+│                          │                                      │
+│                          │ 💡 SUGERENCIA: Considera el          │
+│                          │ impacto en la reputación de marca    │
+│                          │ y la confianza del cliente.          │
+└──────────────────────────┴──────────────────────────────────────┘
+
+
+================================================================================
+ROADMAP Y FUTURAS FUNCIONALIDADES
+================================================================================
+
+PRÓXIMOS 3 MESES (Q1 2025)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✓ Exportación de resultados en PDF
+✓ Comparación entre evaluaciones (progreso temporal)
+✓ Sistema de notificaciones por email
+✓ Aplicación móvil (iOS y Android)
+✓ Integración con LinkedIn para compartir certificados
+✓ Nuevos módulos de creatividad e innovación
+
+PRÓXIMOS 6 MESES (Q2 2025)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✓ Comunidad de usuarios (networking)
+✓ Sesiones de práctica en grupo (simuladas)
+✓ Biblioteca de casos de uso por industria
+✓ Recomendaciones personalizadas con ML
+✓ Integración con Zoom/Teams para evaluaciones en vivo
+✓ Marketplace de contenido educativo
+
+PRÓXIMOS 12 MESES (2025)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✓ Análisis predictivo de desempeño profesional
+✓ Colaboración en tiempo real (WebSockets)
+✓ Gamificación avanzada (rankings, torneos)
+✓ API pública para integraciones
+✓ Versión en múltiples idiomas (inglés, portugués)
+✓ Realidad virtual para simulaciones inmersivas
+
+
+================================================================================
+PREGUNTAS FRECUENTES
+================================================================================
+
+❓ ¿Necesito conocimientos previos para usar Web Skill?
+   No. La plataforma está diseñada para todos los niveles, desde principiantes
+   hasta profesionales avanzados. Los agentes de IA adaptan el contenido a tu
+   nivel actual.
+
+❓ ¿Cuánto tiempo necesito dedicar semanalmente?
+   Recomendamos 2-4 horas semanales para ver resultados óptimos, pero puedes
+   avanzar a tu propio ritmo. La plataforma está disponible 24/7.
+
+❓ ¿Los certificados son reconocidos por empresas?
+   Sí. Nuestros certificados incluyen métricas cuantificables que los
+   empleadores valoran. Además, son compartibles en LinkedIn y verificables.
+
+❓ ¿Puedo usar Web Skill desde mi teléfono?
+   Sí. La plataforma es responsive y funciona en cualquier dispositivo con
+   navegador web. Próximamente lanzaremos apps nativas.
+
+❓ ¿Qué pasa si no veo mejora en mi perfil?
+   Ofrecemos garantía de resultados. Si completas el programa y no mejoras,
+   extendemos tu acceso 3 meses adicionales sin costo.
+
+❓ ¿Los agentes de IA realmente entienden mis respuestas?
+   Sí. Utilizamos modelos de lenguaje avanzados (GPT-4 level) especializados
+   en evaluación de habilidades blandas. El feedback es contextual y preciso.
+
+❓ ¿Mis datos están seguros?
+   Absolutamente. Usamos encriptación de nivel bancario y cumplimos con GDPR.
+   Tus datos nunca se comparten con terceros sin tu consentimiento.
+
+❓ ¿Puedo cancelar mi suscripción en cualquier momento?
+   Sí. No hay contratos de permanencia. Puedes cancelar cuando quieras y
+   mantendrás acceso hasta el final del período pagado.
+
+❓ ¿Ofrecen descuentos para grupos o instituciones?
+   Sí. Tenemos planes especiales para instituciones educativas y empresas
+   con descuentos significativos por volumen.
+
+❓ ¿Hay soporte técnico disponible?
+   Sí. Ofrecemos soporte por email (24-48h) para todos los planes, y soporte
+   prioritario para planes profesionales y corporativos.
+
+
+================================================================================
+LLAMADO A LA ACCIÓN
+================================================================================
+
+🚀 COMIENZA TU TRANSFORMACIÓN HOY
+
+No esperes más para desarrollar las habilidades que te abrirán puertas en
+tu carrera profesional. Web Skill está listo para acompañarte en este viaje.
+
+
+OPCIONES PARA COMENZAR:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1️⃣ PRUEBA GRATUITA DE 7 DÍAS
+   Acceso completo sin compromiso. Sin tarjeta de crédito requerida.
+   [COMENZAR PRUEBA GRATUITA]
+
+2️⃣ DEMO PERSONALIZADA
+   Agenda una sesión de 30 minutos con nuestro equipo para ver la
+   plataforma en acción y resolver todas tus dudas.
+   [AGENDAR DEMO]
+
+3️⃣ SUSCRIPCIÓN INMEDIATA
+   Comienza hoy mismo con 20% de descuento usando el código: SKILL2024
+   [SUSCRIBIRME AHORA]
+
+
+CONTACTO:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📧 Email: contacto@webskill.com
+🌐 Web: www.webskill.com
+📱 WhatsApp: +1 (555) 123-4567
+💼 LinkedIn: /company/webskill
+🐦 Twitter: @webskill_ai
+
+Horario de atención:
+Lunes a Viernes: 9:00 AM - 6:00 PM (GMT-5)
+Soporte técnico 24/7 para planes corporativos
+
+
+OFICINAS:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🇵🇪 Lima, Perú (Sede Principal)
+   Av. Javier Prado Este 123, San Isidro
+
+🇺🇸 Miami, USA (Oficina Regional)
+   1200 Brickell Ave, Suite 1950
+
+🇲🇽 Ciudad de México, México (Próximamente)
+
+
+================================================================================
+INVIERTE EN TU FUTURO. DESARROLLA TUS HABILIDADES. TRANSFORMA TU CARRERA.
+================================================================================
+
+                            WEB SKILL
+                  Donde la IA se encuentra con el talento humano
+
+================================================================================

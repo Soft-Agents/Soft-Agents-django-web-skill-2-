@@ -1,0 +1,477 @@
+{% extends 'web_skill_app/base.html' %}
+{% load static %}
+
+{% block title %}Dashboard Scouter - Resultados{% endblock %}
+
+{% block content %}
+{% if not is_in_iframe %}
+  {% include 'web_skill_app/partials/navigation.html' with currentPage='dashboard' %}
+{% endif %}
+
+<style>
+  .dashboard-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15), 0 0 20px rgba(147, 51, 234, 0.1);
+    border: 1px solid rgba(147, 51, 234, 0.1);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    transition: all 0.3s ease;
+  }
+  
+  .dashboard-card:hover {
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.2), 0 0 30px rgba(147, 51, 234, 0.2);
+    transform: translateY(-2px);
+  }
+
+  .metric-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3), 0 0 20px rgba(118, 75, 162, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+  }
+  
+  .metric-card:hover {
+    box-shadow: 0 12px 35px rgba(102, 126, 234, 0.4), 0 0 30px rgba(118, 75, 162, 0.3);
+    transform: translateY(-3px);
+  }
+
+  .achievement-badge {
+    background: linear-gradient(45deg, #10b981, #059669);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    display: inline-block;
+    margin: 0.25rem;
+    font-size: 0.9rem;
+  }
+
+  .achievement-locked {
+    background: #6b7280;
+    opacity: 0.6;
+  }
+
+  .chart-container {
+    text-align: center;
+    margin: 1rem 0;
+  }
+
+  .chart-container img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15), 0 0 15px rgba(147, 51, 234, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.8);
+    transition: all 0.3s ease;
+  }
+  
+  .chart-container img:hover {
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.2), 0 0 25px rgba(147, 51, 234, 0.2);
+    transform: scale(1.02);
+  }
+
+  .progress-bar {
+    background: #e5e7eb;
+    border-radius: 10px;
+    height: 20px;
+    overflow: hidden;
+    margin: 0.5rem 0;
+  }
+
+  .progress-fill {
+    height: 100%;
+    border-radius: 10px;
+    transition: width 0.3s ease;
+  }
+
+  .level-basic {
+    background: linear-gradient(90deg, #ef4444, #f87171);
+  }
+  .level-intermediate {
+    background: linear-gradient(90deg, #f59e0b, #fbbf24);
+  }
+  .level-advanced {
+    background: linear-gradient(90deg, #10b981, #34d399);
+  }
+  
+  /* Estilos para texto más bold y brillos */
+  .dashboard-card h1, .dashboard-card h2, .dashboard-card h3, .dashboard-card h4 {
+    font-weight: 800 !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .dashboard-card p, .dashboard-card span, .dashboard-card div {
+    font-weight: 600 !important;
+  }
+  
+  .metric-card h1, .metric-card h2, .metric-card h3, .metric-card h4 {
+    font-weight: 900 !important;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  }
+  
+  .metric-card p, .metric-card span {
+    font-weight: 700 !important;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+  }
+  
+  /* Brillos adicionales para elementos específicos */
+  .achievement-badge {
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3), 0 0 10px rgba(16, 185, 129, 0.2);
+    font-weight: 700 !important;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  }
+  
+  .progress-bar {
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1), 0 2px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+  }
+  
+  .progress-fill {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2), inset 0 1px 2px rgba(255, 255, 255, 0.3);
+  }
+</style>
+
+<div class="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 py-8 mt-0">
+  
+  <div class="max-w-7xl mx-auto px-4">
+    <div class="grid grid-cols-12 gap-8">
+
+        {% include 'web_skill_app/encuesta/sidebar_historial.html' %}
+
+        <div class="col-span-12 lg:col-span-8">
+
+          <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-white mb-2">🧠 Dashboard Evaluación</h1>
+            <p class="text-xl text-purple-300">
+              Análisis Completo de Pensamiento Crítico
+            </p>
+            {% if is_demo %}
+            <div class="inline-block bg-gradient-to-r from-orange-500 to-red-500 text-white px-4 py-2 rounded-full text-sm font-semibold mt-2 mb-2">
+              🎯 MODO DEMOSTRACIÓN
+            </div>
+            {% endif %}
+            <p class="text-sm text-white font-semibold mt-2">
+              Sesión: {{ dashboard_id|slice:":8" }}... | {{ resultados.timestamp }}
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="metric-card">
+              <div class="text-3xl font-bold">
+                {{ resultados.promedio_global|floatformat:0 }}/100
+              </div>
+              <div class="text-sm opacity-90">Promedio General</div>
+              <div class="text-xs mt-1">Nivel {{ resultados.nivel_evaluado }}</div>
+            </div>
+
+            <div class="metric-card">
+              <div class="text-lg font-bold">💪 Fortaleza</div>
+              <div class="text-sm opacity-90">
+                {{ resultados.fortaleza|slice:"4:" }}
+              </div>
+            </div>
+
+            <div class="metric-card">
+              <div class="text-lg font-bold">🎯 Oportunidad</div>
+              <div class="text-sm opacity-90">
+                {{ resultados.oportunidad|slice:"4:" }}
+              </div>
+            </div>
+
+            <div class="metric-card">
+              <div class="text-lg font-bold">📊 Pilares</div>
+              <div class="text-sm opacity-90">5 Evaluados</div>
+              <div class="text-xs mt-1">Pensamiento Crítico</div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            {% if graficos.radar %}
+            <div class="dashboard-card">
+              <h3 class="text-xl font-black text-gray-900 mb-4 text-center">
+                Perfil NB-X Completo
+              </h3>
+              <div class="chart-container">
+                <img
+                  src="data:image/png;base64,{{ graficos.radar }}"
+                  alt="Gráfico Radar NB-X"
+                />
+              </div>
+              <p class="text-sm text-gray-800 font-semibold text-center mt-2">
+                Tu perfil muestra el nivel en cada uno de los 5 pilares del
+                pensamiento crítico
+              </p>
+            </div>
+            {% endif %}
+
+            {% if graficos.barras %}
+            <div class="dashboard-card">
+              <h3 class="text-xl font-black text-gray-900 mb-4 text-center">
+                Comparación por Pilares
+              </h3>
+              <div class="chart-container">
+                <img
+                  src="data:image/png;base64,{{ graficos.barras }}"
+                  alt="Gráfico de Barras NB-X"
+                />
+              </div>
+              <p class="text-sm text-gray-800 font-semibold text-center mt-2">
+                Puntuaciones individuales con códigos de color según el nivel de
+                dominio
+              </p>
+            </div>
+            {% endif %}
+          </div>
+
+          {% if graficos.evolucion %}
+          <div class="dashboard-card mb-8">
+            <h3 class="text-xl font-black text-gray-900 mb-4 text-center">
+              Evolución Temporal
+            </h3>
+            <div class="chart-container">
+              <img
+                src="data:image/png;base64,{{ graficos.evolucion }}"
+                alt="Evolución Temporal"
+              />
+            </div>
+            <p class="text-sm text-gray-800 font-semibold text-center mt-2">
+              Tu progreso a lo largo del tiempo en las evaluaciones de pensamiento
+              crítico
+            </p>
+          </div>
+          {% endif %}
+
+          {% if graficos.metricas %}
+          <div class="dashboard-card mb-8">
+            <h3 class="text-xl font-black text-gray-900 mb-4 text-center">
+              Análisis Detallado por Categorías
+            </h3>
+            <div class="chart-container">
+              <img
+                src="data:image/png;base64,{{ graficos.metricas }}"
+                alt="Métricas Detalladas"
+              />
+            </div>
+            <p class="text-sm text-gray-800 font-semibold text-center mt-2">
+              Desglose completo de tus habilidades en pensamiento estructurado,
+              comunicación y argumentación
+            </p>
+          </div>
+          {% endif %}
+
+          <div class="dashboard-card mb-8">
+            <h3 class="text-xl font-black text-gray-900 mb-4">
+              📋 Resumen de Puntuaciones
+            </h3>
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead>
+                  <tr class="border-b">
+                    <th class="text-left py-2 font-black text-gray-900">Pilar</th>
+                    <th class="text-center py-2 font-black text-gray-900">Puntuación</th>
+                    <th class="text-left py-2 font-black text-gray-900">Progreso</th>
+                    <th class="text-left py-2 font-black text-gray-900">Descripción</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="border-b">
+                    <td class="py-3 font-black text-gray-900">NB-1: Análisis</td>
+                    <td class="text-center py-3 font-black text-gray-900">{{ perfil.nb1|floatformat:0 }}/100</td>
+                    <td class="py-3">
+                      <div class="progress-bar">
+                        <div
+                          class="progress-fill level-{% if perfil.nb1 >= 80 %}advanced{% elif perfil.nb1 >= 60 %}intermediate{% else %}basic{% endif %}"
+                          style="width: {{ perfil.nb1 }}%"
+                        ></div>
+                      </div>
+                    </td>
+                    <td class="py-3 text-gray-800 font-semibold">
+                      Capacidad para identificar y examinar información
+                    </td>
+                  </tr>
+                  <tr class="border-b">
+                    <td class="py-3 font-black text-gray-900">NB-2: Evaluación</td>
+                    <td class="text-center py-3 font-black text-gray-900">{{ perfil.nb2|floatformat:0 }}/100</td>
+                    <td class="py-3">
+                      <div class="progress-bar">
+                        <div
+                          class="progress-fill level-{% if perfil.nb2 >= 80 %}advanced{% elif perfil.nb2 >= 60 %}intermediate{% else %}basic{% endif %}"
+                          style="width: {{ perfil.nb2 }}%"
+                        ></div>
+                      </div>
+                    </td>
+                    <td class="py-3 text-gray-800 font-semibold">
+                      Habilidad para juzgar la credibilidad de información
+                    </td>
+                  </tr>
+                  <tr class="border-b">
+                    <td class="py-3 font-black text-gray-900">NB-3: Inferencia</td>
+                    <td class="text-center py-3 font-black text-gray-900">{{ perfil.nb3|floatformat:0 }}/100</td>
+                    <td class="py-3">
+                      <div class="progress-bar">
+                        <div
+                          class="progress-fill level-{% if perfil.nb3 >= 80 %}advanced{% elif perfil.nb3 >= 60 %}intermediate{% else %}basic{% endif %}"
+                          style="width: {{ perfil.nb3 }}%"
+                        ></div>
+                      </div>
+                    </td>
+                    <td class="py-3 text-gray-800 font-semibold">
+                      Capacidad para sacar conclusiones lógicas
+                    </td>
+                  </tr>
+                  <tr class="border-b">
+                    <td class="py-3 font-black text-gray-900">NB-4: Explicación</td>
+                    <td class="text-center py-3 font-black text-gray-900">{{ perfil.nb4|floatformat:0 }}/100</td>
+                    <td class="py-3">
+                      <div class="progress-bar">
+                        <div
+                          class="progress-fill level-{% if perfil.nb4 >= 80 %}advanced{% elif perfil.nb4 >= 60 %}intermediate{% else %}basic{% endif %}"
+                          style="width: {{ perfil.nb4 }}%"
+                        ></div>
+                      </div>
+                    </td>
+                    <td class="py-3 text-gray-800 font-semibold">
+                      Habilidad para comunicar razonamientos
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="py-3 font-black text-gray-900">NB-5: Flexibilidad</td>
+                    <td class="text-center py-3 font-black text-gray-900">{{ perfil.nb5|floatformat:0 }}/100</td>
+                    <td class="py-3">
+                      <div class="progress-bar">
+                        <div
+                          class="progress-fill level-{% if perfil.nb5 >= 80 %}advanced{% elif perfil.nb5 >= 60 %}intermediate{% else %}basic{% endif %}"
+                          style="width: {{ perfil.nb5 }}%"
+                        ></div>
+                      </div>
+                    </td>
+                    <td class="py-3 text-gray-800 font-semibold">
+                      Capacidad para considerar múltiples perspectivas
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="dashboard-card mb-8">
+            <h3 class="text-xl font-black text-gray-900 mb-4">
+              🏆 Logros y Reconocimientos
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <h4 class="font-semibold text-green-700 mb-2">
+                  ✅ Logros Conseguidos
+                </h4>
+                {% for logro in resultados.logros %} {% if logro.desbloqueado %}
+                <div class="achievement-badge">
+                  {{ logro.nombre }} - {{ logro.descripcion }}
+                </div>
+                {% endif %} {% endfor %}
+              </div>
+              <div>
+                <h4 class="font-black text-gray-900 mb-2">
+                  🔒 Próximos Objetivos
+                </h4>
+                {% for logro in resultados.logros %} {% if not logro.desbloqueado %}
+                <div class="achievement-badge achievement-locked">
+                  {{ logro.nombre }} - {{ logro.descripcion }}
+                </div>
+                {% endif %} {% endfor %}
+              </div>
+            </div>
+          </div>
+
+          <div class="dashboard-card mb-8">
+            <h3 class="text-xl font-black text-gray-900 mb-4">
+              🎯 Próximos Pasos Recomendados
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <h4 class="font-semibold text-blue-700 mb-2">
+                  🚀 Para mejorar tu Pensamiento Crítico:
+                </h4>
+                <ul class="text-sm text-gray-800 font-semibold space-y-1">
+                  <li>• Practica con casos de uso reales en la pizarra</li>
+                  <li>• Participa en debates estructurados</li>
+                  <li>• Lee artículos de análisis crítico</li>
+                  <li>• Realiza ejercicios de lógica formal</li>
+                </ul>
+              </div>
+              <div>
+                <h4 class="font-semibold text-purple-700 mb-2">
+                  📚 Recursos Recomendados:
+                </h4>
+                <ul class="text-sm text-gray-800 font-semibold space-y-1">
+                  <li>• Curso de Argumentación Avanzada</li>
+                  <li>• Taller de Análisis de Casos</li>
+                  <li>• Sesiones con Coach Criker</li>
+                  <li>• Evaluaciones de nivel superior</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4 mb-8">
+            <a
+              href="/chat/"
+              class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
+            >
+              🔄 Nueva Evaluación
+            </a>
+            <a
+              href="/chat/knowledge/"
+              class="bg-purple-700 hover:bg-purple-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
+            >
+              📚 Estudia con Knowledge
+            </a>
+            <a
+              href="/skill/"
+              class="bg-green-700 hover:bg-green-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
+            >
+              🎯 Practica con criker
+            </a>
+            <button
+              onclick="confirmarEliminacion()"
+              class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
+            >
+              🗑️ Eliminar Dashboard
+            </button>
+          </div>
+
+        </div> </div> </div>
+</div>
+<script>
+function confirmarEliminacion() {
+  if (confirm('¿Estás seguro de eliminar este dashboard? ¡Los datos se perderán!')) {
+    fetch('/encuesta/eliminar-dashboard/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': '{{ csrf_token }}'
+      },
+      body: JSON.stringify({
+        dashboard_id: '{{ dashboard_id }}'
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        alert('Dashboard eliminado correctamente');
+        window.location.href = data.redirect_url;  // Usar la URL que devuelve el backend
+      } else {
+        alert('Error: ' + data.error);
+      }
+    })
+    .catch(error => {
+      alert('Error al eliminar: ' + error);
+    });
+  }
+}
+</script>
+
+{% endblock %}

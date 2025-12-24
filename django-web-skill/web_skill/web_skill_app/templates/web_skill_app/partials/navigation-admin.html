@@ -1,0 +1,166 @@
+<nav class="bg-white shadow-lg fixed top-0 w-full z-50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between h-16">
+      <div class="flex items-center">
+        <a href="{% url 'admin_dashboard' %}" class="flex-shrink-0 flex items-center">
+          <span class="text-2xl font-bold text-blue-600">Soft Agents</span>
+        </a>
+      </div>
+
+      <div class="hidden md:flex items-center space-x-8">
+        <span class="text-gray-600 font-medium">Panel de Administrador</span>
+      </div>
+
+      <div class="hidden md:flex items-center">
+        <div class="relative group">
+          <button
+            id="user-menu-button"
+            type="button"
+            class="max-w-xs bg-gray-800 rounded-full flex items-center text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white p-1"
+            aria-expanded="false"
+            aria-haspopup="true"
+          >
+            <span class="sr-only">Open user menu</span>
+            <img
+              class="h-8 w-8 rounded-full"
+              src="https://ui-avatars.com/api/?name=Admin&background=DC2626&color=FFFFFF"
+              alt="Admin Avatar"
+            />
+          </button>
+
+          <div
+            id="user-dropdown-menu"
+            class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 hidden group-hover:block transition-all duration-150 z-50"
+            role="menu"
+            aria-orientation="vertical"
+            aria-labelledby="user-menu-button"
+            tabindex="-1"
+          >
+            <div class="block px-4 py-2 text-sm text-gray-700 border-b border-gray-100">
+              Bienvenido, Administrador
+            </div>
+
+            <form
+              action="{% url 'logout_view' %}"
+              method="post"
+              class="m-0 p-0 border-0"
+            >
+              {% csrf_token %}
+              <button
+                type="submit"
+                class="w-full text-left block px-4 py-2 text-sm rounded-md bg-red-600 text-white transition-all duration-200 hover:bg-red-700 hover:font-semibold hover:scale-105"
+                role="menuitem"
+                tabindex="-1"
+              >
+                Cerrar Sesión
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mobile menu button -->
+      <div class="-mr-2 flex items-center md:hidden">
+        <button
+          type="button"
+          id="mobile-menu-button"
+          class="bg-gray-100 inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white focus:ring-blue-500"
+          aria-controls="mobile-menu"
+          aria-expanded="false"
+        >
+          <span class="sr-only">Open main menu</span>
+          <svg
+            class="block h-6 w-6"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            aria-hidden="true"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M4 6h16M4 12h16M4 18h16"
+            />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile menu -->
+  <div class="md:hidden hidden" id="mobile-menu">
+    <div class="pt-4 pb-3 border-t border-gray-200">
+      <div class="flex items-center px-5">
+        <div class="flex-shrink-0">
+          <img
+            class="h-10 w-10 rounded-full"
+            src="https://ui-avatars.com/api/?name=Admin&background=DC2626&color=FFFFFF"
+            alt="Admin Avatar"
+          />
+        </div>
+        <div class="ml-3">
+          <div class="text-base font-medium text-gray-800">
+            Administrador
+          </div>
+        </div>
+      </div>
+      <div class="mt-3 px-2 space-y-1">
+        <form
+          action="{% url 'logout_view' %}"
+          method="post"
+          class="w-full m-0 p-0 border-0"
+        >
+          {% csrf_token %}
+          <button
+            type="submit"
+            class="w-full text-left block px-3 py-2 rounded-md text-base font-medium text-red-600 hover:bg-red-50 hover:text-red-700"
+          >
+            Cerrar Sesión
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Funcionalidad del menú desplegable de escritorio
+    document.addEventListener("DOMContentLoaded", function () {
+      const userMenuButton = document.getElementById("user-menu-button");
+      const dropdownMenu = document.getElementById("user-dropdown-menu");
+
+      if (userMenuButton && dropdownMenu) {
+        userMenuButton.addEventListener("click", function (e) {
+          e.stopPropagation();
+          dropdownMenu.classList.toggle("hidden");
+        });
+
+        document.addEventListener("click", function (e) {
+          if (
+            !userMenuButton.contains(e.target) &&
+            !dropdownMenu.contains(e.target)
+          ) {
+            dropdownMenu.classList.add("hidden");
+          }
+        });
+
+        dropdownMenu.addEventListener("click", function (e) {
+          e.stopPropagation();
+        });
+      }
+    });
+
+    // Funcionalidad del menú móvil
+    const mobileMenuButton = document.getElementById("mobile-menu-button");
+    const mobileMenu = document.getElementById("mobile-menu");
+    if (mobileMenuButton && mobileMenu) {
+      mobileMenuButton.addEventListener("click", () => {
+        mobileMenu.classList.toggle("hidden");
+        const isExpanded =
+          mobileMenuButton.getAttribute("aria-expanded") === "true";
+        mobileMenuButton.setAttribute("aria-expanded", !isExpanded);
+      });
+    }
+  </script>
+</nav>

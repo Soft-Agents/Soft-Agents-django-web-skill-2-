@@ -1,0 +1,1410 @@
+================================================================================
+                    INFORME TÉCNICO - WEB SKILL
+        Plataforma de Evaluación y Desarrollo de Habilidades Blandas
+================================================================================
+
+FECHA: Noviembre 2024
+VERSIÓN: 1.0
+AUTOR: Equipo de Desarrollo Web Skill
+
+================================================================================
+1. RESUMEN EJECUTIVO
+================================================================================
+
+Web Skill es una plataforma web educativa diseñada para practicar, evaluar y 
+enseñar habilidades blandas mediante inteligencia artificial. La aplicación 
+integra múltiples agentes de IA especializados que interactúan con los 
+usuarios para proporcionar retroalimentación personalizada, evaluaciones 
+diagnósticas y contenido educativo adaptativo.
+
+OBJETIVO PRINCIPAL:
+Desarrollar competencias de pensamiento crítico, comunicación, creatividad y 
+colaboración mediante experiencias de aprendizaje interactivas potenciadas 
+por IA.
+
+USUARIOS OBJETIVO:
+- Estudiantes universitarios
+- Profesionales en desarrollo
+- Instituciones educativas
+
+================================================================================
+2. ARQUITECTURA DEL SISTEMA
+================================================================================
+
+2.1 STACK TECNOLÓGICO
+----------------------
+
+BACKEND:
+- Framework: Django 4.2.13 (Python)
+- Base de Datos: MongoDB Atlas (NoSQL) + SQLite (Admin Django)
+- Servidor WSGI: Gunicorn 23.0.0
+- Cache: Redis + django-redis
+
+FRONTEND:
+- HTML5 + CSS3 (Tailwind CSS via CDN)
+- JavaScript (Vanilla JS + AJAX)
+- Visualización: Matplotlib, Seaborn, Plotly
+
+INFRAESTRUCTURA:
+- Contenedorización: Docker
+- Despliegue: Google Cloud Run
+- Almacenamiento estático: WhiteNoise
+
+INTELIGENCIA ARTIFICIAL:
+- OpenAI API (GPT models)
+- LangChain 0.3.27
+- Google Cloud AI Platform
+- Agentes especializados en Cloud Run
+
+
+2.2 ARQUITECTURA DE COMPONENTES
+--------------------------------
+
+┌─────────────────────────────────────────────────────────────────┐
+│                        CAPA DE PRESENTACIÓN                      │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐       │
+│  │  Login   │  │Dashboard │  │  Chat    │  │ Gráficos │       │
+│  │  /Reg    │  │          │  │  IA      │  │          │       │
+│  └──────────┘  └──────────┘  └──────────┘  └──────────┘       │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────────┐
+│                      CAPA DE APLICACIÓN                          │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐         │
+│  │  core_views  │  │  auth_views  │  │preguntas_views│        │
+│  │              │  │              │  │              │         │
+│  └──────────────┘  └──────────────┘  └──────────────┘         │
+│                                                                  │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐         │
+│  │  services.py │  │sofia_views.py│  │dashboard_views│        │
+│  │  (Lógica)    │  │              │  │              │         │
+│  └──────────────┘  └──────────────┘  └──────────────┘         │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────────┐
+│                    CAPA DE SERVICIOS EXTERNOS                    │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐         │
+│  │Agente Profesor│ │Agente Coach  │  │Agente Criker │         │
+│  │(Teoría)      │  │(Guía)        │  │(Práctica)    │         │
+│  └──────────────┘  └──────────────┘  └──────────────┘         │
+│                                                                  │
+│  ┌──────────────┐  ┌──────────────┐                            │
+│  │Agente Scouter│  │Agente Sofía  │                            │
+│  │(Evaluación)  │  │(Asistente)   │                            │
+│  └──────────────┘  └──────────────┘                            │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────────┐
+│                      CAPA DE PERSISTENCIA                        │
+│  ┌──────────────────────┐  ┌──────────────────────┐            │
+│  │   MongoDB Atlas      │  │   Redis Cache        │            │
+│  │   - users            │  │   - Sesiones         │            │
+│  │   - survey_results   │  │   - Respuestas IA    │            │
+│  └──────────────────────┘  └──────────────────────┘            │
+└─────────────────────────────────────────────────────────────────┘
+
+
+================================================================================
+3. MÓDULOS FUNCIONALES PRINCIPALES
+================================================================================
+
+3.1 SISTEMA DE AUTENTICACIÓN
+-----------------------------
+UBICACIÓN: auth_views.py, auth_helpers.py
+
+CARACTERÍSTICAS:
+- Registro de usuarios con validación de email único
+- Autenticación mediante bcrypt (hash seguro de contraseñas)
+- Gestión de sesiones con Django sessions
+- Decorador @login_required personalizado
+- Almacenamiento de perfiles en MongoDB
+
+FLUJO DE AUTENTICACIÓN:
+1. Usuario ingresa credenciales
+2. Sistema valida contra MongoDB (colección 'users')
+3. Contraseña verificada con bcrypt.checkpw()
+4. Sesión iniciada con datos en request.session
+5. Redirección a dashboard/presentación
+
+SEGURIDAD IMPLEMENTADA:
+- Contraseñas hasheadas con bcrypt + salt
+- Validación de campos obligatorios
+- Protección CSRF habilitada
+- Sesiones con timeout configurable
+
+
+3.2 SISTEMA DE AGENTES DE IA
+-----------------------------
+UBICACIÓN: services.py, core_views.py
+
+La aplicación integra 5 agentes especializados desplegados en Cloud Run:
+
+A) AGENTE PROFESOR (Knowledge)
+   - URL: https://agente-profesor-redis-*.run.app/chat
+   - Función: Enseñanza de conceptos teóricos
+   - Almacena historial en: conversation_history_knowledge
+   - Implementa caché de respuestas (Redis)
+   - Saludo automático en primera interacción
+
+B) AGENTE COACH (Skill - Chat Izquierdo)
+   - URL: https://agente-coach-redis-*.run.app/chat
+   - Función: Guía y orientación en ejercicios
+   - Almacena historial en: conversation_history_coach
+   - Respuestas siempre en formato texto
+
+C) AGENTE CRIKER (Skill - Chat Derecho)
+   - URL: https://agente-criker-redis-*.run.app/chat
+   - Función: Evaluación práctica con casos de uso
+   - Almacena historial en: conversation_history_criker
+   - Respuestas duales: texto o JSON (tool_calls)
+   - Genera casos de uso interactivos
+
+D) AGENTE SCOUTER (Evaluación Diagnóstica)
+   - URL: https://agente-preguntas-redis-*.run.app/chat
+   - Función: Evaluación de pensamiento crítico (NB-X)
+   - Genera perfil de 5 dimensiones (NB-1 a NB-5)
+   - Crea dashboards automáticos con visualizaciones
+   - Guarda resultados en MongoDB (survey_results)
+
+E) AGENTE SOFÍA (Asistente General)
+   - URL: https://agente-sofia-redis-*.run.app/chat
+   - Función: Asistencia general y navegación
+   - Implementación en sofia_views.py
+
+CARACTERÍSTICAS TÉCNICAS DE LOS AGENTES:
+- Comunicación vía HTTP POST (JSON)
+- Timeout: 120-180 segundos
+- Sistema de caché por hash MD5 del mensaje
+- Manejo de errores con logging detallado
+- Formato de payload: {'user_id': str, 'message': str}
+
+
+3.3 SISTEMA DE EVALUACIÓN Y DIAGNÓSTICO (SCOUTER)
+--------------------------------------------------
+UBICACIÓN: preguntas_views.py, dashboard_views.py
+
+METODOLOGÍA NB-X (Nivel Base - eXperto):
+El sistema evalúa 5 dimensiones del pensamiento crítico en escala 0-100:
+
+┌────────────────────────────────────────────────────────────────┐
+│ NB-1: ANÁLISIS                                                 │
+│ - Capacidad de descomponer información compleja                │
+│ - Identificación de patrones y relaciones                      │
+│ - Evaluación de datos y evidencias                             │
+├────────────────────────────────────────────────────────────────┤
+│ NB-2: EVALUACIÓN                                               │
+│ - Valoración de argumentos y credibilidad                      │
+│ - Detección de falacias lógicas                                │
+│ - Juicio crítico de fuentes                                    │
+├────────────────────────────────────────────────────────────────┤
+│ NB-3: INFERENCIA                                               │
+│ - Razonamiento deductivo e inductivo                           │
+│ - Formulación de conclusiones lógicas                          │
+│ - Predicción de consecuencias                                  │
+├────────────────────────────────────────────────────────────────┤
+│ NB-4: EXPLICACIÓN                                              │
+│ - Claridad en la comunicación de ideas                         │
+│ - Coherencia argumentativa                                     │
+│ - Vocabulario y gramática                                      │
+├────────────────────────────────────────────────────────────────┤
+│ NB-5: FLEXIBILIDAD COGNITIVA                                   │
+│ - Adaptación a nuevas perspectivas                             │
+│ - Consideración de contra-argumentos                           │
+│ - Pensamiento divergente                                       │
+└────────────────────────────────────────────────────────────────┘
+
+NIVELES DE CLASIFICACIÓN:
+- Básico: Promedio 0-59
+- Intermedio: Promedio 60-79
+- Experto: Promedio 80-100
+
+FLUJO DE EVALUACIÓN:
+1. Usuario inicia chat con Agente Scouter
+2. Agente formula 5 preguntas adaptativas
+3. Sistema detecta finalización por keywords
+4. Extracción de puntuaciones NB-X mediante regex
+5. Cálculo de métricas derivadas:
+   - Pensamiento Estructurado (lógica formal/informal)
+   - Language Skills (vocabulario, gramática, claridad)
+   - Argumentación (estructura, evidencia, persuasión)
+6. Generación de historial simulado (3 evaluaciones)
+7. Cálculo de logros desbloqueados
+8. Almacenamiento en MongoDB (survey_results)
+9. Generación de dashboard con visualizaciones
+
+KEYWORDS DE FINALIZACIÓN:
+- "diagnóstico ha concluido"
+- "perfil nb-x"
+- "evaluación finalizada"
+- "nb-1:", "nb-2:", etc.
+
+
+3.4 SISTEMA DE VISUALIZACIÓN Y DASHBOARDS
+------------------------------------------
+UBICACIÓN: dashboard_views.py
+
+TECNOLOGÍAS:
+- Matplotlib (gráficos estáticos)
+- Seaborn (visualizaciones avanzadas)
+- Plotly (gráficos interactivos - opcional)
+- NumPy (cálculos numéricos)
+
+TIPOS DE GRÁFICOS GENERADOS:
+
+A) GRÁFICO RADAR (Perfil NB-X)
+   - Visualización pentagonal de las 5 dimensiones
+   - Escala 0-100 con marcadores cada 10 puntos
+   - Área sombreada para facilitar lectura
+   - Colores del tema: #667eea (primary)
+   - Formato: PNG base64 embebido en HTML
+
+B) GRÁFICO DE BARRAS COMPARATIVO
+   - Barras coloreadas por nivel de desempeño:
+     * Verde (#10B981): ≥80 (Experto)
+     * Amarillo (#F59E0B): 60-79 (Intermedio)
+     * Rojo (#EF4444): <60 (Básico)
+   - Líneas de referencia en 60 y 80
+   - Valores numéricos sobre cada barra
+   - Rotación de etiquetas para legibilidad
+
+CARACTERÍSTICAS DEL DASHBOARD:
+- Sidebar con historial de evaluaciones del usuario
+- Métricas principales: promedio global, nivel, fortaleza/oportunidad
+- Sección de logros desbloqueados
+- Datos de contexto y timestamp
+- Modo demo para testing (session_id='demo-dashboard')
+- Soporte para iframe (parámetro user_id en GET)
+- Decorador @xframe_options_exempt para embebido
+
+PERSISTENCIA:
+- Datos temporales: Redis Cache (1 hora)
+- Datos permanentes: MongoDB (colección survey_results)
+- Asociación con usuario: campo user_id en documentos
+
+
+3.5 SISTEMA DE CACHÉ Y OPTIMIZACIÓN
+------------------------------------
+UBICACIÓN: services.py, settings.py
+
+ESTRATEGIA DE CACHÉ:
+- Backend: Redis (django-redis)
+- Fallback: LocMemCache (desarrollo)
+
+ELEMENTOS CACHEADOS:
+1. Respuestas de Agente Profesor (Knowledge)
+   - Key: agent_knowledge_response:{md5_hash}
+   - Timeout: Indefinido (hasta limpieza manual)
+
+2. Respuestas de Agente Coach
+   - Key: agent_coach_response:{md5_hash}
+   - Timeout: Indefinido
+
+3. Respuestas de Agente Criker (solo texto)
+   - Key: agent_criker_response:{md5_hash}
+   - Timeout: Indefinido
+   - Nota: NO se cachean respuestas JSON (tool_calls)
+
+4. Historial de chat
+   - Key: historial_{session_id}
+   - Timeout: 3600 segundos (1 hora)
+
+5. Resultados de evaluación
+   - Key: resultados_{session_id}
+   - Timeout: 3600 segundos (1 hora)
+
+BENEFICIOS:
+- Reducción de llamadas a APIs externas (ahorro de costos)
+- Respuestas instantáneas para preguntas repetidas
+- Menor latencia en interacciones comunes
+- Escalabilidad mejorada
+
+
+================================================================================
+4. BASE DE DATOS Y MODELOS DE DATOS
+================================================================================
+
+4.1 MONGODB ATLAS (Base de Datos Principal)
+--------------------------------------------
+CONEXIÓN: db.py
+URI: mongodb+srv://diegocaso1988_db_user@webskill.hv6k6mh.mongodb.net/
+
+COLECCIONES:
+
+A) USERS (Perfiles de Usuario)
+   Estructura del documento:
+   {
+     "_id": ObjectId,
+     "first_name": String,
+     "last_name": String,
+     "email": String (único, lowercase),
+     "password": Binary (bcrypt hash),
+     "created_at": DateTime,
+     "conversation_history_knowledge": Array[
+       {
+         "role": "user" | "agent",
+         "message": String,
+         "timestamp": ISOString
+       }
+     ],
+     "conversation_history_coach": Array[...],
+     "conversation_history_criker": Array[...],
+     "survey_history": Array[ObjectId] // Referencias a survey_results
+   }
+
+B) SURVEY_RESULTS (Resultados de Evaluaciones)
+   Estructura del documento:
+   {
+     "_id": ObjectId,
+     "user_id": String (referencia a users._id),
+     "session_id": String (UUID),
+     "timestamp": ISOString,
+     "perfil_nbx": {
+       "NB-1": Float (0-100),
+       "NB-2": Float (0-100),
+       "NB-3": Float (0-100),
+       "NB-4": Float (0-100),
+       "NB-5": Float (0-100)
+     },
+     "nivel_evaluado": String ("Básico" | "Intermedio" | "Experto"),
+     "promedio_global": Float (0-100),
+     "fortaleza": String,
+     "oportunidad": String,
+     "contexto_usuario": String,
+     "pensamiento_estructurado": Object,
+     "language_skills": Object,
+     "argumentation": Object,
+     "logros": Array[Object]
+   }
+
+ÍNDICES RECOMENDADOS:
+- users.email (único)
+- survey_results.user_id
+- survey_results.timestamp (descendente)
+
+
+4.2 SQLITE (Base de Datos Auxiliar)
+------------------------------------
+UBICACIÓN: web_skill/db.sqlite3
+USO: Sistema de administración de Django
+TABLAS: django_session, auth_user, django_migrations, etc.
+
+
+4.3 GESTIÓN DE CONEXIONES
+--------------------------
+PATRÓN: Singleton con pool de conexiones
+
+IMPLEMENTACIÓN (db.py):
+- Cliente MongoDB persistente (mongo_client)
+- Inicialización al arranque de la aplicación
+- Función get_db_collection() para acceso seguro
+- Manejo de errores con ConnectionError
+- Logging de estado de conexión
+
+VENTAJAS:
+- Reutilización de conexiones (eficiencia)
+- Pool interno de PyMongo (hasta 100 conexiones)
+- Reducción de overhead de conexión
+- Manejo centralizado de errores
+
+
+================================================================================
+5. SEGURIDAD Y CONFIGURACIÓN
+================================================================================
+
+5.1 CONFIGURACIÓN DE SEGURIDAD
+-------------------------------
+
+MODO DESARROLLO (settings.py):
+- DEBUG = True
+- SECRET_KEY = "django-insecure-DEV-ONLY-..."
+- ALLOWED_HOSTS = ['*']
+- SECURE_SSL_REDIRECT = False
+
+MODO PRODUCCIÓN (env.yaml):
+- DEBUG = "False"
+- SECRET_KEY = Variable de entorno segura
+- ALLOWED_HOSTS = Dominio específico
+- SECURE_SSL_REDIRECT = True
+- SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+CSRF PROTECTION:
+- CSRF_TRUSTED_ORIGINS: Lista de dominios permitidos
+- CSRF_COOKIE_SECURE: True en producción
+- CSRF_COOKIE_SAMESITE: 'Lax'
+- CSRF_COOKIE_AGE: 31449600 (1 año)
+
+AUTENTICACIÓN:
+- Contraseñas: bcrypt con salt automático
+- Sesiones: Django sessions con timeout configurable
+- Validadores de contraseña:
+  * UserAttributeSimilarityValidator
+  * MinimumLengthValidator
+  * CommonPasswordValidator
+  * NumericPasswordValidator
+
+
+5.2 VARIABLES DE ENTORNO
+-------------------------
+
+CRÍTICAS:
+- MONGO_URI: Cadena de conexión a MongoDB Atlas
+- MONGO_DB_NAME: Nombre de la base de datos (default: webSkill)
+- SECRET_KEY: Clave secreta de Django
+
+AGENTES DE IA:
+- AGENT_PROFESOR: URL del agente de teoría
+- AGENT_CRIKER_COACH: URL del agente coach
+- AGENT_CRIKER_SKILL: URL del agente de práctica
+- SOFIA_AGENT_URL: URL del agente asistente
+- AGENT_ENCUESTA_URL: URL del agente evaluador
+- AGENT_SCOUTER_URL: URL del agente scouter
+
+OPCIONALES:
+- STREAMLIT_SERVER_URL: URL del servidor Streamlit (si aplica)
+
+
+5.3 LOGGING Y MONITOREO
+------------------------
+
+CONFIGURACIÓN (settings.py):
+- Nivel: INFO (producción), DEBUG (desarrollo)
+- Handler: Console (stdout)
+- Formato: '{levelname} | {asctime} | {module} | {message}'
+
+LOGGERS ESPECÍFICOS:
+- django: Eventos generales del framework
+- django.server: Requests HTTP
+- web_skill_app: Lógica de negocio personalizada
+
+INTEGRACIÓN:
+- Sentry SDK 2.39.0 (monitoreo de errores en producción)
+- Google Cloud Logging (Cloud Run)
+
+EVENTOS REGISTRADOS:
+- Conexiones a MongoDB
+- Llamadas a agentes de IA
+- Errores de autenticación
+- Cache hits/misses
+- Generación de dashboards
+- Extracción de resultados NB-X
+
+
+================================================================================
+6. DESPLIEGUE E INFRAESTRUCTURA
+================================================================================
+
+6.1 CONTENEDORIZACIÓN (DOCKER)
+-------------------------------
+
+IMAGEN BASE: python:3.11-slim
+
+ESTRUCTURA DEL DOCKERFILE:
+1. Instalación de dependencias del sistema (build-essential, libpq-dev)
+2. Instalación de dependencias Python (requirements.txt)
+3. Copia del código fuente
+4. Configuración de permisos (entrypoint.sh)
+5. Recolección de archivos estáticos (collectstatic)
+6. Exposición del puerto 8080
+7. Comando de inicio: entrypoint.sh
+
+ENTRYPOINT.SH:
+#!/bin/bash
+cd /app/web_skill
+python manage.py migrate --noinset
+gunicorn web_skill.wsgi:application \
+  --bind 0.0.0.0:$PORT \
+  --workers 2 \
+  --threads 4 \
+  --timeout 120 \
+  --access-logfile - \
+  --error-logfile -
+
+OPTIMIZACIONES:
+- Imagen slim (menor tamaño)
+- Multi-stage build (no implementado aún)
+- Cache de capas de Docker
+- .dockerignore para excluir archivos innecesarios
+
+
+6.2 GOOGLE CLOUD RUN
+---------------------
+
+CONFIGURACIÓN:
+- Región: us-central1
+- Memoria: 1 GiB (escalable a 2 GiB)
+- CPU: 1 vCPU
+- Timeout: 300 segundos (5 minutos)
+- Concurrencia: 80 requests por instancia
+- Autoscaling: 0-10 instancias
+
+CARACTERÍSTICAS:
+- Serverless (pago por uso)
+- Escalado automático basado en tráfico
+- HTTPS automático con certificado gestionado
+- Integración con Cloud Build para CI/CD
+- Variables de entorno desde env.yaml
+
+COMANDOS DE DESPLIEGUE:
+# Build
+docker build -t gcr.io/PROJECT-ID/web-skill-service .
+
+# Push
+docker push gcr.io/PROJECT-ID/web-skill-service
+
+# Deploy
+gcloud run deploy web-skill-service \
+  --image gcr.io/PROJECT-ID/web-skill-service \
+  --platform managed \
+  --region us-central1 \
+  --allow-unauthenticated \
+  --env-vars-file env.yaml \
+  --memory 1Gi \
+  --cpu 1
+
+
+6.3 ARCHIVOS ESTÁTICOS
+-----------------------
+
+ESTRATEGIA: WhiteNoise
+- Servicio de archivos estáticos sin servidor adicional
+- Compresión automática (gzip)
+- Cache headers optimizados
+- Integración con Django middleware
+
+DIRECTORIOS:
+- STATIC_URL: /static/
+- STATIC_ROOT: /app/staticfiles
+- STATICFILES_DIRS:
+  * web_skill_app/static
+  * theme/static
+
+PROCESO:
+1. collectstatic durante build de Docker
+2. WhiteNoise sirve archivos en runtime
+3. CDN de Tailwind CSS para estilos (no local)
+
+
+================================================================================
+7. FUNCIONALIDADES PRINCIPALES
+================================================================================
+
+7.1 MÓDULO DE APRENDIZAJE (KNOWLEDGE)
+--------------------------------------
+RUTA: /chat/knowledge/
+VISTA: knowledge_view (core_views.py)
+AGENTE: AGENT_PROFESOR
+
+CARACTERÍSTICAS:
+- Chat interactivo para aprendizaje de conceptos
+- Saludo automático en primera visita
+- Historial persistente en MongoDB
+- Respuestas cacheadas para eficiencia
+- Interfaz AJAX sin recarga de página
+- Timestamps formateados (HH:MM)
+
+FLUJO DE INTERACCIÓN:
+1. Usuario envía pregunta vía POST (AJAX)
+2. Sistema verifica caché (MD5 hash del mensaje)
+3. Si no existe, llama al Agente Profesor
+4. Respuesta guardada en caché y MongoDB
+5. JSON devuelto al frontend
+6. Mensaje renderizado en el chat
+
+
+7.2 MÓDULO DE PRÁCTICA (SKILL)
+-------------------------------
+RUTA: /skill/
+VISTA: skill (core_views.py)
+AGENTES: AGENT_CRIKER_COACH + AGENT_CRIKER_SKILL
+
+ARQUITECTURA DUAL:
+┌─────────────────────────────────────────────────┐
+│              PÁGINA SKILL.HTML                  │
+├────────────────────┬────────────────────────────┤
+│   CHAT IZQUIERDO   │    CHAT DERECHO           │
+│   (Coach)          │    (Criker)               │
+│                    │                            │
+│ - Guía teórica     │ - Evaluación práctica     │
+│ - Orientación      │ - Casos de uso            │
+│ - Respuestas texto │ - Respuestas texto/JSON   │
+└────────────────────┴────────────────────────────┘
+
+ENDPOINT API: /api/skill_chat/
+MÉTODO: POST
+PAYLOAD: {
+  "user_id": String,
+  "message": String,
+  "agent_target": "coach" | "criker"
+}
+
+RESPUESTAS:
+A) Tipo "chat" (texto):
+   {
+     "type": "chat",
+     "agent": "coach" | "criker",
+     "content": String
+   }
+
+B) Tipo "CASO_USO" (JSON):
+   {
+     "type": "CASO_USO",
+     "agent": "criker",
+     "data_caso": {
+       "titulo": String,
+       "descripcion": String,
+       "opciones": Array,
+       ...
+     }
+   }
+
+
+7.3 MÓDULO DE EVALUACIÓN (CHAT/ENCUESTA)
+-----------------------------------------
+RUTA: /chat/
+VISTA: preguntas (core_views.py)
+AGENTE: AGENT_SCOUTER_URL
+
+PROCESO DE EVALUACIÓN:
+1. Generación de session_id único (UUID)
+2. Inicialización de historial en caché
+3. Conversación guiada por el agente (5 preguntas)
+4. Detección automática de finalización
+5. Extracción de puntuaciones NB-X
+6. Cálculo de métricas derivadas
+7. Almacenamiento en MongoDB
+8. Redirección a dashboard
+
+ENDPOINTS:
+- POST /encuesta/iniciar/: Inicia nueva evaluación
+- POST /encuesta/mensaje/: Procesa mensajes del chat
+- GET /api/resultados/<session_id>/: Obtiene resultados
+- POST /encuesta/limpiar/: Limpia caché de sesión
+- POST /encuesta/eliminar-dashboard/: Elimina evaluación
+
+
+7.4 MÓDULO DE VISUALIZACIÓN (DASHBOARD)
+----------------------------------------
+RUTA: /encuesta/dashboard/?session_id=<id>
+VISTA: dashboard_view (dashboard_views.py)
+
+SECCIONES DEL DASHBOARD:
+1. Header con métricas principales
+   - Promedio global (0-100)
+   - Nivel evaluado
+   - Fecha y hora de evaluación
+
+2. Gráfico Radar (Perfil NB-X)
+   - Visualización pentagonal
+   - 5 dimensiones del pensamiento crítico
+
+3. Gráfico de Barras Comparativo
+   - Barras coloreadas por nivel
+   - Líneas de referencia
+
+4. Métricas Detalladas
+   - Pensamiento Estructurado
+   - Language Skills
+   - Argumentación
+
+5. Fortalezas y Oportunidades
+   - Dimensión más alta
+   - Dimensión más baja
+
+6. Logros Desbloqueados
+   - Sistema de gamificación
+   - 10 logros posibles
+
+7. Sidebar con Historial
+   - Evaluaciones previas del usuario
+   - Navegación entre dashboards
+
+MODOS DE ACCESO:
+- Normal: Desde la aplicación (con sesión)
+- Iframe: Embebido (parámetro user_id en GET)
+- Demo: Datos de prueba (session_id='demo-dashboard')
+
+
+================================================================================
+8. ESTRUCTURA DE RUTAS (URLs)
+================================================================================
+
+PÁGINAS ESTÁTICAS:
+- /                          → home (index.html)
+- /pensamiento-critico/      → Información sobre pensamiento crítico
+- /comunicacion/             → Información sobre comunicación
+- /creatividad/              → Información sobre creatividad
+- /colaboracion/             → Información sobre colaboración
+- /presentacion/             → Página de presentación
+- /skill/                    → Módulo de práctica (dual chat)
+
+AUTENTICACIÓN:
+- /login/                    → Página de login
+- /register/                 → Registro de usuarios (POST)
+- /logout/                   → Cierre de sesión (POST)
+
+APLICACIÓN (Requieren login):
+- /dashboard/                → Dashboard principal del usuario
+- /chat/knowledge/           → Chat de aprendizaje (Agente Profesor)
+- /chat/                     → Chat de evaluación (Agente Scouter)
+
+LECCIONES:
+- /lecciones/<leccion_id>/   → Contenido de lección específica
+
+EVALUACIÓN:
+- /encuesta/iniciar/         → Inicia nueva evaluación
+- /encuesta/mensaje/         → Procesa mensajes (AJAX)
+- /encuesta/dashboard/       → Dashboard de resultados
+- /encuesta/inyectar-datos/  → Inyecta datos de prueba
+- /encuesta/limpiar/         → Limpia caché
+- /encuesta/eliminar-dashboard/ → Elimina evaluación
+
+API ENDPOINTS:
+- /api/skill_chat/           → Chat dual (Coach/Criker)
+- /api/resultados/<session_id>/ → Obtiene resultados de evaluación
+- /api/graficos/<session_id>/<tipo>/ → Genera gráficos dinámicos
+
+OTROS:
+- /ask-sofia/                → Agente Sofía (asistente)
+- /test/                     → Vista de pruebas
+- /streamlit/.*              → Proxy a servidor Streamlit (si aplica)
+
+
+================================================================================
+9. DEPENDENCIAS PRINCIPALES
+================================================================================
+
+FRAMEWORK Y CORE:
+- Django==4.2.13              (Framework web)
+- djangorestframework==3.16.1 (API REST)
+- gunicorn==23.0.0            (Servidor WSGI)
+
+BASE DE DATOS:
+- pymongo==4.15.1             (Driver MongoDB)
+- bcrypt==5.0.0               (Hash de contraseñas)
+
+CACHÉ Y SESIONES:
+- redis==6.4.0                (Cliente Redis)
+- django-redis==6.0.0         (Backend de caché)
+
+INTELIGENCIA ARTIFICIAL:
+- openai==1.109.1             (API de OpenAI)
+- langchain==0.3.27           (Framework de IA)
+- google-cloud-aiplatform==1.117.0 (Google AI)
+
+VISUALIZACIÓN Y DATOS:
+- matplotlib>=3.7.0           (Gráficos estáticos)
+- seaborn>=0.12.0             (Visualizaciones avanzadas)
+- plotly>=5.15.0              (Gráficos interactivos)
+- numpy>=1.24.0               (Cálculos numéricos)
+- pandas>=2.0.0               (Manipulación de datos)
+- scipy>=1.10.0               (Cálculos científicos)
+- scikit-learn>=1.3.0         (Machine Learning)
+
+ARCHIVOS ESTÁTICOS:
+- whitenoise==6.11.0          (Servicio de estáticos)
+- Pillow>=10.0.0              (Procesamiento de imágenes)
+
+SEGURIDAD Y UTILIDADES:
+- cryptography==46.0.1        (Criptografía)
+- requests==2.32.5            (Cliente HTTP)
+- urllib3==2.5.0              (Cliente HTTP bajo nivel)
+- python-decouple==3.8        (Variables de entorno)
+- django-cors-headers==4.9.0  (CORS)
+- PyJWT==2.10.1               (JSON Web Tokens)
+- pytz==2025.2                (Zonas horarias)
+
+MONITOREO:
+- sentry-sdk==2.39.0          (Monitoreo de errores)
+
+
+================================================================================
+10. FLUJOS DE USUARIO PRINCIPALES
+================================================================================
+
+10.1 FLUJO DE REGISTRO Y ONBOARDING
+------------------------------------
+1. Usuario accede a /login/
+2. Clic en "Registrarse"
+3. Completa formulario (nombre, apellido, email, contraseña)
+4. Sistema valida:
+   - Campos obligatorios completos
+   - Email único en la base de datos
+   - Formato de email válido
+5. Contraseña hasheada con bcrypt
+6. Documento creado en MongoDB (colección users)
+7. Sesión iniciada automáticamente
+8. Redirección a /presentacion/
+9. Usuario explora las secciones informativas
+10. Acceso al dashboard para comenzar actividades
+
+
+10.2 FLUJO DE APRENDIZAJE (KNOWLEDGE)
+--------------------------------------
+1. Usuario logueado accede a /chat/knowledge/
+2. Sistema carga historial desde MongoDB
+3. Si es primera vez, agente envía saludo automático
+4. Usuario escribe pregunta en el chat
+5. Frontend envía POST AJAX a knowledge_view
+6. Backend verifica caché (MD5 del mensaje)
+7. Si no existe en caché:
+   a. Llamada HTTP POST al Agente Profesor
+   b. Timeout de 120 segundos
+   c. Respuesta guardada en caché
+8. Historial actualizado en MongoDB
+9. Respuesta JSON devuelta al frontend
+10. Mensaje renderizado en el chat con timestamp
+11. Usuario puede continuar la conversación
+
+
+10.3 FLUJO DE PRÁCTICA (SKILL)
+-------------------------------
+1. Usuario accede a /skill/
+2. Página carga con dos chats (Coach y Criker)
+3. Usuario selecciona un chat y escribe mensaje
+4. Frontend identifica el agente target (coach/criker)
+5. POST AJAX a /api/skill_chat/ con:
+   - user_id
+   - message
+   - agent_target
+6. Backend enruta al servicio correspondiente
+7. Agente procesa y responde:
+   - Coach: Siempre texto
+   - Criker: Texto o JSON (caso de uso)
+8. Si es caso de uso (JSON):
+   a. Frontend renderiza interfaz interactiva
+   b. Usuario selecciona opciones
+   c. Feedback inmediato
+9. Si es texto:
+   a. Renderizado como mensaje normal
+10. Historial guardado en MongoDB
+11. Usuario puede alternar entre ambos chats
+
+
+10.4 FLUJO DE EVALUACIÓN COMPLETA
+----------------------------------
+1. Usuario accede a /chat/
+2. Sistema genera session_id único (UUID)
+3. Historial inicializado en Redis
+4. Agente Scouter inicia conversación
+5. Usuario responde 5 preguntas adaptativas
+6. Cada mensaje procesado vía POST /encuesta/mensaje/
+7. Sistema detecta finalización por keywords
+8. Extracción de puntuaciones NB-X mediante regex
+9. Cálculo de métricas:
+   - Promedio global
+   - Nivel (Básico/Intermedio/Experto)
+   - Fortaleza y oportunidad
+   - Pensamiento estructurado
+   - Language skills
+   - Argumentación
+   - Historial simulado (3 evaluaciones)
+   - Logros desbloqueados
+10. Documento creado en MongoDB (survey_results)
+11. ID agregado al historial del usuario
+12. Redirección a /encuesta/dashboard/?session_id=<id>
+13. Dashboard renderizado con gráficos
+14. Usuario puede:
+    - Ver resultados detallados
+    - Navegar historial de evaluaciones
+    - Descargar/compartir resultados (futuro)
+
+
+================================================================================
+11. PATRONES DE DISEÑO Y BUENAS PRÁCTICAS
+================================================================================
+
+11.1 PATRONES ARQUITECTÓNICOS
+------------------------------
+
+A) SEPARACIÓN DE RESPONSABILIDADES (SoC)
+   - Vistas divididas por funcionalidad:
+     * core_views.py: Lógica principal
+     * auth_views.py: Autenticación
+     * preguntas_views.py: Evaluaciones
+     * dashboard_views.py: Visualizaciones
+     * sofia_views.py: Agente asistente
+   - services.py: Lógica de negocio centralizada
+   - db.py: Gestión de conexiones
+   - auth_helpers.py: Utilidades de autenticación
+
+B) SINGLETON PATTERN
+   - Cliente MongoDB persistente (mongo_client)
+   - Inicialización única al arranque
+   - Reutilización en toda la aplicación
+
+C) DECORATOR PATTERN
+   - @login_required: Control de acceso
+   - @require_http_methods: Validación de métodos HTTP
+   - @csrf_exempt: Excepciones CSRF específicas
+   - @xframe_options_exempt: Permitir iframes
+
+D) FACTORY PATTERN
+   - Generación dinámica de gráficos
+   - Creación de documentos MongoDB
+   - Construcción de respuestas JSON
+
+E) CACHE-ASIDE PATTERN
+   - Verificación de caché antes de llamar a agentes
+   - Almacenamiento tras obtener respuesta
+   - Invalidación manual cuando necesario
+
+
+11.2 PRINCIPIOS SOLID
+---------------------
+
+SINGLE RESPONSIBILITY:
+- Cada vista tiene una responsabilidad clara
+- Servicios separados por agente
+- Funciones auxiliares específicas
+
+OPEN/CLOSED:
+- Extensible para nuevos agentes sin modificar código existente
+- Configuración mediante variables de entorno
+
+DEPENDENCY INVERSION:
+- Dependencia de abstracciones (get_db_collection)
+- Inyección de configuración desde settings
+
+
+11.3 MANEJO DE ERRORES
+-----------------------
+
+ESTRATEGIA MULTICAPA:
+1. Try-Catch en servicios (services.py)
+2. Logging detallado con contexto
+3. Respuestas JSON con códigos HTTP apropiados
+4. Mensajes de error amigables al usuario
+5. Fallbacks para servicios externos
+
+CÓDIGOS HTTP UTILIZADOS:
+- 200: Éxito
+- 400: Bad Request (datos inválidos)
+- 404: Not Found (recurso no existe)
+- 500: Internal Server Error
+- 502: Bad Gateway (error de agente externo)
+- 503: Service Unavailable (BD no disponible)
+
+TIPOS DE EXCEPCIONES MANEJADAS:
+- ConnectionError: Problemas de BD
+- ValueError: Validación de datos
+- requests.exceptions.RequestException: Errores de API
+- json.JSONDecodeError: JSON malformado
+- Exception: Catch-all para errores inesperados
+
+
+11.4 OPTIMIZACIONES IMPLEMENTADAS
+----------------------------------
+
+PERFORMANCE:
+- Caché de respuestas de IA (ahorro de costos y latencia)
+- Pool de conexiones MongoDB (eficiencia)
+- Compresión de estáticos con WhiteNoise
+- Lazy loading de imágenes (frontend)
+- Gráficos generados bajo demanda
+
+ESCALABILIDAD:
+- Arquitectura stateless (Cloud Run)
+- Sesiones en Redis (compartidas entre instancias)
+- Base de datos NoSQL (escalado horizontal)
+- Agentes externos independientes
+
+SEGURIDAD:
+- Contraseñas nunca en texto plano
+- CSRF protection habilitada
+- HTTPS en producción
+- Validación de entrada en todos los endpoints
+- Sanitización de datos de usuario
+
+
+================================================================================
+12. LIMITACIONES Y ÁREAS DE MEJORA
+================================================================================
+
+12.1 LIMITACIONES ACTUALES
+---------------------------
+
+TÉCNICAS:
+- Sin sistema de recuperación de contraseña
+- Caché sin TTL definido (puede crecer indefinidamente)
+- Gráficos generados en cada request (no cacheados)
+- Sin paginación en historial de evaluaciones
+- Timeout fijo de agentes (no adaptativo)
+- Sin retry logic para llamadas a agentes
+- Historial simulado (no real) en dashboards
+
+FUNCIONALES:
+- Sin exportación de resultados (PDF, CSV)
+- Sin comparación entre evaluaciones
+- Sin recomendaciones personalizadas
+- Sin sistema de notificaciones
+- Sin gamificación completa (logros básicos)
+- Sin análisis de progreso temporal
+
+ESCALABILIDAD:
+- Sin CDN para archivos estáticos
+- Sin balanceo de carga explícito
+- Sin rate limiting
+- Sin circuit breaker para agentes
+- Sin health checks automatizados
+
+
+12.2 MEJORAS PROPUESTAS
+------------------------
+
+CORTO PLAZO (1-3 meses):
+1. Implementar recuperación de contraseña por email
+2. Agregar TTL a entradas de caché
+3. Cachear gráficos generados
+4. Implementar paginación en historial
+5. Agregar retry logic con backoff exponencial
+6. Crear health check endpoint (/health/)
+7. Implementar rate limiting por usuario
+
+MEDIANO PLAZO (3-6 meses):
+1. Sistema de exportación de resultados (PDF)
+2. Comparación visual entre evaluaciones
+3. Motor de recomendaciones basado en perfil
+4. Sistema de notificaciones (email/push)
+5. Gamificación avanzada (badges, niveles, rankings)
+6. Análisis de progreso con gráficos temporales
+7. Integración con LMS (Moodle, Canvas)
+8. API pública para integraciones
+
+LARGO PLAZO (6-12 meses):
+1. Migrar a arquitectura de microservicios
+2. Implementar GraphQL API
+3. Aplicación móvil nativa (React Native)
+4. Sistema de recomendación con ML
+5. Análisis predictivo de desempeño
+6. Colaboración en tiempo real (WebSockets)
+7. Integración con sistemas de videoconferencia
+8. Marketplace de contenido educativo
+
+
+12.3 DEUDA TÉCNICA IDENTIFICADA
+--------------------------------
+
+CÓDIGO:
+- views.py comentado (legacy code no eliminado)
+- Duplicación de lógica de formateo de timestamps
+- Funciones largas en preguntas_views.py (>100 líneas)
+- Falta de type hints en Python
+- Comentarios en español e inglés mezclados
+
+TESTING:
+- Sin tests unitarios implementados
+- Sin tests de integración
+- Sin tests end-to-end
+- Sin coverage reports
+- Sin CI/CD pipeline completo
+
+DOCUMENTACIÓN:
+- Sin documentación de API (Swagger/OpenAPI)
+- Sin diagramas de arquitectura actualizados
+- Sin guía de contribución
+- Sin changelog estructurado
+- Comentarios de código inconsistentes
+
+INFRAESTRUCTURA:
+- Sin entorno de staging
+- Sin blue-green deployment
+- Sin rollback automatizado
+- Sin disaster recovery plan
+- Sin backups automatizados de MongoDB
+
+
+================================================================================
+13. MÉTRICAS Y KPIs
+================================================================================
+
+13.1 MÉTRICAS TÉCNICAS
+----------------------
+
+PERFORMANCE:
+- Tiempo de respuesta promedio: <2s (objetivo)
+- Tiempo de carga inicial: <3s
+- Tiempo de generación de gráficos: <1s
+- Latencia de agentes IA: 5-15s (variable)
+- Cache hit rate: >70% (objetivo)
+
+DISPONIBILIDAD:
+- Uptime objetivo: 99.5%
+- RTO (Recovery Time Objective): <1 hora
+- RPO (Recovery Point Objective): <24 horas
+
+ESCALABILIDAD:
+- Usuarios concurrentes soportados: 100+ (Cloud Run)
+- Requests por segundo: 50+ (estimado)
+- Tamaño de base de datos: <1GB (actual)
+- Crecimiento mensual: ~100MB
+
+
+13.2 MÉTRICAS DE NEGOCIO
+-------------------------
+
+ADOPCIÓN:
+- Usuarios registrados
+- Usuarios activos mensuales (MAU)
+- Tasa de retención (D1, D7, D30)
+- Tasa de conversión (visitante → registro)
+
+ENGAGEMENT:
+- Evaluaciones completadas por usuario
+- Tiempo promedio en plataforma
+- Mensajes enviados a agentes
+- Lecciones completadas
+- Dashboards visualizados
+
+CALIDAD:
+- Tasa de finalización de evaluaciones
+- Satisfacción del usuario (NPS)
+- Errores reportados por usuario
+- Tiempo de resolución de issues
+
+
+13.3 COSTOS ESTIMADOS (MENSUAL)
+--------------------------------
+
+INFRAESTRUCTURA:
+- Google Cloud Run: $10-50 (según tráfico)
+- MongoDB Atlas: $0-25 (tier gratuito hasta 512MB)
+- Redis Cloud: $0-10 (tier gratuito disponible)
+- Container Registry: $1-5
+
+SERVICIOS EXTERNOS:
+- OpenAI API: $50-500 (según uso)
+- Google Cloud AI: $10-100 (según uso)
+- Sentry: $0-26 (tier gratuito hasta 5K eventos/mes)
+
+TOTAL ESTIMADO: $71-716/mes
+(Varía significativamente según número de usuarios y uso de IA)
+
+OPTIMIZACIONES DE COSTO:
+- Caché de respuestas IA (ahorro ~60%)
+- Autoscaling a 0 instancias (sin tráfico = $0)
+- Tier gratuito de MongoDB y Redis
+- Compresión de datos
+
+
+================================================================================
+14. GUÍA DE MANTENIMIENTO
+================================================================================
+
+14.1 TAREAS RUTINARIAS
+-----------------------
+
+DIARIAS:
+- Revisar logs de errores en Cloud Run
+- Monitorear uso de APIs de IA
+- Verificar disponibilidad de agentes externos
+- Revisar métricas de performance
+
+SEMANALES:
+- Analizar cache hit rate
+- Revisar crecimiento de base de datos
+- Verificar backups de MongoDB
+- Actualizar dependencias de seguridad
+- Revisar issues reportados
+
+MENSUALES:
+- Análisis de costos de infraestructura
+- Revisión de métricas de negocio
+- Limpieza de datos obsoletos en caché
+- Auditoría de seguridad
+- Actualización de documentación
+
+
+14.2 PROCEDIMIENTOS DE EMERGENCIA
+----------------------------------
+
+CAÍDA DE SERVICIO:
+1. Verificar estado de Cloud Run
+2. Revisar logs recientes
+3. Verificar conectividad con MongoDB
+4. Verificar disponibilidad de agentes
+5. Rollback a versión anterior si necesario
+6. Comunicar a usuarios (si >30 min)
+
+ERROR DE BASE DE DATOS:
+1. Verificar conexión a MongoDB Atlas
+2. Revisar límites de tier (conexiones, storage)
+3. Verificar credenciales en env.yaml
+4. Restaurar desde backup si necesario
+5. Migrar a tier superior si límites alcanzados
+
+AGENTE DE IA NO RESPONDE:
+1. Verificar URL del agente en settings
+2. Probar endpoint manualmente (curl/Postman)
+3. Revisar logs del agente en Cloud Run
+4. Reiniciar servicio del agente
+5. Implementar respuesta de fallback
+
+
+14.3 ACTUALIZACIÓN DE DEPENDENCIAS
+-----------------------------------
+
+PROCESO:
+1. Crear rama de actualización
+2. Actualizar requirements.txt
+3. Probar localmente con Docker
+4. Ejecutar tests (cuando estén implementados)
+5. Desplegar a staging (cuando exista)
+6. Monitorear por 24 horas
+7. Desplegar a producción
+8. Documentar cambios en changelog
+
+DEPENDENCIAS CRÍTICAS:
+- Django: Actualizar solo versiones LTS
+- pymongo: Verificar compatibilidad con MongoDB Atlas
+- openai: Revisar breaking changes en API
+- matplotlib: Verificar compatibilidad de gráficos
+
+
+14.4 MONITOREO Y ALERTAS
+-------------------------
+
+ALERTAS CONFIGURADAS (Recomendadas):
+- Error rate >5% en 5 minutos
+- Latencia >5s en 95th percentile
+- Disponibilidad <99% en 1 hora
+- Uso de memoria >80%
+- Tasa de error de agentes >10%
+- Costo diario >$50
+
+HERRAMIENTAS:
+- Google Cloud Monitoring (métricas de infraestructura)
+- Sentry (errores de aplicación)
+- Cloud Logging (logs centralizados)
+- Uptime checks (disponibilidad)
+
+DASHBOARDS:
+- Performance (latencia, throughput)
+- Errores (rate, tipos, stack traces)
+- Costos (por servicio, tendencias)
+- Usuarios (activos, nuevos, retención)
+
+
+================================================================================
+15. CONCLUSIONES Y RECOMENDACIONES
+================================================================================
+
+15.1 FORTALEZAS DEL SISTEMA
+----------------------------
+
+ARQUITECTURA:
+✓ Diseño modular y escalable
+✓ Separación clara de responsabilidades
+✓ Uso de patrones de diseño establecidos
+✓ Arquitectura serverless (Cloud Run)
+
+TECNOLOGÍA:
+✓ Stack moderno y bien soportado
+✓ Integración efectiva de múltiples agentes IA
+✓ Base de datos NoSQL flexible (MongoDB)
+✓ Sistema de caché eficiente (Redis)
+
+FUNCIONALIDAD:
+✓ Evaluación integral de pensamiento crítico
+✓ Visualizaciones claras y profesionales
+✓ Experiencia de usuario fluida
+✓ Retroalimentación personalizada por IA
+
+SEGURIDAD:
+✓ Autenticación robusta con bcrypt
+✓ Protección CSRF implementada
+✓ Variables de entorno para secretos
+✓ HTTPS en producción
+
+
+15.2 ÁREAS CRÍTICAS DE MEJORA
+------------------------------
+
+PRIORIDAD ALTA:
+1. Implementar suite de tests (unitarios, integración, E2E)
+2. Agregar recuperación de contraseña
+3. Implementar retry logic para agentes
+4. Crear entorno de staging
+5. Configurar backups automatizados de MongoDB
+
+PRIORIDAD MEDIA:
+1. Documentar API con OpenAPI/Swagger
+2. Implementar rate limiting
+3. Agregar exportación de resultados (PDF)
+4. Crear sistema de notificaciones
+5. Optimizar generación de gráficos (caché)
+
+PRIORIDAD BAJA:
+1. Refactorizar código legacy comentado
+2. Estandarizar comentarios (idioma único)
+3. Agregar type hints en Python
+4. Implementar paginación en historial
+5. Crear guía de contribución
+
+
+15.3 RECOMENDACIONES ESTRATÉGICAS
+----------------------------------
+
+CORTO PLAZO (0-3 meses):
+- Enfocarse en estabilidad y testing
+- Implementar monitoreo proactivo
+- Documentar procesos críticos
+- Establecer métricas de éxito claras
+
+MEDIANO PLAZO (3-6 meses):
+- Expandir funcionalidades de gamificación
+- Integrar con plataformas LMS existentes
+- Desarrollar API pública
+- Implementar análisis predictivo
+
+LARGO PLAZO (6-12 meses):
+- Considerar migración a microservicios
+- Desarrollar aplicación móvil
+- Implementar colaboración en tiempo real
+- Crear marketplace de contenido
+
+
+15.4 CONSIDERACIONES FINALES
+-----------------------------
+
+Web Skill representa una solución innovadora para el desarrollo de habilidades
+blandas mediante inteligencia artificial. La arquitectura actual es sólida y
+escalable, con una base tecnológica moderna que permite crecimiento futuro.
+
+PUNTOS CLAVE:
+- Sistema funcional y desplegado en producción
+- Integración exitosa de múltiples agentes de IA
+- Evaluación cuantitativa de pensamiento crítico
+- Visualizaciones profesionales y comprensibles
+- Arquitectura preparada para escalar
+
+PRÓXIMOS PASOS RECOMENDADOS:
+1. Implementar testing automatizado (crítico)
+2. Establecer pipeline de CI/CD completo
+3. Crear documentación técnica detallada
+4. Configurar monitoreo y alertas proactivas
+5. Planificar roadmap de producto a 12 meses
+
+RIESGOS IDENTIFICADOS:
+- Dependencia de servicios externos (agentes IA)
+- Costos variables según uso de APIs
+- Falta de tests puede generar regresiones
+- Sin plan de disaster recovery formal
+
+OPORTUNIDADES:
+- Mercado creciente de EdTech
+- Diferenciación por uso de IA avanzada
+- Potencial de integración con instituciones
+- Escalabilidad técnica demostrada
+
+================================================================================
+FIN DEL INFORME TÉCNICO
+================================================================================
+
+Documento generado: Noviembre 2024
+Versión: 1.0
+Confidencialidad: Interno
+
+Para consultas técnicas o aclaraciones sobre este informe, contactar al
+equipo de desarrollo de Web Skill.
+
+================================================================================

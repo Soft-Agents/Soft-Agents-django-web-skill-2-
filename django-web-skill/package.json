@@ -1,0 +1,20 @@
+{
+  "name": "app_web_skill",
+  "version": "1.0.0",
+  "description": "Proyecto Django  Web Skill\r Este proyecto es una aplicación web construida con Django, Tailwind CSS y MongoDB Atlas. Permite a los usuarios registrarse y guardar sus datos en una base de datos NoSQL.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Soft-Agents/App_web_skill.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Soft-Agents/App_web_skill/issues"
+  },
+  "homepage": "https://github.com/Soft-Agents/App_web_skill#readme"
+}

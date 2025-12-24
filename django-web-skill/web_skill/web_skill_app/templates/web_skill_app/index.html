@@ -1,0 +1,184 @@
+{% extends 'web_skill_app/base.html' %}
+{% load static %}
+
+{% block title %}Knowledge - Plataforma Tecnológica{% endblock %}
+
+{% block content %}
+    {% include 'web_skill_app/partials/navigation.html' with currentPage='home' %}
+
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        @keyframes float {
+            0% { transform: translateY(0) translateX(0); }
+            50% { transform: translateY(-50px) translateX(50px); }
+            100% { transform: translateY(0) translateX(0); }
+        }
+        .particle {
+            animation: float 15s infinite ease-in-out alternate;
+        }
+
+        /* --- CORREGIDO: REGLAS PARA OCULTAR EL SCROLLBAR SIN DESACTIVARLO --- */
+        #main-content-scroll {
+            -ms-overflow-style: none;  /* IE y Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+        #main-content-scroll::-webkit-scrollbar {
+            width: 0;  /* Chrome, Safari y Opera */
+            height: 0;
+        }
+        /* --- FIN DE REGLAS DE SCROLLBAR --- */
+
+    </style>
+
+    <div 
+        id="main-content-scroll" 
+        class="flex-1 overflow-y-auto"
+        style="height: calc(100vh - 4rem);" 
+    > 
+        <div class="relative h-[230vh] w-full">
+
+            <div class="sticky top-0 h-screen w-full bg-white z-1"></div>
+
+            <section 
+                id="hero-layer"
+                class="sticky top-0 h-screen w-full z-10 flex flex-col justify-center items-center text-center text-white overflow-hidden"
+                style="
+                    background: radial-gradient(circle, #4a1a7c 0%, #1a0a2a 70%);
+                    clip-path: circle(10% at center center);
+                    /* Margin-top negativo para que empiece pegado al top del spacer */
+                    margin-top: -100vh;
+                "
+            >
+                <div id="particles-container" class="absolute inset-0 z-[-1] overflow-hidden pointer-events-none">
+                </div>
+
+                <div class="relative z-20 max-w-full">
+                    <p 
+                        id="pre-title"
+                        class="font-['Bebas_Neue'] font-bold text-white lowercase leading-none opacity-0 transition-opacity duration-500"
+                        style="
+                            font-size: clamp(4rem, 12.5vw, 9rem);
+                            margin-bottom: -1rem; /* Margen ajustado */
+                            text-shadow: 
+                                -2px -2px 0 #000, 2px -2px 0 #000, 
+                                -2px 2px 0 #000, 2px 2px 0 #000, 
+                                -3px -3px 0 #333, 3px 3px 0 #333;
+                        "
+                    >
+                        welcome to
+                    </p>
+                    
+                    <h1 
+                        id="animated-title"
+                        class="font-['Bebas_Neue'] font-bold text-white uppercase leading-none tracking-wide"
+                        style="
+                            font-size: clamp(8rem, 25vw, 18rem);
+                            text-shadow: 
+                                -3px -3px 0 #000, 3px -3px 0 #000, 
+                                -3px 3px 0 #000, 3px 3px 0 #000, 
+                                -5px -5px 0 #333, 5px 5px 0 #333;
+                        "
+                    >
+                        SOFTAGENTS
+                    </h1>
+                    
+                    <a 
+                        href="{% url 'presentacion' %}" 
+                        id="animated-button"
+                        class="
+                            font-['Poppins'] font-bold text-gray-800 no-underline cursor-pointer
+                            inline-block mt-16 px-16 py-8 rounded-full 
+                            text-4xl border-2 border-gray-400 shadow-lg
+                            bg-gradient-to-b from-gray-200 to-gray-300
+                            opacity-0 transition-all duration-300 ease-in-out
+                            translate-y-8
+                            
+                            /* --- BOTÓN HOVER CORREGIDO --- */
+                            hover:bg-black hover:text-black hover:border-white
+                            hover:shadow-[0_0_20px_#ffffff,0_0_40px_rgba(255,255,255,0.8)]
+                            hover:-translate-y-1 hover:scale-105
+                        "
+                    >
+                        empecemos
+                    </a>
+                </div>
+            </section>
+        </div>
+    </div>
+
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            
+            const scrollContainer = document.getElementById("main-content-scroll");
+            
+            const heroLayer = document.getElementById("hero-layer");
+            const button = document.getElementById("animated-button");
+            const preTitle = document.getElementById("pre-title");
+            const particlesContainer = document.getElementById("particles-container");
+
+            // --- Generación de Partículas (36) ---
+            function createParticles() {
+                const numParticles = 36;
+                for (let i = 0; i < numParticles; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle absolute bg-white/60 rounded-full opacity-0 transition-opacity duration-500';
+                    
+                    const size = Math.random() * 8 + 4;
+                    particle.style.width = `${size}px`;
+                    particle.style.height = `${size}px`;
+                    
+                    particle.style.left = `${Math.random() * 100}%`;
+                    particle.style.top = `${Math.random() * 100}%`;
+                    
+                    particle.style.animationDelay = `${Math.random() * 10}s`;
+                    
+                    particlesContainer.appendChild(particle);
+                    setTimeout(() => particle.style.opacity = '1', i * 100); 
+                }
+            }
+            createParticles();
+
+
+            // --- Escuchamos el scroll del DIV ---
+            scrollContainer.addEventListener("scroll", function() {
+                
+                // Recorrido de scroll (1.5)
+                let scrollDistance = scrollContainer.clientHeight * 1.5;
+                
+                let scrollPercent = scrollContainer.scrollTop / scrollDistance;
+                let progress = Math.min(scrollPercent, 1.0);
+
+                // --- 1. Animación del Círculo (clip-path) ---
+                let startRadius = 10; 
+                let endRadius = 150;
+                let radius = startRadius + (progress * (endRadius - startRadius));
+
+                heroLayer.style.clipPath = `circle(${radius}% at center center)`;
+
+                // --- 2. Animación del Pre-título (Aparición) ---
+                if (progress > 0.3) {
+                    let preTitleOpacity = (progress - 0.3) / 0.2;
+                    preTitle.style.opacity = Math.min(preTitleOpacity, 1);
+                } else {
+                    preTitle.style.opacity = 0;
+                }
+
+                // --- 3. Animación del Botón (Aparición) ---
+                if (progress > 0.5) {
+                    let buttonOpacity = (progress - 0.5) / 0.3;
+                    let buttonTranslate = 30 - (buttonOpacity * 30);
+
+                    button.style.opacity = Math.min(buttonOpacity, 1);
+                    button.style.transform = `translateY(${Math.max(buttonTranslate, 0)}px)`;
+                    
+                } else {
+                    button.style.opacity = 0;
+                    button.style.transform = `translateY(30px)`;
+                }
+            });
+        });
+    </script>
+
+{% endblock %}

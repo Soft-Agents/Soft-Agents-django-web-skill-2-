@@ -1,0 +1,88 @@
+<!-- Sidebar Historial de Encuestas -->
+<div class="col-span-12 lg:col-span-4 mb-8 lg:mb-0">
+  <div class="dashboard-card">
+    <!-- Usuario Info -->
+    <div class="flex items-center mb-6 pb-4 border-b border-gray-200">
+      <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center mr-4 text-white font-black text-lg shadow-lg">
+        {{ user.first_name|first|upper|default:"U" }}
+      </div>
+      <div class="flex-1">
+        <div class="font-black text-gray-800 text-base">
+          {{ user.first_name|default:"Usuario" }}
+        </div>
+        <div class="text-sm text-gray-600 font-semibold">
+          Evaluaciones completadas
+        </div>
+      </div>
+    </div>
+    
+    <h3 class="text-lg font-black text-gray-900 mb-4 flex items-center">
+      📊 Historial de Evaluaciones
+    </h3>
+    
+    {% if historial %}
+      <div class="space-y-3 max-h-96 overflow-y-auto">
+        {% for evaluacion in historial %}
+          <div class="p-3 rounded-lg border transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/20 hover:transform hover:scale-105
+                      {% if evaluacion.id == current_dashboard_id %}bg-blue-50 border-blue-300 shadow-lg shadow-blue-500/20{% else %}bg-gray-50 border-gray-200 hover:bg-gray-100 shadow-md{% endif %}"
+               style="box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1), 0 0 10px rgba(147, 51, 234, 0.05);"">
+            <a href="/encuesta/dashboard/?session_id={{ evaluacion.id }}{% if is_in_iframe %}&user_id={{ user_id }}{% endif %}" 
+               class="block text-decoration-none">
+              
+              <!-- Fecha y hora -->
+              <div class="text-sm font-black text-gray-800 mb-1">
+                {{ evaluacion.timestamp }}
+              </div>
+              
+              <!-- Nivel y promedio -->
+              <div class="flex justify-between items-center mb-2">
+                <span class="text-xs px-2 py-1 rounded-full font-bold shadow-sm
+                           {% if evaluacion.nivel == 'Experto' %}bg-green-100 text-green-800 shadow-green-500/20
+                           {% elif evaluacion.nivel == 'Intermedio' %}bg-yellow-100 text-yellow-800 shadow-yellow-500/20
+                           {% else %}bg-red-100 text-red-800 shadow-red-500/20{% endif %}">
+                  {{ evaluacion.nivel }}
+                </span>
+                <span class="text-sm font-black text-gray-700">
+                  {{ evaluacion.promedio }}/100
+                </span>
+              </div>
+              
+              <!-- Contexto del usuario -->
+              {% if evaluacion.contexto %}
+                <div class="text-xs text-gray-600 truncate font-semibold">
+                  {{ evaluacion.contexto|slice:":50" }}{% if evaluacion.contexto|length > 50 %}...{% endif %}
+                </div>
+              {% endif %}
+              
+              <!-- Indicador de evaluación actual -->
+              {% if evaluacion.id == current_dashboard_id %}
+                <div class="text-xs text-blue-700 font-black mt-1">
+                  ✓ Evaluación actual
+                </div>
+              {% endif %}
+            </a>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="text-center py-8 text-gray-600">
+        <div class="text-4xl mb-2">📋</div>
+        <p class="text-sm font-bold">No hay evaluaciones previas</p>
+        <p class="text-xs mt-1 font-semibold">Completa tu primera encuesta para ver el historial</p>
+      </div>
+    {% endif %}
+    
+    <!-- Botón para nueva evaluación -->
+    <div class="mt-4 pt-4 border-t border-gray-200">
+  <button 
+    type="button"
+    onclick="window.top.flipToChat();"
+    class="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 
+           text-white px-4 py-2 rounded-lg font-black transition-all duration-300 
+           shadow-lg hover:shadow-xl hover:shadow-purple-500/30 text-center block text-sm
+           hover:transform hover:scale-105 cursor-pointer">
+    🔄 Nueva Evaluación
+  </button>
+</div>
+  </div>
+</div>
