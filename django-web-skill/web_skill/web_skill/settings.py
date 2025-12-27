@@ -2,6 +2,7 @@ from pathlib import Path
 import os
 import sys
 import traceback
+from decouple import config
 
 # LOGGING TEMPRANO PARA CAPTURAR ERRORES DE INICIO
 import logging
@@ -22,11 +23,11 @@ try:
     logger.info(f"✅ BASE_DIR: {BASE_DIR}")
 
     # DEBUG debe ser booleano
-    DEBUG = os.getenv('DEBUG', 'False').lower() in ('true', '1', 'yes')
+    DEBUG = config('DEBUG', default=False, cast=bool)
     logger.info(f"✅ DEBUG: {DEBUG}")
 
     # Secret Key
-    SECRET_KEY = os.getenv('SECRET_KEY')
+    SECRET_KEY = config('SECRET_KEY')
     if not SECRET_KEY:
         raise ValueError("❌ SECRET_KEY no configurado en variables de entorno")
     logger.info(f"✅ SECRET_KEY: {SECRET_KEY[:10]}...")
@@ -87,7 +88,7 @@ try:
     logger.info(f"✅ WSGI_APPLICATION: {WSGI_APPLICATION}")
 
     # Base de datos
-    MONGO_URI = os.getenv('MONGO_URI')
+    MONGO_URI = config('MONGO_URI')
     if not MONGO_URI:
         raise ValueError("❌ MONGO_URI no configurado")
     logger.info(f"✅ MONGO_URI: {MONGO_URI[:30]}...")
