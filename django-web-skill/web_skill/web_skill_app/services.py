@@ -70,21 +70,49 @@ def get_conversation_history_knowledge(user_id):
 def get_agent_response_knowledge(user_id, user_message):
     """
     Gets a response from the Knowledge agent.
-    It first checks the cache for a similar message, and if not found,
-    calls the agent and caches the response.
+    It injects the user's completed lessons into the prompt so the Agent knows the progress.
     """
-    message_hash = hashlib.md5(user_message.strip().lower().encode()).hexdigest()
+    # 1. Recuperamos el documento del usuario PRIMERO para ver sus lecciones
+    try:
+        users_collection = get_db_collection()
+        user_doc, user_object_id = _get_user_doc(users_collection, user_id)
+        
+        # --- NUEVA LÓGICA: OBTENER PROGRESO ---
+        completed_lessons = user_doc.get('lecciones_completadas', [])
+        context_instruction = ""
+        
+        if completed_lessons:
+            lista_lecciones = ", ".join(completed_lessons)
+            # Creamos una instrucción oculta para el agente
+            context_instruction = (
+                f"\n\n[SYSTEM CONTEXT: El usuario ya ha completado y aprobado las siguientes lecciones: {lista_lecciones}. "
+                "Si pregunta qué sigue, guíalo a la siguiente. Felicítalo si acaba de terminar una.]"
+            )
+        # --------------------------------------
+
+    except Exception as e:
+        logger.error(f"Error recuperando usuario en knowledge service: {e}")
+        # Si falla la DB, seguimos con el mensaje normal sin contexto para no romper el chat
+        completed_lessons = []
+        context_instruction = ""
+        user_object_id = user_id
+
+    # Usamos el mensaje + contexto para generar el hash del caché (así si avanza, la respuesta cambia)
+    full_message_for_agent = f"{user_message} {context_instruction}"
+    
+    message_hash = hashlib.md5(full_message_for_agent.strip().lower().encode()).hexdigest()
     cache_key = f"agent_knowledge_response:{message_hash}"
 
     cached_response = cache.get(cache_key)
+    
+    # --- SI ESTÁ EN CACHÉ ---
     if cached_response:
         logger.info(f"Cache HIT for key {cache_key}")
         try:
-            users_collection = get_db_collection()
-            user_doc, user_object_id = _get_user_doc(users_collection, user_id)
             conversation_history = user_doc.get('conversation_history_knowledge', [])
             
             current_time = datetime.datetime.now()
+            # Guardamos solo el mensaje original del usuario (sin el texto oculto del sistema)
             conversation_history.append({'role': 'user', 'message': user_message, 'timestamp': current_time.isoformat()})
             conversation_history.append({'role': 'agent', 'message': cached_response, 'timestamp': (current_time + datetime.timedelta(seconds=1)).isoformat()})
             
@@ -93,22 +121,22 @@ def get_agent_response_knowledge(user_id, user_message):
                 {'$set': {'conversation_history_knowledge': conversation_history}}
             )
             logger.debug(f"Knowledge history updated for {user_object_id} with CACHED response.")
-        except (ConnectionError, ValueError) as e:
-            logger.error(f"Error updating history with cached response for {user_id}: {e}")
+        except Exception as e:
+            logger.error(f"Error updating history with cached response: {e}")
         
         return cached_response
 
+    # --- SI NO ESTÁ EN CACHÉ (LLAMAR AL AGENTE) ---
     logger.info(f"Cache MISS for key {cache_key}. Calling agent.")
     try:
-        users_collection = get_db_collection()
-        user_doc, user_object_id = _get_user_doc(users_collection, user_id)
         conversation_history = user_doc.get('conversation_history_knowledge', [])
 
         agent_url = settings.AGENT_PROFESOR
         if not agent_url:
             raise ValueError("AGENT_PROFESOR URL not configured.")
             
-        payload = {'user_id': str(user_object_id), 'message': user_message}
+        # AQUÍ ENVIAMOS EL MENSAJE CONTEXTUALIZADO (Mensaje + Lista de lecciones)
+        payload = {'user_id': str(user_object_id), 'message': full_message_for_agent}
         
         response = requests.post(
             agent_url, json=payload, headers={'Content-Type': 'application/json'}, timeout=120
@@ -125,6 +153,9 @@ def get_agent_response_knowledge(user_id, user_message):
         logger.info(f"Saved new response to cache with key {cache_key}")
 
         current_time = datetime.datetime.now()
+        
+        # IMPORTANTE: Al guardar en el historial, guardamos 'user_message' (lo que escribió el humano),
+        # NO 'full_message_for_agent' (que tiene las instrucciones raras del sistema).
         conversation_history.append({'role': 'user', 'message': user_message, 'timestamp': current_time.isoformat()})
         conversation_history.append({'role': 'agent', 'message': agent_response, 'timestamp': (current_time + datetime.timedelta(seconds=1)).isoformat()})
         

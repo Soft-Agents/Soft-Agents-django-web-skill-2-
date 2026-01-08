@@ -1,5 +1,9 @@
 # web_skill_app/core_views.py
 
+# --- IMPORTS NECESARIOS AL INICIO DEL ARCHIVO ---
+from .db import get_db_collection
+from bson.objectid import ObjectId
+
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.conf import settings
@@ -152,6 +156,8 @@ def knowledge_view(request):
     # (Esta parte es la misma que antes)
     
     conversation_history = []
+    completed_lessons = [] # Lista vacía por defecto
+
     try:
         # 1. Recuperar historial
         conversation_history = get_conversation_history_knowledge(user_id_str)
@@ -167,6 +173,12 @@ def knowledge_view(request):
             
             # Recargar el historial después del saludo
             conversation_history = get_conversation_history_knowledge(user_id_str)
+        
+        # 3. RECUPERAR LECCIONES COMPLETADAS DE MONGODB (NUEVO)
+        users_collection = get_db_collection()
+        user_doc = users_collection.find_one({'_id': ObjectId(user_id_str)})
+        if user_doc:
+            completed_lessons = user_doc.get('lecciones_completadas', [])
             
     except Exception as e:
         logger.error(f"Error en GET de knowledge_view para {user_id_str}: {e}")
@@ -180,6 +192,8 @@ def knowledge_view(request):
         {
             'user': user,
             'conversation_history': conversation_history,
+            # Convertimos a JSON string para que JS lo lea fácil
+            'completed_lessons_json': json.dumps(completed_lessons),
         }
     )
     
@@ -275,6 +289,37 @@ def leccion_view(request, leccion_id):
     template_name = f"web_skill_app/lecciones/leccion{leccion_id}.html"
     # Simplemente renderizamos la plantilla. Django se encargará de la herencia.
     return render(request, template_name)
+
+# --- NUEVA VISTA PARA GUARDAR EL PROGRESO ---
+@login_required
+def marcar_leccion_completada(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Método no permitido'}, status=405)
+    
+    try:
+        data = json.loads(request.body)
+        leccion_id = data.get('leccion_id')
+        user_id_str = request.user.get('user_id')
+
+        if not leccion_id or not user_id_str:
+            return JsonResponse({'error': 'Faltan datos'}, status=400)
+
+        users_collection = get_db_collection()
+        
+        # Usamos $addToSet para que no se dupliquen si el usuario le da click varias veces
+        users_collection.update_one(
+            {'_id': ObjectId(user_id_str)},
+            {'$addToSet': {'lecciones_completadas': leccion_id}}
+        )
+
+        return JsonResponse({'status': 'ok', 'leccion_id': leccion_id})
+
+    except Exception as e:
+        logger.error(f"Error marcando lección: {e}")
+        return JsonResponse({'error': str(e)}, status=500)
+    
+# --- FIN DEL CÓDIGO ---
+
 
 
 
