@@ -346,5 +346,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     updateWelcomeMessage();
+   
+    const btnOcultar= document.getElementById("btn-activar-sofia")
+    const contenido= document.getElementById("avatar-flotante")
 
+    btnOcultar.addEventListener("click", ()=>{
+        contenido.classList.toggle("contenido-oculto")
+    })
 }); // Fin de DOMContentLoaded
+

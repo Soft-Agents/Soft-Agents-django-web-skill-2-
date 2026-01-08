@@ -1,5 +1,9 @@
 # web_skill_app/core_views.py
+import speech_recognition as sr
 
+from pydub import AudioSegment
+import io
+import traceback # Para ver el error completo
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.conf import settings
@@ -29,9 +33,57 @@ from .services import (
 )
 # Configurar un logger para esta vista
 logger = logging.getLogger(__name__)
+ffmpeg_path = r"C:\ffmpeg\bin\ffmpeg.exe"
+ffprobe_path = r"C:\ffmpeg\bin\ffprobe.exe"
 
-
+AudioSegment.converter = ffmpeg_path
+AudioSegment.ffprobe = ffprobe_path
 # --- VISTAS DE PÁGINAS ESTÁTICAS (sin cambios) ---
+def transcribe_audio(request):
+    if request.method == 'POST':
+        try:
+            audio_file = request.FILES.get('audio_data')
+            if not audio_file:
+                return JsonResponse({'status': 'error', 'message': 'No audio file received'}, status=400)
+
+            # Conversión usando pydub
+            audio = AudioSegment.from_file(io.BytesIO(audio_file.read()))
+            wav_io = io.BytesIO()
+            audio.export(wav_io, format="wav")
+            wav_io.seek(0)
+
+            # Reconocimiento
+            recognizer = sr.Recognizer()
+            with sr.AudioFile(wav_io) as source:
+                # --- AGREGAR ESTO: Calibrar ruido de fondo ---
+                # Ayuda a que Google ignore el siseo o ruido del ambiente
+                recognizer.adjust_for_ambient_noise(source, duration=0.5)
+                
+                audio_data = recognizer.record(source)
+                
+                try:
+                    text = recognizer.recognize_google(audio_data, language="es-ES")
+                    return JsonResponse({'status': 'ok', 'text': text})
+                
+                # Manejo específico si Google no entiende nada (audio vacío o puro ruido)
+                except sr.UnknownValueError:
+                    print("--- Google Speech no detectó palabras claras ---")
+                    return JsonResponse({
+                        'status': 'error', 
+                        'text': '', 
+                        'message': 'No se detectó voz clara. Intenta hablar más fuerte.'
+                    }, status=200)
+
+        except Exception as e:
+            print(f"--- Fallo en transcripción: {str(e)} ---")
+            return JsonResponse({
+                'status': 'error', 
+                'text': '', 
+                'message': f'Error interno: {str(e)}'
+            }, status=200)
+
+    return JsonResponse({'status': 'error', 'message': 'Invalid method'}, status=405)
+
 def home(request):
     context = {'timestamp': int(time.time())}
     return render(request, 'web_skill_app/index.html', context)
@@ -59,6 +111,8 @@ def presentacion(request):
 def skill(request):
     context = {'timestamp': int(time.time())}
     return render(request, "web_skill_app/skill.html", context)
+
+
 
 @login_required # <-- 1. AÑADE EL DECORADOR
 def preguntas(request):
@@ -275,7 +329,5 @@ def leccion_view(request, leccion_id):
     template_name = f"web_skill_app/lecciones/leccion{leccion_id}.html"
     # Simplemente renderizamos la plantilla. Django se encargará de la herencia.
     return render(request, template_name)
-
-
 
     
