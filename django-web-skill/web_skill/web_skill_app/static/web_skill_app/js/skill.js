@@ -24,6 +24,82 @@ document.addEventListener("DOMContentLoaded", () => {
   const messageInputCriker = document.getElementById("message-input-criker");
   const chatMessagesCriker = document.getElementById("chat-messages-criker");
 
+  const micButtonCoach = document.getElementById("mic-button-coach");
+  const micButtonCriker = document.getElementById("mic-button-criker");
+
+  // --- Configuración de Voz (Web Speech API) ---
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const recognition = SpeechRecognition ? new SpeechRecognition() : null;
+  const synthesis = window.speechSynthesis;
+  let activeMicAgent = null; // 'coach' o 'criker'
+
+  if (recognition) {
+    recognition.lang = 'es-MX';
+    recognition.continuous = false;
+    recognition.interimResults = false;
+
+    recognition.onstart = () => {
+      console.log(`🎙️ Grabación iniciada para: ${activeMicAgent}`);
+      if (activeMicAgent === 'coach') {
+        micButtonCoach.classList.add('text-red-500', 'animate-pulse');
+      } else if (activeMicAgent === 'criker') {
+        micButtonCriker.classList.add('text-red-500', 'animate-pulse');
+      }
+    };
+
+    recognition.onend = () => {
+      console.log("🎙️ Grabación finalizada.");
+      micButtonCoach.classList.remove('text-red-500', 'animate-pulse');
+      micButtonCriker.classList.remove('text-red-500', 'animate-pulse');
+      activeMicAgent = null;
+    };
+
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      console.log(`🗣️ Texto reconocido: "${transcript}"`);
+
+      if (activeMicAgent === 'coach') {
+        messageInputCoach.value = transcript;
+        sendButtonCoach.click();
+      } else if (activeMicAgent === 'criker') {
+        messageInputCriker.value = transcript;
+        sendButtonCriker.click();
+      }
+    };
+
+    recognition.onerror = (event) => {
+      console.error("❌ Error en reconocimiento de voz:", event.error);
+      activeMicAgent = null;
+    };
+  }
+
+  function toggleMic(agent) {
+    if (!recognition) {
+      alert("Tu navegador no soporta reconocimiento de voz.");
+      return;
+    }
+
+    if (activeMicAgent === agent) {
+      recognition.stop();
+    } else {
+      if (activeMicAgent) recognition.stop();
+      activeMicAgent = agent;
+      recognition.start();
+    }
+  }
+
+  function speakText(text) {
+    if (!synthesis) return;
+    // Cancelar cualquier habla previa
+    synthesis.cancel();
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'es-MX';
+    utterance.rate = 1.0;
+    utterance.pitch = 1.0;
+    synthesis.speak(utterance);
+  }
+
   // --- Función para agregar mensajes al chat ---
   function addMessageToChat(chatContainer, role, message) {
     // Remover placeholder si existe
@@ -35,16 +111,57 @@ document.addEventListener("DOMContentLoaded", () => {
     const messageDiv = document.createElement('div');
     messageDiv.classList.add('chat-message');
     messageDiv.classList.add(role === 'user' ? 'user-message' : 'agent-message');
-    
+
     const messageBubble = document.createElement('div');
     messageBubble.classList.add('message-bubble');
     messageBubble.textContent = message;
-    
+
+    // Agregar botón de copiar para mensajes del agente
+    if (role !== 'user') {
+      const copyBtn = document.createElement('button');
+      copyBtn.className = 'copy-button';
+      copyBtn.innerHTML = `
+        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path>
+        </svg>
+        <span>Copiar</span>
+      `;
+      copyBtn.onclick = (e) => {
+        e.stopPropagation();
+        copyToClipboard(message, copyBtn);
+      };
+      messageBubble.appendChild(copyBtn);
+    }
+
     messageDiv.appendChild(messageBubble);
     chatContainer.appendChild(messageDiv);
-    
+
     // Auto-scroll al último mensaje
     chatContainer.scrollTop = chatContainer.scrollHeight;
+  }
+
+  // --- Función para copiar al portapapeles ---
+  function copyToClipboard(text, buttonElement) {
+    navigator.clipboard.writeText(text).then(() => {
+      console.log("📋 Copiado al portapapeles");
+
+      // Feedback visual
+      const originalContent = buttonElement.innerHTML;
+      buttonElement.innerHTML = `
+        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+        </svg>
+        <span>¡Copiado!</span>
+      `;
+      buttonElement.classList.add('copied');
+
+      setTimeout(() => {
+        buttonElement.innerHTML = originalContent;
+        buttonElement.classList.remove('copied');
+      }, 2000);
+    }).catch(err => {
+      console.error("❌ Error al copiar:", err);
+    });
   }
 
   // --- Función para mostrar indicador de "escribiendo..." ---
@@ -110,15 +227,16 @@ document.addEventListener("DOMContentLoaded", () => {
       if (data.type === "chat") {
         // Respuesta de texto normal
         addMessageToChat(chatContainer, 'agent', data.content);
+        // speakText(data.content); // Desactivado por solicitud del usuario
         console.log(`💬 Mensaje de chat agregado para ${agentTarget}`);
 
       } else if (data.type === "CASO_USO") {
         // Respuesta JSON (Caso de Uso)
         console.log("🎯 Caso de Uso detectado. Mostrando en pantalla...");
-        
+
         // Informar al usuario en el chat
         addMessageToChat(chatContainer, 'agent', '✅ Caso de uso generado. Revisa el área central.');
-        
+
         // Mostrar el caso de uso en el área central
         window.mostrarCasoDeUso(data.data_caso);
 
@@ -130,14 +248,14 @@ document.addEventListener("DOMContentLoaded", () => {
     } catch (error) {
       console.error(`❌ Error al comunicarse con ${agentTarget}:`, error);
       removeTypingIndicator();
-      
+
       let errorMessage = 'Lo siento, hubo un error al procesar tu mensaje.';
       if (error.message.includes('Failed to fetch')) {
         errorMessage = 'Error de conexión. Verifica tu internet.';
       } else if (error.message) {
         errorMessage = `Error: ${error.message}`;
       }
-      
+
       addMessageToChat(chatContainer, 'agent', errorMessage);
     }
   }
@@ -189,7 +307,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (data.personajes && data.personajes[0]) {
       const name1 = document.getElementById("name-1");
       const logo1 = document.getElementById("logo-1");
-      
+
       if (name1) name1.textContent = data.personajes[0].nombre;
       if (logo1) logo1.textContent = data.personajes[0].nombre.charAt(0).toUpperCase();
     }
@@ -198,35 +316,63 @@ document.addEventListener("DOMContentLoaded", () => {
     if (data.personajes && data.personajes[1]) {
       const name2 = document.getElementById("name-2");
       const logo2 = document.getElementById("logo-2");
-      
+
       if (name2) name2.textContent = data.personajes[1].nombre;
       if (logo2) logo2.textContent = data.personajes[1].nombre.charAt(0).toUpperCase();
     }
 
-    // Rellenar diálogos
+    // Rellenar diálogos con números de secuencia
     const bubble1 = document.getElementById("bubble-1");
     const bubble2 = document.getElementById("bubble-2");
+    const sequence1 = document.getElementById("sequence-1");
+    const sequence2 = document.getElementById("sequence-2");
 
     if (bubble1 && data.dialogo && data.personajes && data.personajes[0]) {
-      // ✅ Solución:
-      // 1. FILTRAR para obtener TODAS las líneas del personaje
-      const lineasHTML1 = data.dialogo
-        .filter(d => d.id_personaje === data.personajes[0].id)
-        .map(d => `<p>${d.linea}</p>`) // 2. Convertir cada línea en un párrafo HTML
-        .join('<hr class="my-2 border-gray-600">'); // 3. Unirlas con un separador
-      
-      // 4. Usar .innerHTML para renderizar el HTML
-      bubble1.innerHTML = lineasHTML1 || ""; 
+      // Crear array con índice global para mostrar orden cronológico
+      const mensajesConOrden = data.dialogo
+        .map((d, index) => ({ ...d, orden: index + 1 })) // Agregar número de orden global
+        .filter(d => d.id_personaje === data.personajes[0].id); // Filtrar por personaje 1
+
+      // Generar HTML con badges de secuencia
+      const lineasHTML1 = mensajesConOrden
+        .map(d => `
+          <div class="mb-3">
+            <span class="inline-block px-2 py-1 bg-purple-600 text-white text-xs font-bold rounded-full mb-1">#${d.orden}</span>
+            <p class="text-slate-200">${d.linea}</p>
+          </div>
+        `)
+        .join('');
+
+      bubble1.innerHTML = lineasHTML1 || "";
+
+      // Actualizar badge principal con el primer número
+      if (sequence1 && mensajesConOrden.length > 0) {
+        sequence1.textContent = mensajesConOrden[0].orden;
+      }
     }
 
     if (bubble2 && data.dialogo && data.personajes && data.personajes[1]) {
-      // ✅ Solución: (Igual para el personaje 2)
-      const lineasHTML2 = data.dialogo
-        .filter(d => d.id_personaje === data.personajes[1].id)
-        .map(d => `<p>${d.linea}</p>`)
-        .join('<hr class="my-2 border-gray-600">'); 
-      
+      // Crear array con índice global para mostrar orden cronológico
+      const mensajesConOrden = data.dialogo
+        .map((d, index) => ({ ...d, orden: index + 1 })) // Agregar número de orden global
+        .filter(d => d.id_personaje === data.personajes[1].id); // Filtrar por personaje 2
+
+      // Generar HTML con badges de secuencia (color rosa para personaje 2)
+      const lineasHTML2 = mensajesConOrden
+        .map(d => `
+          <div class="mb-3">
+            <span class="inline-block px-2 py-1 bg-pink-600 text-white text-xs font-bold rounded-full mb-1">#${d.orden}</span>
+            <p class="text-slate-200">${d.linea}</p>
+          </div>
+        `)
+        .join('');
+
       bubble2.innerHTML = lineasHTML2 || "";
+
+      // Actualizar badge principal con el primer número
+      if (sequence2 && mensajesConOrden.length > 0) {
+        sequence2.textContent = mensajesConOrden[0].orden;
+      }
     }
 
     // Rellenar preguntas
@@ -254,10 +400,25 @@ document.addEventListener("DOMContentLoaded", () => {
       messageInputCoach.value = "";
     });
 
-    messageInputCoach.addEventListener("keypress", (event) => {
-      if (event.key === "Enter") {
+    messageInputCoach.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" && !event.shiftKey) {
         event.preventDefault();
         sendButtonCoach.click();
+      }
+    });
+
+    micButtonCoach?.addEventListener("click", () => toggleMic('coach'));
+
+    // Auto-resize para textarea
+    messageInputCoach.addEventListener("input", function () {
+      this.style.height = '40px'; // Reset to min-height
+      let newHeight = Math.min(this.scrollHeight, 100);
+      this.style.height = newHeight + 'px';
+
+      if (this.scrollHeight > 100) {
+        this.style.overflowY = 'auto';
+      } else {
+        this.style.overflowY = 'hidden';
       }
     });
 
@@ -274,10 +435,25 @@ document.addEventListener("DOMContentLoaded", () => {
       messageInputCriker.value = "";
     });
 
-    messageInputCriker.addEventListener("keypress", (event) => {
-      if (event.key === "Enter") {
+    messageInputCriker.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" && !event.shiftKey) {
         event.preventDefault();
         sendButtonCriker.click();
+      }
+    });
+
+    micButtonCriker?.addEventListener("click", () => toggleMic('criker'));
+
+    // Auto-resize para textarea
+    messageInputCriker.addEventListener("input", function () {
+      this.style.height = '40px'; // Reset to min-height
+      let newHeight = Math.min(this.scrollHeight, 100);
+      this.style.height = newHeight + 'px';
+
+      if (this.scrollHeight > 100) {
+        this.style.overflowY = 'auto';
+      } else {
+        this.style.overflowY = 'hidden';
       }
     });
 
