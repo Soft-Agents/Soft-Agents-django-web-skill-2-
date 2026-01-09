@@ -100,11 +100,59 @@ document.addEventListener("DOMContentLoaded", () => {
     synthesis.speak(utterance);
   }
 
+  // --- Historial de Chat (LocalStorage) ---
+  const MAX_HISTORY = 20;
+
+  function getHistoryKey(agent) {
+    return `chat_history_${CURRENT_USER_ID}_${agent}`;
+  }
+
+  function saveMessageToHistory(agent, role, message) {
+    const key = getHistoryKey(agent);
+    let history = JSON.parse(localStorage.getItem(key) || "[]");
+
+    history.push({ role, message, timestamp: new Date().toISOString() });
+
+    // Mantener solo los últimos MAX_HISTORY mensajes
+    if (history.length > MAX_HISTORY) {
+      history = history.slice(-MAX_HISTORY);
+    }
+
+    localStorage.setItem(key, JSON.stringify(history));
+  }
+
+  function loadChatHistory(agent, chatContainer) {
+    const key = getHistoryKey(agent);
+    const history = JSON.parse(localStorage.getItem(key) || "[]");
+
+    if (history.length > 0) {
+      // Remover placeholder si existe
+      const placeholder = chatContainer.querySelector('.chat-placeholder') || chatContainer.querySelector('.text-center');
+      if (placeholder) {
+        placeholder.remove();
+      }
+
+      history.forEach(item => {
+        addMessageToChat(chatContainer, item.role, item.message, false); // false = no volver a guardar
+      });
+      console.log(`📜 Historial cargado para ${agent}: ${history.length} mensajes.`);
+    }
+  }
+
   // --- Función para agregar mensajes al chat ---
-  function addMessageToChat(chatContainer, role, message) {
+  function addMessageToChat(chatContainer, role, message, save = true) {
+    // Determinar qué agente es basado en el container
+    const agent = chatContainer.id.includes('coach') ? 'coach' : 'criker';
+
+    if (save) {
+      saveMessageToHistory(agent, role, message);
+    }
+
     // Remover placeholder si existe
-    const placeholder = chatContainer.querySelector('.chat-placeholder');
-    if (placeholder) {
+    const placeholder = chatContainer.querySelector('.chat-placeholder') ||
+      (chatContainer.children.length === 1 && chatContainer.querySelector('.text-center'));
+
+    if (placeholder && chatContainer.contains(placeholder)) {
       placeholder.remove();
     }
 
@@ -237,6 +285,9 @@ document.addEventListener("DOMContentLoaded", () => {
         // Informar al usuario en el chat
         addMessageToChat(chatContainer, 'agent', '✅ Caso de uso generado. Revisa el área central.');
 
+        // Guardar el estado del caso de uso (opcional, pero ayuda a la persistencia)
+        localStorage.setItem(`last_case_${CURRENT_USER_ID}`, JSON.stringify(data.data_caso));
+
         // Mostrar el caso de uso en el área central
         window.mostrarCasoDeUso(data.data_caso);
 
@@ -278,6 +329,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // --- Función para mostrar Caso de Uso en el área central ---
   window.mostrarCasoDeUso = function (data) {
+    if (!data) return;
     console.log("🎨 Mostrando caso de uso en área central:", data);
 
     // Ocultar pantalla de bienvenida
@@ -391,6 +443,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
     console.log("✅ Caso de uso renderizado correctamente.");
   };
+
+  // --- Cargar Historial Existente ---
+  loadChatHistory('coach', chatMessagesCoach);
+  loadChatHistory('criker', chatMessagesCriker);
+
+  // Cargar último caso de uso si existe
+  const lastCase = localStorage.getItem(`last_case_${CURRENT_USER_ID}`);
+  if (lastCase) {
+    try {
+      window.mostrarCasoDeUso(JSON.parse(lastCase));
+    } catch (e) {
+      console.error("❌ Error al cargar último caso:", e);
+    }
+  }
 
   // --- Event Listeners para COACH ---
   if (sendButtonCoach && messageInputCoach && chatMessagesCoach) {
