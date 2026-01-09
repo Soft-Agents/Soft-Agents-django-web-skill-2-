@@ -57,4 +57,4 @@ sentry-sdk==2.39.0
 pytz==2025.2
 PyJWT==2.10.1
 
-sqlparse==0.2.4
+sqlparse>=0.3.1

@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 
 # Cargar variables de entorno desde .env
 load_dotenv()
+from decouple import config
 
 # LOGGING TEMPRANO PARA CAPTURAR ERRORES DE INICIO
 import logging
@@ -26,11 +27,11 @@ try:
     logger.info(f"✅ BASE_DIR: {BASE_DIR}")
 
     # DEBUG debe ser booleano
-    DEBUG = os.getenv('DEBUG', 'False').lower() in ('true', '1', 'yes')
+    DEBUG = config('DEBUG', default=False, cast=bool)
     logger.info(f"✅ DEBUG: {DEBUG}")
 
     # Secret Key
-    SECRET_KEY = os.getenv('SECRET_KEY')
+    SECRET_KEY = config('SECRET_KEY')
     if not SECRET_KEY:
         raise ValueError("❌ SECRET_KEY no configurado en variables de entorno")
     logger.info(f"✅ SECRET_KEY: {SECRET_KEY[:10]}...")
@@ -91,7 +92,7 @@ try:
     logger.info(f"✅ WSGI_APPLICATION: {WSGI_APPLICATION}")
 
     # Base de datos
-    MONGO_URI = os.getenv('MONGO_URI')
+    MONGO_URI = config('MONGO_URI')
     if not MONGO_URI:
         raise ValueError("❌ MONGO_URI no configurado")
     logger.info(f"✅ MONGO_URI: {MONGO_URI[:30]}...")
@@ -126,6 +127,7 @@ try:
         BASE_DIR / 'theme' / 'static',
     ]
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+    #STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
     DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
     logger.info(f"✅ STATIC_ROOT: {STATIC_ROOT}")
 
@@ -183,17 +185,17 @@ try:
     }
 
     # MongoDB
-    MONGO_DB_NAME = os.getenv('MONGO_DB_NAME', 'webSkill')
+    MONGO_DB_NAME = config('MONGO_DB_NAME', default='webSkill')
     logger.info(f"✅ MONGO_DB_NAME: {MONGO_DB_NAME}")
 
-    # URLs de agentes
-    AGENT_PROFESOR = os.getenv('AGENT_PROFESOR', '')
-    AGENT_CRIKER_COACH = os.getenv('AGENT_CRIKER_COACH', '')
-    AGENT_CRIKER_SKILL = os.getenv('AGENT_CRIKER_SKILL', '')
-    SOFIA_AGENT_URL = os.getenv('SOFIA_AGENT_URL', '')
-    AGENT_ENCUESTA_URL = os.getenv('AGENT_ENCUESTA_URL', '')
-    AGENT_SCOUTER_URL = os.getenv('AGENT_SCOUTER_URL', '')
-    STREAMLIT_SERVER_URL = os.getenv('STREAMLIT_SERVER_URL', 'http://localhost:8501')
+    # URLs de agentes (CORREGIDO: Usando config en vez de os.getenv)
+    AGENT_PROFESOR = config('AGENT_PROFESOR', default='')
+    AGENT_CRIKER_COACH = config('AGENT_CRIKER_COACH', default='')
+    AGENT_CRIKER_SKILL = config('AGENT_CRIKER_SKILL', default='')
+    SOFIA_AGENT_URL = config('SOFIA_AGENT_URL', default='')
+    AGENT_ENCUESTA_URL = config('AGENT_ENCUESTA_URL', default='')
+    AGENT_SCOUTER_URL = config('AGENT_SCOUTER_URL', default='')
+    STREAMLIT_SERVER_URL = config('STREAMLIT_SERVER_URL', default='http://localhost:8501')
 
     logger.info("=" * 80)
     logger.info("✅ SETTINGS.PY CARGADO EXITOSAMENTE")

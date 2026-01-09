@@ -15,13 +15,26 @@
                 </a>
 
                 <div class="flex flex-col items-center">
-                    <div class="relative w-28 h-28 mb-3">
+                    <div class="relative w-28 h-28 mb-3 group">
                         <div class="absolute inset-[-4px] rounded-full bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 opacity-80 animate-pulse" id="avatar-light"></div>
+                        
                         <div class="relative w-full h-full overflow-hidden rounded-full border-4 border-slate-900">
                             <img src="https://static.vecteezy.com/system/resources/previews/036/182/403/non_2x/ai-generated-3d-cartoon-man-in-red-suit-businessman-character-on-transparent-background-png.png" alt="Agente Profesor" class="object-cover w-full h-full">
                         </div>
+
+                        <button id="toggleMuteBtn" class="absolute top-0 right-0 transform translate-x-2 -translate-y-1 bg-slate-800 border border-slate-600 text-slate-300 p-1.5 rounded-full hover:bg-purple-600 hover:text-white hover:border-purple-400 transition-all shadow-lg z-20" title="Activar/Desactivar Voz">
+                            <svg id="icon-vol-on" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                                <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                            </svg>
+                            <svg id="icon-vol-off" class="hidden" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                                <line x1="23" y1="9" x2="17" y2="15"></line>
+                                <line x1="17" y1="9" x2="23" y2="15"></line>
+                            </svg>
+                        </button>
                     </div>
-                    <h3 class="text-lg font-bold text-purple-400">🧠 Agente Profesor</h3>
+                    <h3 class="text-lg font-bold text-purple-400">🧠 Agente Yashay</h3>
                     <p class="text-xs text-slate-400">Tu guía de pensamiento crítico</p>
                 </div>
             </div>
@@ -48,6 +61,11 @@
                 <form class="flex gap-2" id="chat-form" method="post" action="{% url 'chat_knowledge' %}">
                     {% csrf_token %}
                     <input type="text" name="user_message" class="flex-1 px-4 py-2 text-sm text-white bg-slate-700/50 border border-slate-600 rounded-lg outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 placeholder-slate-500 transition-all" id="messageInput" placeholder="Pregunta sobre la lección..." autocomplete="off" required>
+                    <button type="button" id="micBtn" class="p-2 text-white bg-slate-700/50 border border-slate-600 rounded-lg hover:bg-purple-600/30 transition-all">
+                        <svg id="micIcon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                        </svg>
+                    </button>
                     <button type="submit" class="p-2 text-white bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50" id="sendButton">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
@@ -58,12 +76,14 @@
         </aside>
 
         <main class="flex-1 flex bg-slate-900 relative overflow-hidden">
-            
-            <div class="w-72 bg-slate-800/50 border-r border-purple-500/20 flex flex-col overflow-y-auto custom-scrollbar flex-shrink-0">
-                <div class="p-6">
-                    <h2 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
-                        <span>📚</span> Temario
-                    </h2>
+    
+            <div id="temario-sidebar" class="w-72 bg-slate-800/50 border-r border-purple-500/20 flex flex-col overflow-y-auto custom-scrollbar flex-shrink-0 transition-all duration-300 ease-in-out relative">
+                <div class="p-6 min-w-[18rem]"> 
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                            <span>📚</span> Temario
+                        </h2>
+                    </div>
 
                     {% for pilar_num in "12345" %}
                     <div class="mb-4 pilar-section">
@@ -77,16 +97,31 @@
                         
                         <div class="pilar-lessons max-h-0 overflow-hidden transition-[max-height] duration-300 ease-out bg-slate-900/30 rounded-b-lg mx-1">
                             {% for leccion_num in "123" %}
-                                <a href="#" class="flex items-center justify-between p-3 my-1 text-sm text-slate-400 hover:text-white hover:bg-purple-500/20 border-l-2 border-transparent hover:border-purple-500 transition-all lesson-link" onclick="cargarLeccion('{{ pilar_num }}.{{ leccion_num }}'); return false;">
-                                    <span>📖 Lección {{ pilar_num }}.{{ leccion_num }}</span>
-                                    <div class="w-4 h-4 rounded border border-slate-600 bg-slate-800"></div>
+                                {% with leccion_id=pilar_num|add:"."|add:leccion_num %}
+                                <a href="#" class="flex items-center justify-between p-3 my-1 text-sm text-slate-400 hover:text-white hover:bg-purple-500/20 border-l-2 border-transparent hover:border-purple-500 transition-all lesson-link" onclick="cargarLeccion('{{ leccion_id }}'); return false;">
+                                    <span class="flex items-center gap-2">
+                                        <div id="check-{{ leccion_id }}" class="w-4 h-4 rounded border border-slate-500 flex items-center justify-center transition-colors lesson-checkbox">
+                                            <svg class="w-3 h-3 text-white hidden check-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                                        </div>
+                                        Lección {{ leccion_id }}
+                                    </span>
                                 </a>
+                                {% endwith %}
                             {% endfor %}
                         </div>
                     </div>
                     {% endfor %}
                 </div>
             </div>
+
+            <button id="temario-toggle" onclick="toggleTemario()" class="absolute top-6 left-72 z-20 w-6 h-12 flex items-center justify-center bg-slate-700 text-slate-300 rounded-r-md border-y border-r border-slate-600 hover:bg-purple-600 hover:text-white hover:border-purple-500 shadow-lg transition-all duration-300 ease-in-out group" title="Ocultar/Mostrar Temario">
+                <svg id="icon-collapse" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="transform group-hover:-translate-x-0.5 transition-transform">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
+                <svg id="icon-expand" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="hidden transform group-hover:translate-x-0.5 transition-transform">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+            </button>
 
             <div class="flex-1 p-6 lg:p-8 overflow-hidden relative bg-gradient-to-br from-slate-900 via-[#1a1033] to-slate-900" id="main-scroll">
                 
@@ -121,11 +156,10 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
         .animate-fadeIn { animation: fadeIn 0.3s ease-out forwards; }
         
-        /* Forzamos que el último hijo directo del contenido de la lección (asumiendo que son los botones)
-           tenga margen superior automático para pegarse al fondo si el texto es corto */
+        /* Forzamos que el último hijo directo del contenido de la lección tenga margen */
         #pizarra-content > div > *:last-child {
             margin-top: auto;
-            padding-top: 2rem; /* Espacio extra para separar del texto */
+            padding-top: 2rem; 
         }
 
         .pilar-section.open .pilar-lessons { max-height: 500px; }
@@ -142,18 +176,85 @@
         .typing-dot:nth-child(2) { animation-delay: 0.2s; }
         .typing-dot:nth-child(3) { animation-delay: 0.4s; }
         @keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
+
+        /* ESTILOS PARA CHECKBOX MARCADO */
+        .lesson-checkbox.checked { background-color: #10b981; border-color: #10b981; } /* Verde */
+        .lesson-checkbox.checked .check-icon { display: block; }
     </style>
 
     <script>
+        const micBtn = document.getElementById('micBtn');
+        let mediaRecorder;
+        let audioChunks = [];
         const chatForm = document.getElementById('chat-form');
         const chatInput = document.getElementById('messageInput');
         const chatMessages = document.getElementById('chatMessages');
         const avatarLight = document.getElementById('avatar-light');
         const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
         const synth = window.speechSynthesis;
+        let leccion_actual = "0.0";
 
-        window.onload = () => { chatMessages.scrollTop = chatMessages.scrollHeight; }
+        // --- LÓGICA DE PAUSA / REANUDAR AUDIO ---
+        const muteBtn = document.getElementById('toggleMuteBtn');
+        const iconOn = document.getElementById('icon-vol-on');
+        const iconOff = document.getElementById('icon-vol-off');
+        
+        // Leemos preferencia
+        let isMuted = localStorage.getItem('agentMuted') === 'true';
 
+        function updateIconsUI() {
+            if (isMuted) {
+                iconOn.classList.add('hidden');
+                iconOff.classList.remove('hidden');
+                muteBtn.classList.add('text-red-400', 'border-red-400/50');
+            } else {
+                iconOff.classList.add('hidden');
+                iconOn.classList.remove('hidden');
+                muteBtn.classList.remove('text-red-400', 'border-red-400/50');
+            }
+        }
+
+        updateIconsUI();
+
+        muteBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            isMuted = !isMuted;
+            localStorage.setItem('agentMuted', isMuted);
+            updateIconsUI();
+
+            if (isMuted) {
+                if (synth.speaking) {
+                    synth.pause();
+                    avatarLight.classList.remove('speaking-animation');
+                }
+            } else {
+                if (synth.paused) {
+                    synth.resume();
+                    avatarLight.classList.add('speaking-animation');
+                }
+            }
+        });
+
+        // --- RECUPERAR LECCIONES COMPLETADAS ---
+        const completedLessons = JSON.parse('{{ completed_lessons_json|safe }}' || '[]');
+
+        window.onload = () => { 
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            completedLessons.forEach(id => {
+                markCheckboxVisual(id);
+            });
+        }
+
+        function markCheckboxVisual(id) {
+            const checkContainer = document.getElementById(`check-${id}`);
+            if (checkContainer) {
+                checkContainer.classList.add('checked');
+                const icon = checkContainer.querySelector('.check-icon');
+                if (icon) icon.classList.remove('hidden');
+            }
+        }
+
+        // --- LÓGICA DEL ACORDEÓN (PILAR) ---
         function togglePilar(header) {
             const section = header.parentElement;
             const isOpen = section.classList.contains('open');
@@ -161,12 +262,13 @@
             if (!isOpen) section.classList.add('open');
         }
 
+        // --- CARGAR LECCIÓN ---
         function cargarLeccion(codigo) {
+            leccion_actual = codigo;
             document.querySelectorAll('.lesson-link').forEach(l => l.classList.remove('active'));
             if (event && event.currentTarget) event.currentTarget.classList.add('active');
 
             const pizarraContent = document.getElementById("pizarra-content");
-            // Mantenemos la estructura flex para el cargando
             pizarraContent.innerHTML = '<div class="w-full h-full flex items-center justify-center text-purple-300 animate-pulse"><div class="text-center"><span class="text-4xl block mb-2">⏳</span><span>Cargando lección...</span></div></div>';
 
             fetch(`/lecciones/${codigo}/`)
@@ -175,8 +277,32 @@
                     return response.text();
                 })
                 .then(html => {
-                    // Inyectamos y envolvemos en el div flex para asegurar el sticky footer
-                    pizarraContent.innerHTML = `<div class="w-full h-full flex flex-col justify-between">${html}</div>`;
+                    const isCompleted = completedLessons.includes(codigo);
+                    const btnText = isCompleted ? "✅ Lección Completada" : "🏆 Finalizar Lección";
+                    const btnColorClass = isCompleted 
+                        ? "bg-green-600 cursor-default opacity-80" 
+                        : "bg-gradient-to-r from-purple-600 to-pink-600 hover:opacity-90 hover:scale-105";
+                    const btnDisabled = isCompleted ? "disabled" : "";
+
+                    const contentWithButton = `
+                        <div class="w-full h-full flex flex-col justify-between fade-in">
+                            <div class="prose prose-invert max-w-none overflow-y-auto custom-scrollbar pr-2">
+                                ${html}
+                            </div>
+                            <div class="mt-6 flex justify-center pt-4 border-t border-white/10">
+                                <button 
+                                    id="btn-finish-${codigo}"
+                                    onclick="finalizarLeccion('${codigo}')" 
+                                    class="px-8 py-3 rounded-full font-bold text-white shadow-lg transition-all transform ${btnColorClass} hidden js-finish-btn"
+                                    ${btnDisabled}
+                                >
+                                    ${btnText}
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    
+                    pizarraContent.innerHTML = contentWithButton;
                     
                     const scripts = pizarraContent.querySelectorAll('script');
                     scripts.forEach(oldScript => {
@@ -191,10 +317,50 @@
                 });
         }
 
+        // --- FINALIZAR LECCIÓN ---
+        function finalizarLeccion(codigo) {
+            const btn = document.getElementById(`btn-finish-${codigo}`);
+            const originalText = btn.innerHTML;
+            btn.innerHTML = "Guardando...";
+            btn.disabled = true;
+
+            fetch("{% url 'marcar_leccion_completada' %}", {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken 
+                },
+                body: JSON.stringify({ leccion_id: codigo })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'ok') {
+                    markCheckboxVisual(codigo);
+                    btn.innerHTML = "✅ Lección Completada";
+                    btn.classList.remove('bg-gradient-to-r', 'from-purple-600', 'to-pink-600', 'hover:opacity-90', 'hover:scale-105');
+                    btn.classList.add('bg-green-600', 'cursor-default', 'opacity-80');
+                    if (!completedLessons.includes(codigo)) completedLessons.push(codigo);
+                    addMessage('agent', `¡Felicidades! Has completado la lección ${codigo}. 🚀`);
+                } else {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                    addMessage('agent', '⚠️ Hubo un problema al guardar el progreso.');
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                addMessage('agent', '⚠️ Error de conexión.');
+            });
+        }
+
+        // --- CHAT FORM SUBMIT ---
         chatForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             const text = chatInput.value.trim();
             if (!text) return;
+            
             if (synth.speaking) synth.cancel();
 
             addMessage('user', text);
@@ -220,6 +386,7 @@
             }
         });
 
+        // --- FUNCIONES DEL CHAT ---
         function addMessage(role, text) {
             const isUser = role === 'user';
             const div = document.createElement('div');
@@ -244,21 +411,151 @@
         function removeMessage(id) { const el = document.getElementById(id); if (el) el.remove(); }
 
         function handleAgentResponse(text) {
-            avatarLight.classList.add('speaking-animation');
             const div = document.createElement('div');
             div.className = `flex justify-start message animate-fadeIn`;
             div.innerHTML = `<div class="max-w-[90%] px-4 py-3 rounded-xl shadow-lg text-sm bg-slate-700/80 text-slate-200 border border-purple-400/30 rounded-tl-none"><div class="message-text agent-text-content"></div></div>`;
             chatMessages.appendChild(div);
             const textContainer = div.querySelector('.agent-text-content');
+            
             let i = 0;
             function type() {
-                if (i < text.length) { textContainer.innerHTML += text.charAt(i); i++; chatMessages.scrollTop = chatMessages.scrollHeight; setTimeout(type, 15); }
+                if (i < text.length) { 
+                    textContainer.innerHTML += text.charAt(i); 
+                    i++; 
+                    chatMessages.scrollTop = chatMessages.scrollHeight; 
+                    setTimeout(type, 15); 
+                }
             }
             type();
+
             const utter = new SpeechSynthesisUtterance(text);
             utter.lang = 'es-ES';
-            utter.onend = () => avatarLight.classList.remove('speaking-animation');
-            synth.speak(utter);
+            
+            utter.onstart = () => {
+                if (!isMuted) avatarLight.classList.add('speaking-animation');
+            };
+            utter.onend = () => {
+                avatarLight.classList.remove('speaking-animation');
+            };
+            utter.onpause = () => {
+                avatarLight.classList.remove('speaking-animation');
+            };
+            utter.onresume = () => {
+                avatarLight.classList.add('speaking-animation');
+            };
+
+            if (!isMuted) {
+                synth.speak(utter);
+            }
+        }
+
+        // --- MICRÓFONO Y TRANSCRIPCIÓN ---
+        micBtn.addEventListener('mousedown', async () => {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                const options = { mimeType: 'audio/webm;codecs=opus' };
+                
+                if (MediaRecorder.isTypeSupported(options.mimeType)) {
+                    mediaRecorder = new MediaRecorder(stream, options);
+                } else {
+                    mediaRecorder = new MediaRecorder(stream);
+                }
+
+                audioChunks = [];
+
+                mediaRecorder.ondataavailable = (event) => {
+                    if (event.data.size > 0) {
+                        audioChunks.push(event.data);
+                    }
+                };
+
+                mediaRecorder.onstop = async () => {
+                    const audioBlob = new Blob(audioChunks, { type: mediaRecorder.mimeType });
+                    console.log("Grabación finalizada. Tamaño:", audioBlob.size, "bytes");
+                    await transcribeAndProcess(audioBlob);
+                };
+
+                mediaRecorder.start();
+                micBtn.classList.add('bg-red-500/50', 'animate-pulse'); 
+                if (avatarLight) avatarLight.classList.add('speaking-animation');
+
+            } catch (err) {
+                console.error("Error al acceder al micrófono:", err);
+                addMessage('agent', '⚠️ No se pudo acceder al micrófono. Revisa los permisos.');
+            }
+        });
+
+        micBtn.addEventListener('mouseup', () => {
+            if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+                mediaRecorder.stop();
+                micBtn.classList.remove('bg-red-500/50', 'animate-pulse');
+            }
+        });
+
+        async function transcribeAndProcess(blob) {
+            if (blob.size < 1000) {
+                addMessage('agent', '⚠️ El audio es muy corto, intenta hablar un poco más.');
+                return;
+            }
+            const formData = new FormData();
+            formData.append('audio_data', blob, 'recording.webm');
+
+            const loadingId = addLoadingIndicator();
+
+            try {
+                const response = await fetch('/transcribe/', { 
+                    method: 'POST',
+                    body: formData,
+                    headers: { 'X-CSRFToken': csrfToken }
+                });
+
+                const data = await response.json();
+                removeMessage(loadingId);
+
+                if (data.status === 'ok' && data.text) {
+                    chatInput.value = data.text;
+                    chatForm.requestSubmit(); 
+                } else {
+                    const errorReal = data.message || 'No pude entender el audio.';
+                    addMessage('agent', '⚠️ ' + errorReal);
+                }
+            } catch (error) {
+                removeMessage(loadingId);
+                console.error("Error en transcripción:", error);
+                addMessage('agent', '⚠️ Error al procesar el audio.');
+            }
+        }
+
+        // --- LÓGICA DEL SIDEBAR (TEMARIO) ---
+        function toggleTemario() {
+            const sidebar = document.getElementById('temario-sidebar');
+            const toggleBtn = document.getElementById('temario-toggle');
+            const iconCollapse = document.getElementById('icon-collapse');
+            const iconExpand = document.getElementById('icon-expand');
+
+            const isOpen = sidebar.classList.contains('w-72');
+
+            if (isOpen) {
+                // CERRAR
+                sidebar.classList.remove('w-72');
+                sidebar.classList.add('w-0', 'border-none');
+                
+                toggleBtn.classList.remove('left-72');
+                toggleBtn.classList.add('left-0');
+                
+                iconCollapse.classList.add('hidden');
+                iconExpand.classList.remove('hidden');
+            } else {
+                // ABRIR
+                sidebar.classList.remove('w-0', 'border-none');
+                sidebar.classList.add('w-72');
+                
+                toggleBtn.classList.remove('left-0');
+                toggleBtn.classList.add('left-72');
+                
+                iconExpand.classList.add('hidden');
+                iconCollapse.classList.remove('hidden');
+            }
         }
     </script>
 {% endblock %}

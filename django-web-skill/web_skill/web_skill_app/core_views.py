@@ -1,5 +1,14 @@
 # web_skill_app/core_views.py
 
+# --- 1. IMPORTS (Mantenemos los que ya tenías) ---
+import speech_recognition as sr
+from pydub import AudioSegment
+import io
+import traceback 
+# --- IMPORTS NECESARIOS AL INICIO DEL ARCHIVO ---
+from .db import get_db_collection
+from bson.objectid import ObjectId
+
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.conf import settings
@@ -9,29 +18,101 @@ import re
 from django.http import HttpResponse
 import time
 import uuid
-import logging
+import logging  # Importante para el logger
 import requests
-import json # Importar json para leer el body
+import json
+import os       # Necesario para verificar rutas
+import shutil   # Necesario para buscar ffmpeg en el sistema
+
+
 
 # Importar el decorador de autenticación
 from .auth_helpers import login_required
 
-# Importar la lógica de negocio desde services.py
 from .services import (
     get_conversation_history_knowledge, 
     get_agent_response_knowledge,
-    # --- NUEVAS IMPORTACIONES ---
-    get_conversation_history_coach,    # Para el chat izquierdo de skill.html
-    get_agent_response_coach,      # Para el chat izquierdo de skill.html
-    get_conversation_history_criker,   # Para el chat derecho de skill.html
-    get_agent_response_criker        # Para el chat derecho de skill.html (devuelve str o dict)
-    # --- FIN NUEVAS IMPORTACIONES ---
+    get_conversation_history_coach,
+    get_agent_response_coach,
+    get_conversation_history_criker,
+    get_agent_response_criker
 )
-# Configurar un logger para esta vista
+from .db import get_db_collection
+from bson.objectid import ObjectId
+
+# --- 2. DEFINIR LOGGER (ESTO DEBE IR ANTES DE USARLO) ---
 logger = logging.getLogger(__name__)
 
+# --- 3. CONFIGURACIÓN DE FFMPEG (Ahora sí podemos usar logger) ---
+ffmpeg_path_system = shutil.which("ffmpeg")
+ffprobe_path_system = shutil.which("ffprobe")
+
+if ffmpeg_path_system:
+    # Si el sistema lo encuentra automáticamente (Linux/Cloud o PC bien configurada)
+    AudioSegment.converter = r"C:\ffmpeg\bin\ffmpeg.exe"
+    AudioSegment.ffprobe = r"C:\ffmpeg\bin\ffprobe.exe"
+else:
+    # FALLBACK: Ruta manual para tu PC local si no está en el PATH
+    # Asegúrate de que esta ruta sea real en TU computadora
+    local_ffmpeg = r"C:\ffmpeg\bin\ffmpeg.exe"
+    local_ffprobe = r"C:\ffmpeg\bin\ffprobe.exe"
+    
+    if os.path.exists(local_ffmpeg):
+        AudioSegment.converter = local_ffmpeg
+        AudioSegment.ffprobe = local_ffprobe
+    else:
+        # Ahora sí funcionará este warning porque logger ya existe
+        logger.warning("⚠️ FFMPEG no encontrado ni en el sistema ni en C:\\ffmpeg\\bin. La transcripción de audio fallará.")
+
+
+# --- VISTAS DE PÁGINAS ESTÁTICAS ---
 
 # --- VISTAS DE PÁGINAS ESTÁTICAS (sin cambios) ---
+def transcribe_audio(request):
+    if request.method == 'POST':
+        try:
+            audio_file = request.FILES.get('audio_data')
+            if not audio_file:
+                return JsonResponse({'status': 'error', 'message': 'No audio file received'}, status=400)
+
+            # Conversión usando pydub
+            audio = AudioSegment.from_file(io.BytesIO(audio_file.read()))
+            wav_io = io.BytesIO()
+            audio.export(wav_io, format="wav")
+            wav_io.seek(0)
+
+            # Reconocimiento
+            recognizer = sr.Recognizer()
+            with sr.AudioFile(wav_io) as source:
+                # --- AGREGAR ESTO: Calibrar ruido de fondo ---
+                # Ayuda a que Google ignore el siseo o ruido del ambiente
+                recognizer.adjust_for_ambient_noise(source, duration=0.5)
+                
+                audio_data = recognizer.record(source)
+                
+                try:
+                    text = recognizer.recognize_google(audio_data, language="es-ES")
+                    return JsonResponse({'status': 'ok', 'text': text})
+                
+                # Manejo específico si Google no entiende nada (audio vacío o puro ruido)
+                except sr.UnknownValueError:
+                    print("--- Google Speech no detectó palabras claras ---")
+                    return JsonResponse({
+                        'status': 'error', 
+                        'text': '', 
+                        'message': 'No se detectó voz clara. Intenta hablar más fuerte.'
+                    }, status=200)
+
+        except Exception as e:
+            print(f"--- Fallo en transcripción: {str(e)} ---")
+            return JsonResponse({
+                'status': 'error', 
+                'text': '', 
+                'message': f'Error interno: {str(e)}'
+            }, status=200)
+
+    return JsonResponse({'status': 'error', 'message': 'Invalid method'}, status=405)
+
 def home(request):
     context = {'timestamp': int(time.time())}
     return render(request, 'web_skill_app/index.html', context)
@@ -59,6 +140,8 @@ def presentacion(request):
 def skill(request):
     context = {'timestamp': int(time.time())}
     return render(request, "web_skill_app/skill.html", context)
+
+
 
 @login_required # <-- 1. AÑADE EL DECORADOR
 def preguntas(request):
@@ -152,6 +235,8 @@ def knowledge_view(request):
     # (Esta parte es la misma que antes)
     
     conversation_history = []
+    completed_lessons = [] # Lista vacía por defecto
+
     try:
         # 1. Recuperar historial
         conversation_history = get_conversation_history_knowledge(user_id_str)
@@ -167,6 +252,12 @@ def knowledge_view(request):
             
             # Recargar el historial después del saludo
             conversation_history = get_conversation_history_knowledge(user_id_str)
+        
+        # 3. RECUPERAR LECCIONES COMPLETADAS DE MONGODB (NUEVO)
+        users_collection = get_db_collection()
+        user_doc = users_collection.find_one({'_id': ObjectId(user_id_str)})
+        if user_doc:
+            completed_lessons = user_doc.get('lecciones_completadas', [])
             
     except Exception as e:
         logger.error(f"Error en GET de knowledge_view para {user_id_str}: {e}")
@@ -180,6 +271,8 @@ def knowledge_view(request):
         {
             'user': user,
             'conversation_history': conversation_history,
+            # Convertimos a JSON string para que JS lo lea fácil
+            'completed_lessons_json': json.dumps(completed_lessons),
         }
     )
     
@@ -275,6 +368,37 @@ def leccion_view(request, leccion_id):
     template_name = f"web_skill_app/lecciones/leccion{leccion_id}.html"
     # Simplemente renderizamos la plantilla. Django se encargará de la herencia.
     return render(request, template_name)
+
+# --- NUEVA VISTA PARA GUARDAR EL PROGRESO ---
+@login_required
+def marcar_leccion_completada(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Método no permitido'}, status=405)
+    
+    try:
+        data = json.loads(request.body)
+        leccion_id = data.get('leccion_id')
+        user_id_str = request.user.get('user_id')
+
+        if not leccion_id or not user_id_str:
+            return JsonResponse({'error': 'Faltan datos'}, status=400)
+
+        users_collection = get_db_collection()
+        
+        # Usamos $addToSet para que no se dupliquen si el usuario le da click varias veces
+        users_collection.update_one(
+            {'_id': ObjectId(user_id_str)},
+            {'$addToSet': {'lecciones_completadas': leccion_id}}
+        )
+
+        return JsonResponse({'status': 'ok', 'leccion_id': leccion_id})
+
+    except Exception as e:
+        logger.error(f"Error marcando lección: {e}")
+        return JsonResponse({'error': str(e)}, status=500)
+    
+# --- FIN DEL CÓDIGO ---
+
 
 
 
