@@ -379,14 +379,13 @@ async function transcribeAndProcess(blob) {
         const data = await response.json();
         removeMessage(loadingId);
 
-        if (data.text && data.text.trim() !== "") {
-            // Insertamos el texto en tu input actual
+        if (data.status === 'ok' && data.text) {
             chatInput.value = data.text;
-            
-            // Disparamos el evento submit de tu formulario para que siga tu lógica original
             chatForm.requestSubmit(); 
         } else {
-            addMessage('agent', '⚠️ No pude entender el audio, intenta de nuevo.');
+            // Ahora mostramos el mensaje real que manda el servidor (data.message)
+            const errorReal = data.message || 'No pude entender el audio.';
+            addMessage('agent', '⚠️ ' + errorReal);
         }
     } catch (error) {
         removeMessage(loadingId);

@@ -184,12 +184,15 @@ try:
     logger.info(f"✅ MONGO_DB_NAME: {MONGO_DB_NAME}")
 
     # URLs de agentes
-    AGENT_PROFESOR = os.getenv('AGENT_PROFESOR', '')
-    AGENT_CRIKER_COACH = os.getenv('AGENT_CRIKER_COACH', '')
-    AGENT_CRIKER_SKILL = os.getenv('AGENT_CRIKER_SKILL', '')
-    SOFIA_AGENT_URL = os.getenv('SOFIA_AGENT_URL', '')
+    # Se ponen las URLs directas como "default" para que funcione sí o sí
+    AGENT_PROFESOR = os.getenv('AGENT_PROFESOR', 'https://agente-profesor-redis-178017465262.us-central1.run.app/chat')
+    AGENT_CRIKER_COACH = os.getenv('AGENT_CRIKER_COACH', 'https://agente-coach-redis-178017465262.us-central1.run.app/chat')
+    AGENT_CRIKER_SKILL = os.getenv('AGENT_CRIKER_SKILL', 'https://agente-criker-redis2-178017465262.us-central1.run.app/chat')
+    SOFIA_AGENT_URL = os.getenv('SOFIA_AGENT_URL', 'https://agente-sofia-redis-178017465262.us-central1.run.app/chat')
+    
+    # Estas dos pueden quedar vacías si no las usas, o ponles sus URLs si las tienes
     AGENT_ENCUESTA_URL = os.getenv('AGENT_ENCUESTA_URL', '')
-    AGENT_SCOUTER_URL = os.getenv('AGENT_SCOUTER_URL', '')
+    AGENT_SCOUTER_URL = os.getenv('AGENT_SCOUTER_URL', 'https://agente-sofia-redis-178017465262.us-central1.run.app/chat') # A veces Scouter es Sofia
     STREAMLIT_SERVER_URL = os.getenv('STREAMLIT_SERVER_URL', 'http://localhost:8501')
 
     logger.info("=" * 80)

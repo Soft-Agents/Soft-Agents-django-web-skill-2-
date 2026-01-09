@@ -60,4 +60,7 @@ urlpatterns = [
     path('administrador/', admin_views.admin_dashboard_view, name='admin_dashboard'),
     path('administrador/usuarios/', admin_views.admin_users_list_view, name='admin_users_list'),
     path('administrador/usuarios/<str:user_id>/evaluaciones/', admin_views.admin_user_evaluations_view, name='admin_user_evaluations'),
+
+
+    path('transcribe/', core_views.transcribe_audio, name='transcribe_audio'),
 ]

@@ -1,9 +1,10 @@
 # web_skill_app/core_views.py
-import speech_recognition as sr
 
+# --- 1. IMPORTS (Mantenemos los que ya tenías) ---
+import speech_recognition as sr
 from pydub import AudioSegment
 import io
-import traceback # Para ver el error completo
+import traceback 
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.conf import settings
@@ -13,31 +14,55 @@ import re
 from django.http import HttpResponse
 import time
 import uuid
-import logging
+import logging  # Importante para el logger
 import requests
-import json # Importar json para leer el body
+import json
+import os       # Necesario para verificar rutas
+import shutil   # Necesario para buscar ffmpeg en el sistema
+
+
 
 # Importar el decorador de autenticación
 from .auth_helpers import login_required
 
-# Importar la lógica de negocio desde services.py
 from .services import (
     get_conversation_history_knowledge, 
     get_agent_response_knowledge,
-    # --- NUEVAS IMPORTACIONES ---
-    get_conversation_history_coach,    # Para el chat izquierdo de skill.html
-    get_agent_response_coach,      # Para el chat izquierdo de skill.html
-    get_conversation_history_criker,   # Para el chat derecho de skill.html
-    get_agent_response_criker        # Para el chat derecho de skill.html (devuelve str o dict)
-    # --- FIN NUEVAS IMPORTACIONES ---
+    get_conversation_history_coach,
+    get_agent_response_coach,
+    get_conversation_history_criker,
+    get_agent_response_criker
 )
-# Configurar un logger para esta vista
-logger = logging.getLogger(__name__)
-ffmpeg_path = r"C:\ffmpeg\bin\ffmpeg.exe"
-ffprobe_path = r"C:\ffmpeg\bin\ffprobe.exe"
+from .db import get_db_collection
+from bson.objectid import ObjectId
 
-AudioSegment.converter = ffmpeg_path
-AudioSegment.ffprobe = ffprobe_path
+# --- 2. DEFINIR LOGGER (ESTO DEBE IR ANTES DE USARLO) ---
+logger = logging.getLogger(__name__)
+
+# --- 3. CONFIGURACIÓN DE FFMPEG (Ahora sí podemos usar logger) ---
+ffmpeg_path_system = shutil.which("ffmpeg")
+ffprobe_path_system = shutil.which("ffprobe")
+
+if ffmpeg_path_system:
+    # Si el sistema lo encuentra automáticamente (Linux/Cloud o PC bien configurada)
+    AudioSegment.converter = r"C:\ffmpeg\bin\ffmpeg.exe"
+    AudioSegment.ffprobe = r"C:\ffmpeg\bin\ffprobe.exe"
+else:
+    # FALLBACK: Ruta manual para tu PC local si no está en el PATH
+    # Asegúrate de que esta ruta sea real en TU computadora
+    local_ffmpeg = r"C:\ffmpeg\bin\ffmpeg.exe"
+    local_ffprobe = r"C:\ffmpeg\bin\ffprobe.exe"
+    
+    if os.path.exists(local_ffmpeg):
+        AudioSegment.converter = local_ffmpeg
+        AudioSegment.ffprobe = local_ffprobe
+    else:
+        # Ahora sí funcionará este warning porque logger ya existe
+        logger.warning("⚠️ FFMPEG no encontrado ni en el sistema ni en C:\\ffmpeg\\bin. La transcripción de audio fallará.")
+
+
+# --- VISTAS DE PÁGINAS ESTÁTICAS ---
+
 # --- VISTAS DE PÁGINAS ESTÁTICAS (sin cambios) ---
 def transcribe_audio(request):
     if request.method == 'POST':
