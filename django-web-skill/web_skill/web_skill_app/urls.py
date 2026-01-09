@@ -9,7 +9,7 @@ from . import preguntas_views
 from . import streamlit_proxy
 from . import dashboard_views
 from . import feedback_views
-from . import admin_views
+from . import admin_views  # Asegúrate de que este import exista
 
 urlpatterns = [
     # --- Vistas Estáticas y Principales ---
@@ -24,7 +24,7 @@ urlpatterns = [
     # --- Vistas de la App (Dashboard y Agentes) ---
     path('dashboard/', core_views.dashboard_view, name='dashboard'),
     path('chat/knowledge/', core_views.knowledge_view, name='chat_knowledge'),
-    path('api/skill_chat/', core_views.skill_chat_api, name='skill_chat_api'), # NUEVA RUTA para el POST AJAX
+    path('api/skill_chat/', core_views.skill_chat_api, name='skill_chat_api'),
 
     # --- RUTA NUEVA PARA MARCAR LECCIÓN ---
     path('api/marcar_leccion/', core_views.marcar_leccion_completada, name='marcar_leccion_completada'),
@@ -34,11 +34,11 @@ urlpatterns = [
     path('register/', auth_views.register_view, name='register_view'),
     path('logout/', auth_views.logout_view, name='logout_view'),
     
-    path('test/', test_views.test_views, name='test_views'),  # Ruta para la vista de prueba
+    path('test/', test_views.test_views, name='test_views'),
     
-    path('ask-sofia/', sofia_views.ask_sofia, name='ask_sofia'), # <-- Añade esta línea
+    path('ask-sofia/', sofia_views.ask_sofia, name='ask_sofia'),
 
-    # --- Vistas de Lecciones (NUEVO) ---
+    # --- Vistas de Lecciones ---
     path("lecciones/<str:leccion_id>/", core_views.leccion_view, name="leccion_view"),
     
     # --- Vistas de la Encuesta Interactiva ---
@@ -52,15 +52,13 @@ urlpatterns = [
     path('encuesta/limpiar/', preguntas_views.limpiar_cache, name='limpiar_cache'),
     path('encuesta/eliminar-dashboard/', preguntas_views.eliminar_dashboard, name='eliminar_dashboard'),
 
-    # # --- Proxy para Streamlit ---
-    # re_path(r'^streamlit/.*', streamlit_proxy.streamlit_proxy, name='streamlit_proxy'),
-    
     # --- feedback ---
     path('feedback/', feedback_views.feedback_page, name='feedback_page'),
     path('feedback/guardar/', feedback_views.guardar_feedback, name='guardar_feedback'),
     
-    # --- Vistas de Administrador ---
-    path('administrador/', admin_views.admin_dashboard_view, name='admin_dashboard'),
-    path('administrador/usuarios/', admin_views.admin_users_list_view, name='admin_users_list'),
-    path('administrador/usuarios/<str:user_id>/evaluaciones/', admin_views.admin_user_evaluations_view, name='admin_user_evaluations'),
+    # --- Vistas de Administrador (CORREGIDAS) ---
+    # Se quitaron los sufijos "_view" para coincidir con admin_views.py
+    path('administrador/', admin_views.admin_dashboard, name='admin_dashboard'),
+    path('administrador/usuarios/', admin_views.admin_users_list, name='admin_users_list'),
+    path('administrador/usuarios/<str:user_id>/evaluaciones/', admin_views.admin_user_evaluations, name='admin_user_evaluations'),
 ]

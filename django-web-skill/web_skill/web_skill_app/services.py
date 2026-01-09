@@ -427,16 +427,7 @@ def get_agent_response_scouter(user_id, user_message):
 def get_user_survey_history(user_id):
     """
     Returns list of survey dashboards for sidebar from MongoDB.
-    Returns: [
-        {
-            'id': str,
-            'timestamp': str,
-            'nivel': str,
-            'promedio': float,
-            'contexto': str
-        },
-        ...
-    ]
+    CORREGIDO: Devuelve claves compatibles con ambos templates (Admin y Usuario).
     """
     try:
         from .db import mongo_client
@@ -446,15 +437,22 @@ def get_user_survey_history(user_id):
         db = mongo_client[getattr(settings, 'MONGO_DB_NAME', 'webSkill')]
         survey_collection = db['survey_results']
         
-        # Buscar todas las evaluaciones del usuario, ordenadas por fecha descendente
+        # Búsqueda híbrida (String y ObjectId) para asegurar que encuentre los datos
+        criteria = []
+        criteria.append({'user_id': str(user_id)}) 
+        try:
+            criteria.append({'user_id': ObjectId(str(user_id))})
+        except:
+            pass
+            
         surveys = survey_collection.find(
-            {'user_id': user_id}
-        ).sort('timestamp', -1)  # Más recientes primero
+            {'$or': criteria}
+        ).sort('timestamp', -1)
         
         historial = []
         for doc in surveys:
             try:
-                # Formatear timestamp para display
+                # Formatear timestamp
                 timestamp_str = doc.get('timestamp', '')
                 try:
                     if 'T' in timestamp_str:
@@ -465,12 +463,28 @@ def get_user_survey_history(user_id):
                 except:
                     formatted_date = timestamp_str
                 
+                # Extraer valores seguros
+                nivel_val = doc.get('nivel_evaluado', 'N/A')
+                promedio_val = doc.get('promedio_global', 0)
+                if isinstance(promedio_val, float):
+                    promedio_val = int(promedio_val) # Convertir a entero para visualización limpia
+
                 historial.append({
-                    'id': str(doc['_id']),
+                    'id': str(doc['_id']), 
+                    'dashboard_id': str(doc['_id']),
                     'timestamp': formatted_date,
-                    'nivel': doc.get('nivel_evaluado', 'N/A'),
-                    'promedio': doc.get('promedio_global', 0),
-                    'contexto': doc.get('contexto_usuario', '')
+                    
+                    # --- AQUÍ ESTÁ LA SOLUCIÓN MÁGICA ---
+                    # Enviamos con AMBOS nombres para que funcione en todos tus HTMLs
+                    'nivel': nivel_val,              # Para sidebar_historial.html
+                    'nivel_evaluado': nivel_val,     # Para admin_user_evaluations.html
+                    
+                    'promedio': promedio_val,        # Para sidebar_historial.html
+                    'promedio_global': promedio_val, # Para admin_user_evaluations.html
+                    # ------------------------------------
+                    
+                    'contexto': doc.get('contexto_usuario', ''),         # Para sidebar
+                    'contexto_usuario': doc.get('contexto_usuario', '')  # Para admin
                 })
             except Exception as e:
                 logger.warning(f"Error procesando survey {doc.get('_id')}: {e}")
