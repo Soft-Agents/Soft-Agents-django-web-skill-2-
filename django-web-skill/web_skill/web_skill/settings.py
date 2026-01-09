@@ -180,20 +180,17 @@ try:
     }
 
     # MongoDB
-    MONGO_DB_NAME = os.getenv('MONGO_DB_NAME', 'webSkill')
+    MONGO_DB_NAME = config('MONGO_DB_NAME', default='webSkill')
     logger.info(f"✅ MONGO_DB_NAME: {MONGO_DB_NAME}")
 
-    # URLs de agentes
-    # Se ponen las URLs directas como "default" para que funcione sí o sí
-    AGENT_PROFESOR = os.getenv('AGENT_PROFESOR', 'https://agente-profesor-redis-178017465262.us-central1.run.app/chat')
-    AGENT_CRIKER_COACH = os.getenv('AGENT_CRIKER_COACH', 'https://agente-coach-redis-178017465262.us-central1.run.app/chat')
-    AGENT_CRIKER_SKILL = os.getenv('AGENT_CRIKER_SKILL', 'https://agente-criker-redis2-178017465262.us-central1.run.app/chat')
-    SOFIA_AGENT_URL = os.getenv('SOFIA_AGENT_URL', 'https://agente-sofia-redis-178017465262.us-central1.run.app/chat')
-    
-    # Estas dos pueden quedar vacías si no las usas, o ponles sus URLs si las tienes
-    AGENT_ENCUESTA_URL = os.getenv('AGENT_ENCUESTA_URL', '')
-    AGENT_SCOUTER_URL = os.getenv('AGENT_SCOUTER_URL', 'https://agente-sofia-redis-178017465262.us-central1.run.app/chat') # A veces Scouter es Sofia
-    STREAMLIT_SERVER_URL = os.getenv('STREAMLIT_SERVER_URL', 'http://localhost:8501')
+    # URLs de agentes (CORREGIDO: Usando config en vez de os.getenv)
+    AGENT_PROFESOR = config('AGENT_PROFESOR', default='')
+    AGENT_CRIKER_COACH = config('AGENT_CRIKER_COACH', default='')
+    AGENT_CRIKER_SKILL = config('AGENT_CRIKER_SKILL', default='')
+    SOFIA_AGENT_URL = config('SOFIA_AGENT_URL', default='')
+    AGENT_ENCUESTA_URL = config('AGENT_ENCUESTA_URL', default='')
+    AGENT_SCOUTER_URL = config('AGENT_SCOUTER_URL', default='')
+    STREAMLIT_SERVER_URL = config('STREAMLIT_SERVER_URL', default='http://localhost:8501')
 
     logger.info("=" * 80)
     logger.info("✅ SETTINGS.PY CARGADO EXITOSAMENTE")
