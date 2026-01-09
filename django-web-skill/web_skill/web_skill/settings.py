@@ -2,6 +2,10 @@ from pathlib import Path
 import os
 import sys
 import traceback
+from dotenv import load_dotenv
+
+# Cargar variables de entorno desde .env
+load_dotenv()
 from decouple import config
 
 # LOGGING TEMPRANO PARA CAPTURAR ERRORES DE INICIO
