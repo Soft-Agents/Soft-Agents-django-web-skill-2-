@@ -61,6 +61,11 @@
                 <form class="flex gap-2" id="chat-form" method="post" action="{% url 'chat_knowledge' %}">
                     {% csrf_token %}
                     <input type="text" name="user_message" class="flex-1 px-4 py-2 text-sm text-white bg-slate-700/50 border border-slate-600 rounded-lg outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 placeholder-slate-500 transition-all" id="messageInput" placeholder="Pregunta sobre la lección..." autocomplete="off" required>
+                    <button type="button" id="micBtn" class="p-2 text-white bg-slate-700/50 border border-slate-600 rounded-lg hover:bg-purple-600/30 transition-all">
+                        <svg id="micIcon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                        </svg>
+                    </button>
                     <button type="submit" class="p-2 text-white bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50" id="sendButton">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
@@ -103,6 +108,9 @@
 {% endwith %}
                     {% endfor %}
                 </div>
+                
+                    
+                
             </div>
             {% endfor %}
         </div>
@@ -178,6 +186,9 @@
     </style>
 
     <script>
+        const micBtn = document.getElementById('micBtn'); // Asegúrate de que el botón en el HTML tenga este ID
+        let mediaRecorder;
+        let audioChunks = [];
         const chatForm = document.getElementById('chat-form');
         const chatInput = document.getElementById('messageInput');
         const chatMessages = document.getElementById('chatMessages');
@@ -186,6 +197,7 @@
         const csrfInput = document.querySelector('[name=csrfmiddlewaretoken]');
         const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
         const synth = window.speechSynthesis;
+        let leccion_actual = "0.0";
 
 // --- LÓGICA DE PAUSA / REANUDAR ---
     const muteBtn = document.getElementById('toggleMuteBtn');
@@ -208,6 +220,93 @@
         }
     }
 
+        function cargarLeccion(codigo) {
+            leccion_actual = codigo;
+            document.querySelectorAll('.lesson-link').forEach(l => l.classList.remove('active'));
+            if (event && event.currentTarget) event.currentTarget.classList.add('active');
+
+            const pizarraContent = document.getElementById("pizarra-content");
+            // Mantenemos la estructura flex para el cargando
+            pizarraContent.innerHTML = '<div class="w-full h-full flex items-center justify-center text-purple-300 animate-pulse"><div class="text-center"><span class="text-4xl block mb-2">⏳</span><span>Cargando lección...</span></div></div>';
+
+            fetch(`/lecciones/${codigo}/`)
+                .then(response => {
+                    if (!response.ok) throw new Error("Error de red");
+                    return response.text();
+                })
+                .then(html => {
+                    // Inyectamos y envolvemos en el div flex para asegurar el sticky footer
+                    pizarraContent.innerHTML = `<div class="w-full h-full flex flex-col justify-between">${html}</div>`;
+                    
+                    const scripts = pizarraContent.querySelectorAll('script');
+                    scripts.forEach(oldScript => {
+                        const newScript = document.createElement('script');
+                        newScript.textContent = oldScript.textContent;
+                        document.body.appendChild(newScript);
+                        setTimeout(() => newScript.remove(), 100); 
+                    });
+                })
+                .catch(err => {
+                    pizarraContent.innerHTML = `<div class="flex items-center justify-center h-full text-red-400">Error: ${err.message}</div>`;
+                });
+        }
+
+        function saltarLeccion(){
+            let parte = leccion_actual.split('.');
+            let pilar = parseInt(parte[0]);
+            let leccion = parseInt(parte[1]);
+            if (leccion < 3) {
+                // Si hay más lecciones en el mismo pilar, sumamos 1 a la lección
+                leccion++;
+            } else if (pilar < 5) {
+                // Si terminamos las 3 lecciones, pasamos al siguiente pilar y lección 1
+                pilar++;
+                leccion = 1;
+            }
+            // 3. Creamos el nuevo código (ej: "1.3")
+            const siguienteCodigo = `${pilar}.${leccion}`;
+            
+            // 4. Ejecutamos la carga
+            cargarLeccion(siguienteCodigo);
+            
+            // 5. (Opcional) Abrir el menú lateral automáticamente para que coincida
+            actualizarMenuLateral(pilar, siguienteCodigo);
+        }
+        function actualizarMenuLateral(pilarNum, codigoCompleto) {
+            // Abrir el acordeón del pilar si está cerrado
+            const pilarHeader = document.querySelector(`.pilar-section:nth-child(${pilarNum}) .cursor-pointer`);
+            const pilarSection = pilarHeader?.parentElement;
+            if (pilarSection && !pilarSection.classList.contains('open')) {
+                togglePilar(pilarHeader);
+            }
+        }
+
+        chatForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const text = chatInput.value.trim();
+            if (!text) return;
+            if (synth.speaking) synth.cancel();
+
+            addMessage('user', text);
+            chatInput.value = '';
+            const loadingId = addLoadingIndicator();
+
+            try {
+                const res = await fetch(chatForm.action, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken },
+                    body: JSON.stringify({ user_message: text })
+                });
+                const data = await res.json();
+                removeMessage(loadingId);
+                if (data.status === 'ok') {
+                    handleAgentResponse(data.agent_response);
+                } else {
+                    addMessage('agent', '⚠️ Error: ' + (data.error || 'Desconocido'));
+                }
+            } catch (err) {
+                removeMessage(loadingId);
+                addMessage('agent', '⚠️ Error de conexión.');
     // Inicializar iconos
     updateIconsUI();
 
@@ -479,6 +578,96 @@ function finalizarLeccion(codigo) {
         if (!isMuted) {
             synth.speak(utter);
         }
+        // Lógica para grabar audio al mantener presionado
+micBtn.addEventListener('mousedown', async () => {
+    try {
+        // 1. Primero obtenemos el stream del micrófono
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        
+        // 2. Definimos las opciones de formato
+        const options = { mimeType: 'audio/webm;codecs=opus' };
+        
+        // 3. Verificamos si el navegador soporta el formato y creamos el recorder
+        if (MediaRecorder.isTypeSupported(options.mimeType)) {
+            mediaRecorder = new MediaRecorder(stream, options);
+        } else {
+            // Si no soporta opus, dejamos que el navegador use su formato por defecto
+            mediaRecorder = new MediaRecorder(stream);
+        }
+
+        audioChunks = [];
+
+        mediaRecorder.ondataavailable = (event) => {
+            if (event.data.size > 0) {
+                audioChunks.push(event.data);
+            }
+        };
+
+        mediaRecorder.onstop = async () => {
+            // Importante: Aunque el navegador grabe en webm, 
+            // enviamos el blob con el tipo que el navegador generó.
+            const audioBlob = new Blob(audioChunks, { type: mediaRecorder.mimeType });
+            console.log("Grabación finalizada. Tamaño:", audioBlob.size, "bytes");
+            await transcribeAndProcess(audioBlob);
+        };
+
+        // 4. Iniciar la grabación
+        mediaRecorder.start();
+        
+        // Feedback visual
+        micBtn.classList.add('bg-red-500/50', 'animate-pulse'); 
+        if (avatarLight) avatarLight.classList.add('speaking-animation');
+
+    } catch (err) {
+        console.error("Error al acceder al micrófono:", err);
+        addMessage('agent', '⚠️ No se pudo acceder al micrófono. Revisa los permisos.');
+    }
+});
+micBtn.addEventListener('mouseup', () => {
+    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+        mediaRecorder.stop();
+        micBtn.classList.remove('bg-red-500/50', 'animate-pulse');
+    }
+});
+
+// Función para enviar audio al servidor y luego al chat
+async function transcribeAndProcess(blob) {
+    if (blob.size < 1000) {
+        addMessage('agent', '⚠️ El audio es muy corto, intenta hablar un poco más.');
+        return;
+    }
+    const formData = new FormData();
+    formData.append('audio_data', blob, 'recording.webm');
+
+    // Mostramos un indicador de que estamos "escribiendo" la transcripción
+    const loadingId = addLoadingIndicator();
+
+    try {
+        const response = await fetch('/transcribe/', { 
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': csrfToken // Reutilizamos tu variable csrfToken
+            }
+        });
+
+        const data = await response.json();
+        removeMessage(loadingId);
+
+        if (data.status === 'ok' && data.text) {
+            chatInput.value = data.text;
+            chatForm.requestSubmit(); 
+        } else {
+            // Ahora mostramos el mensaje real que manda el servidor (data.message)
+            const errorReal = data.message || 'No pude entender el audio.';
+            addMessage('agent', '⚠️ ' + errorReal);
+        }
+    } catch (error) {
+        removeMessage(loadingId);
+        console.error("Error en transcripción:", error);
+        addMessage('agent', '⚠️ Error al procesar el audio.');
+    }
+}
     }
 
     // --- LÓGICA DEL TEMARIO (Sidebar) ---

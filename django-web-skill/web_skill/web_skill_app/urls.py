@@ -24,7 +24,9 @@ urlpatterns = [
     # --- Vistas de la App (Dashboard y Agentes) ---
     path('dashboard/', core_views.dashboard_view, name='dashboard'),
     path('chat/knowledge/', core_views.knowledge_view, name='chat_knowledge'),
-    path('api/skill_chat/', core_views.skill_chat_api, name='skill_chat_api'),
+     
+    path('transcribe/', core_views.transcribe_audio, name='transcribe'),
+    path('api/skill_chat/', core_views.skill_chat_api, name='skill_chat_api'),# NUEVA RUTA para el POST AJAX
 
     # --- RUTA NUEVA PARA MARCAR LECCIÓN ---
     path('api/marcar_leccion/', core_views.marcar_leccion_completada, name='marcar_leccion_completada'),

@@ -1,18 +1,21 @@
 {% extends 'web_skill_app/base.html' %}
-{% load static %}
+   {%load static%} 
 {% block title %}Dashboard - Selecciona tu Asistente{% endblock %}
 {% block content %}
     {% include 'web_skill_app/partials/navigation.html' with currentPage='dashboard' %}
 
     <style>
+        .contenido-oculto{
+        display: none !important;
+        }
         /* --- TUS ESTILOS DE SOFIA (SE MANTIENEN IGUAL) --- */
         #avatar-flotante {
-            position: fixed; top: 50px; left: 50px; width: 460px; height: 460px;
-            background-image: url('{% static "web_skill_app/img/sofia.png" %}');
+            position: fixed; top: 50px; left: 50px; 
             background-size: contain; background-repeat: no-repeat;
             background-position: center bottom; z-index: 9999; cursor: grab;
             user-select: none; transition: transform 0.2s ease, filter 0.2s ease; outline: none;
         }
+        
         @media (max-width: 768px) {
             #avatar-flotante { width: 260px; height: 260px; top: 100px; left: 10px; }
         }
@@ -56,6 +59,13 @@
                 <p class="text-xl text-gray-300 max-w-3xl mx-auto">
                     Elige tu asistente de IA especializado para comenzar a explorar y aprender
                 </p>
+                    <button id="btn-activar-sofia" class="inline-flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-6 rounded-full transition-all transform hover:scale-105 shadow-lg">
+                <span class="relative flex h-3 w-3">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-3 w-3 bg-blue-100"></span>
+                </span>
+                Hablar con Sofía ahora
+                </button>
             </div>
 
             <div class="grid md:grid-cols-4 gap-8 max-w-8xl mx-auto items-stretch">
@@ -177,7 +187,8 @@
         </div>
     </div>
 
-    <div id="avatar-flotante">
+    <div id="avatar-flotante" class="">
+        <img src='{% static "web_skill_app/img/sofia.png" %}' alt="" class="h-23 w-23">
         <div id="bocadillo-texto">
             <div id="sofia-chat-history">
                 <div class="sofia-message agent">
@@ -191,5 +202,5 @@
             </div>
         </div>
     </div>
-    <script src="{% static 'web_skill_app/js/sofia.js' %}"></script>
+<script src="{% static 'web_skill_app/js/sofia.js' %}?v=1.1"></script>
 {% endblock %}
