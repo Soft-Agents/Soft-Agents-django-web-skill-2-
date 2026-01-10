@@ -1,0 +1,97 @@
+{% extends 'web_skill_app/base.html' %}
+{% load static %}
+
+{% block title %}Gestión Multi-Empresa{% endblock %}
+
+{% block content %}
+{% include 'web_skill_app/partials/navigation-admin.html' %}
+
+<div class="min-h-screen bg-slate-900 py-8 pt-24 text-white">
+    <div class="max-w-6xl mx-auto px-4">
+        
+        <div class="flex justify-between items-center mb-8">
+            <div>
+                <h1 class="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">
+                    🏢 Gestión Multi-Empresa (Databases)
+                </h1>
+                <p class="text-slate-400 mt-2">Crea entornos aislados para probar el producto con diferentes clientes.</p>
+            </div>
+            
+            <div class="text-right">
+                <span class="block text-sm text-slate-400">Base de Datos Activa:</span>
+                <span class="text-xl font-bold text-green-400 border border-green-500/30 bg-green-500/10 px-3 py-1 rounded-lg">
+                    {{ active_db }}
+                </span>
+            </div>
+        </div>
+
+        {% if messages %}
+        <div class="mb-8 space-y-2">
+            {% for message in messages %}
+            <div class="p-4 rounded-lg {% if message.tags == 'error' %}bg-red-500/20 text-red-200 border border-red-500/50{% else %}bg-green-500/20 text-green-200 border border-green-500/50{% endif %}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="bg-slate-800/50 border border-slate-700 rounded-2xl p-6 mb-8">
+            <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
+                <span>➕</span> Nueva Empresa
+            </h2>
+            <form action="{% url 'admin_create_database' %}" method="POST" class="flex gap-4 items-end">
+                {% csrf_token %}
+                <div class="flex-1">
+                    <label class="block text-sm text-slate-400 mb-1">Nombre de la Empresa / DB (Sin espacios)</label>
+                    <input type="text" name="db_name" placeholder="ej: coca_cola, senati_prueba" required
+                           class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-3 text-white focus:border-purple-500 outline-none">
+                </div>
+                <button type="submit" class="px-6 py-3 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-lg transition-all shadow-lg shadow-purple-500/20">
+                    Crear Entorno
+                </button>
+            </form>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for db in company_dbs %}
+            <div class="bg-slate-800 border {% if db == active_db %}border-green-500 ring-1 ring-green-500{% else %}border-slate-700{% endif %} rounded-2xl p-6 flex flex-col justify-between hover:bg-slate-750 transition-colors">
+                
+                <div>
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="p-3 bg-slate-700 rounded-lg">
+                            <span class="text-2xl">🗄️</span>
+                        </div>
+                        {% if db == active_db %}
+                        <span class="px-2 py-1 bg-green-500/20 text-green-300 text-xs font-bold rounded">ACTIVA</span>
+                        {% endif %}
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-1">{{ db }}</h3>
+                    <p class="text-sm text-slate-400">MongoDB Database</p>
+                </div>
+
+                <div class="mt-6 flex gap-3 pt-4 border-t border-slate-700">
+                    {% if db != active_db %}
+                    <a href="{% url 'admin_switch_database' db %}" class="flex-1 py-2 text-center bg-blue-600/20 text-blue-300 hover:bg-blue-600 hover:text-white rounded-lg transition-all text-sm font-semibold border border-blue-500/30">
+                        Usar esta DB
+                    </a>
+                    {% else %}
+                    <button disabled class="flex-1 py-2 text-center bg-slate-700 text-slate-500 rounded-lg cursor-not-allowed text-sm">
+                        Seleccionada
+                    </button>
+                    {% endif %}
+
+                    {% if db != 'webSkill' %}
+                    <a href="{% url 'admin_delete_database' db %}" 
+                       onclick="return confirm('⚠️ PELIGRO: ¿Estás seguro de que quieres ELIMINAR la empresa {{ db }}? Se borrarán TODOS sus usuarios y evaluaciones para siempre.');"
+                       class="px-3 py-2 bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white rounded-lg border border-red-500/30 transition-all" title="Eliminar">
+                        🗑️
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+    </div>
+</div>
+{% endblock %}
