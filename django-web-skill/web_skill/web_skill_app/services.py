@@ -70,92 +70,105 @@ def get_conversation_history_knowledge(user_id):
 def get_agent_response_knowledge(user_id, user_message):
     """
     Gets a response from the Knowledge agent.
-    It injects the user's completed lessons into the prompt so the Agent knows the progress.
+    INCLUYE PERSONALIZACIÓN POR CARRERA + PROTECCIÓN ANTI-JSON.
     """
-    # 1. Recuperamos el documento del usuario PRIMERO para ver sus lecciones
+    # 1. Recuperamos el documento del usuario
     try:
         users_collection = get_db_collection()
         user_doc, user_object_id = _get_user_doc(users_collection, user_id)
         
-        # --- NUEVA LÓGICA: OBTENER PROGRESO ---
+        # --- DATOS DEL USUARIO ---
         completed_lessons = user_doc.get('lecciones_completadas', [])
-        context_instruction = ""
+        lista_lecciones = ", ".join(completed_lessons) if completed_lessons else "Ninguna"
         
-        if completed_lessons:
-            lista_lecciones = ", ".join(completed_lessons)
-            # Creamos una instrucción oculta para el agente
-            context_instruction = (
-                f"\n\n[SYSTEM CONTEXT: El usuario ya ha completado y aprobado las siguientes lecciones: {lista_lecciones}. "
-                "Si pregunta qué sigue, guíalo a la siguiente. Felicítalo si acaba de terminar una.]"
-            )
-        # --------------------------------------
+        # Intentamos recuperar la carrera o profesión
+        # Ajusta las claves ('carrera', 'profesion') según como lo guardes en tu registro
+        carrera_usuario = user_doc.get('carrera', user_doc.get('profesion', 'Estudiante General'))
+        
+        # --- ESTRATEGIA: SYSTEM OVERRIDE CON PERSONALIZACIÓN ---
+        system_override = (
+            f"[SISTEMA: MODO PROFESOR PERSONALIZADO]\n"
+            f"DATOS USUARIO: Carrera/Perfil: {carrera_usuario}. Progreso: {lista_lecciones}.\n"
+            f"TU ROL: Profesor Teórico Yashay.\n"
+            
+            f"🎯 INSTRUCCIÓN DE PERSONALIZACIÓN: Explica los conceptos teóricos usando EJEMPLOS BREVES Y ANALOGÍAS relacionadas con su carrera ({carrera_usuario}). "
+            f"Por ejemplo, si es 'Ingeniero', usa analogías de sistemas/construcción. Si es 'Médico', usa analogías de diagnóstico.\n"
+            
+            f"⛔ PROHIBICIÓN ABSOLUTA: Aunque uses ejemplos de su carrera, NO generes 'Casos Prácticos' completos, ni diálogos simulados, ni JSON.\n"
+            f"⛔ PROHIBICIÓN: NO uses formato de guion (Personaje A: ...). Mantén formato de prosa explicativa.\n"
+            
+            f"Si el usuario pide un ejercicio práctico completo, dile: 'Para aplicar esto en un caso práctico simulado, habla con Criker en la sección Skill'.\n"
+            f"MENSAJE DEL USUARIO:\n"
+            f"--------------------------------------------------\n"
+        )
+        # --------------------------------------------
 
     except Exception as e:
         logger.error(f"Error recuperando usuario en knowledge service: {e}")
-        # Si falla la DB, seguimos con el mensaje normal sin contexto para no romper el chat
-        completed_lessons = []
-        context_instruction = ""
+        system_override = ""
         user_object_id = user_id
 
-    # Usamos el mensaje + contexto para generar el hash del caché (así si avanza, la respuesta cambia)
-    full_message_for_agent = f"{user_message} {context_instruction}"
+    # CONCATENAMOS
+    full_message_for_agent = f"{system_override}{user_message}"
     
+    # Hash para caché
     message_hash = hashlib.md5(full_message_for_agent.strip().lower().encode()).hexdigest()
     cache_key = f"agent_knowledge_response:{message_hash}"
 
     cached_response = cache.get(cache_key)
     
-    # --- SI ESTÁ EN CACHÉ ---
+    # --- CACHE HIT ---
     if cached_response:
         logger.info(f"Cache HIT for key {cache_key}")
         try:
             conversation_history = user_doc.get('conversation_history_knowledge', [])
-            
             current_time = datetime.datetime.now()
-            # Guardamos solo el mensaje original del usuario (sin el texto oculto del sistema)
             conversation_history.append({'role': 'user', 'message': user_message, 'timestamp': current_time.isoformat()})
             conversation_history.append({'role': 'agent', 'message': cached_response, 'timestamp': (current_time + datetime.timedelta(seconds=1)).isoformat()})
-            
-            users_collection.update_one(
-                {'_id': user_object_id},
-                {'$set': {'conversation_history_knowledge': conversation_history}}
-            )
-            logger.debug(f"Knowledge history updated for {user_object_id} with CACHED response.")
+            users_collection.update_one({'_id': user_object_id}, {'$set': {'conversation_history_knowledge': conversation_history}})
         except Exception as e:
-            logger.error(f"Error updating history with cached response: {e}")
-        
+            logger.error(f"Error updating history cache: {e}")
         return cached_response
 
-    # --- SI NO ESTÁ EN CACHÉ (LLAMAR AL AGENTE) ---
-    logger.info(f"Cache MISS for key {cache_key}. Calling agent.")
+    # --- CACHE MISS ---
+    logger.info(f"Cache MISS. Calling agent.")
     try:
         conversation_history = user_doc.get('conversation_history_knowledge', [])
-
         agent_url = settings.AGENT_PROFESOR
+        
         if not agent_url:
             raise ValueError("AGENT_PROFESOR URL not configured.")
             
-        # AQUÍ ENVIAMOS EL MENSAJE CONTEXTUALIZADO (Mensaje + Lista de lecciones)
         payload = {'user_id': str(user_object_id), 'message': full_message_for_agent}
         
-        response = requests.post(
-            agent_url, json=payload, headers={'Content-Type': 'application/json'}, timeout=120
-        )
-        response.raise_for_status()
-        response_data = response.json()
-        
-        agent_response = response_data.get('response')
-        if 'error' in response_data or not agent_response:
-             error_msg = response_data.get('error', 'Unknown agent error.')
-             raise Exception(f"Agent Error: {error_msg}")
+        # --- PROTECCIÓN Y FILTRADO ---
+        try:
+            response = requests.post(agent_url, json=payload, headers={'Content-Type': 'application/json'}, timeout=120)
+            response.raise_for_status()
+            response_data = response.json()
+            
+            agent_response = response_data.get('response')
+            
+            # FILTRO DE SEGURIDAD (Por si el agente es muy terco con el JSON)
+            if agent_response and ("{" in agent_response and "titulo_caso" in agent_response):
+                logger.warning("Agente intentó enviar JSON. Interceptando...")
+                agent_response = (
+                    f"Entendido. Como {carrera_usuario}, verás que este concepto es fundamental. "
+                    "Te lo explico teóricamente: [El agente tuvo un lapsus técnico, pero aquí estoy para explicarte la teoría pura]."
+                )
+
+            if 'error' in response_data:
+                 logger.error(f"Agente devolvió error interno: {response_data['error']}")
+                 agent_response = "Mis circuitos teóricos se han cruzado un momento. ¿Podrías repetirme tu duda?"
+
+        except Exception as agent_err:
+            logger.error(f"Fallo conexión Agente: {agent_err}")
+            agent_response = "Estoy experimentando una breve interrupción técnica. Intenta de nuevo en unos segundos."
+        # -----------------------------------------------
 
         cache.set(cache_key, agent_response)
-        logger.info(f"Saved new response to cache with key {cache_key}")
-
-        current_time = datetime.datetime.now()
         
-        # IMPORTANTE: Al guardar en el historial, guardamos 'user_message' (lo que escribió el humano),
-        # NO 'full_message_for_agent' (que tiene las instrucciones raras del sistema).
+        current_time = datetime.datetime.now()
         conversation_history.append({'role': 'user', 'message': user_message, 'timestamp': current_time.isoformat()})
         conversation_history.append({'role': 'agent', 'message': agent_response, 'timestamp': (current_time + datetime.timedelta(seconds=1)).isoformat()})
         
@@ -163,13 +176,12 @@ def get_agent_response_knowledge(user_id, user_message):
             {'_id': user_object_id},
             {'$set': {'conversation_history_knowledge': conversation_history}}
         )
-        logger.debug(f"Knowledge history updated for {user_object_id}.")
         
         return agent_response
 
-    except (ConnectionError, ValueError, requests.exceptions.RequestException, Exception) as e:
-        logger.error(f"Error in get_agent_response_knowledge for {user_id}: {e}")
-        raise e
+    except Exception as e:
+        logger.error(f"Error CRÍTICO services: {e}")
+        return "Error de sistema. Contacta soporte."
 
 # ===== FUNCIONES PARA SKILL (Coach de Teoría - Chat Izquierdo en 'skill.html') =====
 def get_conversation_history_coach(user_id):

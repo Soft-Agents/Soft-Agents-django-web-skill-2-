@@ -3,9 +3,17 @@
 import os
 import sys
 
-
 def main():
     """Run administrative tasks."""
+    
+    # --- NUEVO: Cargar variables de entorno desde .env ---
+    try:
+        from dotenv import load_dotenv
+        load_dotenv()
+    except ImportError:
+        pass # Si no está instalado, seguimos (aunque podría fallar más adelante si faltan variables)
+    # -----------------------------------------------------
+
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "web_skill.settings")
     try:
         from django.core.management import execute_from_command_line
