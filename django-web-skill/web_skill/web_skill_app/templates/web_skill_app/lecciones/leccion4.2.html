@@ -1,0 +1,398 @@
+
+
+
+        <!-- Contenedor Principal de Slides -->
+        <div class="flex-1 p-8 overflow-y-auto" id="slide-container">
+            <!-- Slide 1: Portada -->
+            <div class="slide-content hidden" id="slide-1">
+                <div class="h-full flex flex-col justify-center items-center text-center">
+                    <h1 class="text-5xl font-bold text-blue-100 mb-4">Lección 4.2</h1>
+                    <h2 class="text-3xl font-semibold text-blue-200">Argument Mapping: Visualización de Razonamiento Complejo</h2>
+                </div>
+            </div>
+
+            <!-- Slide 2: Introducción -->
+            <div class="slide-content hidden" id="slide-2">
+                <h2 class="text-3xl font-bold text-blue-100 mb-6">Introducción: Un Diagrama de Flujo para el Pensamiento Crítico</h2>
+                <p class="text-lg text-blue-50 leading-relaxed mb-4">En la lección anterior, sentamos las bases para estructurar explicaciones. Ahora, profundizaremos en una herramienta poderosa que nos permite no solo organizar nuestras propias ideas, sino también desentrañar y comprender la complejidad de los argumentos de otros: <span class="font-bold text-yellow-300">el mapeo de argumentos (Argument Mapping)</span>.</p>
+                <p class="text-lg text-blue-50 leading-relaxed">Esta técnica transforma el razonamiento, a menudo lineal y denso en el lenguaje natural, en una representación visual que revela la estructura subyacente, las relaciones entre las premisas y las conclusiones, y la solidez general de un argumento.</p>
+            </div>
+
+            <!-- Slide 3: ¿Qué es el Argument Mapping? -->
+            <div class="slide-content hidden" id="slide-3">
+                <h2 class="text-3xl font-bold text-blue-100 mb-6">1. ¿Qué es el Argument Mapping?</h2>
+                <p class="text-lg text-blue-50 leading-relaxed mb-4">El <span class="font-bold text-yellow-300">mapeo de argumentos</span> es una técnica visual que representa la estructura lógica de un argumento. En lugar de leer un texto de principio a fin, se identifican las afirmaciones clave (premisas y conclusiones) y se dibujan las relaciones de apoyo o refutación entre ellas.</p>
+                <p class="text-lg text-blue-50 leading-relaxed">Esto permite una comprensión mucho más clara de cómo las diferentes partes de un argumento se conectan para formar un todo coherente. Es una herramienta indispensable para el análisis profundo, la evaluación y la comunicación de ideas complejas.</p>
+            </div>
+
+            <!-- Slide 4: Objetivo del Mapeo -->
+            <div class="slide-content hidden" id="slide-4">
+                <h2 class="text-3xl font-bold text-blue-100 mb-6">Objetivo del Mapeo de Argumentos</h2>
+                <p class="text-lg text-blue-50 leading-relaxed mb-4">Esta técnica nos obliga a destilar el argumento a sus componentes esenciales, eliminando el ruido y revelando la arquitectura lógica.</p>
+                <div class="bg-blue-800 bg-opacity-40 p-4 rounded-lg">
+                    <h3 class="text-xl font-semibold text-yellow-300 mb-2">Beneficios Clave:</h3>
+                    <ul class="text-base space-y-2 list-disc ml-4">
+                        <li>Transforma "prosa verbosa" en estructura clara</li>
+                        <li>Revela conexiones lógicas ocultas</li>
+                        <li>Facilita la evaluación sistemática</li>
+                        <li>Identifica puntos débiles específicos</li>
+                        <li>Mejora la comunicación de ideas complejas</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Slide 5: Ejemplo de Mapeo vs Lectura Linear -->
+            <div class="slide-content hidden" id="slide-5">
+    <h2 class="text-3xl font-bold text-blue-100 mb-6">Ejemplo: Mapeo vs. Lectura Lineal</h2>
+    <div class="space-y-6 text-blue-50">
+        <div class="bg-blue-800 bg-opacity-40 p-4 rounded-lg">
+            <h3 class="text-xl font-semibold text-yellow-300 mb-2">✓ Mapeo de Argumentos (Pensamiento Crítico):</h3>
+            <p class="text-base leading-relaxed">Diego analiza un editorial creando un mapa: identifica la conclusión principal (política fiscal es beneficiosa) y desglosa las razones de apoyo. Al visualizar la estructura, puede identificar fácilmente las fortalezas, debilidades y lagunas lógicas del argumento.</p>
+        </div>
+        <div class="bg-red-900 bg-opacity-40 p-4 rounded-lg">
+            <h3 class="text-xl font-semibold text-red-300 mb-2">✗ Lectura Lineal (No-Pensamiento Crítico):</h3>
+            <p class="text-base leading-relaxed">Una persona lee el mismo editorial y basa su opinión en la impresión general o en las partes emocionales. Sin mapeo, le es imposible identificar premisas o la evidencia específica, siendo abrumada por la complejidad del texto original.</p>
+        </div>
+    </div>
+</div>
+
+            <!-- Slide 6: Componentes del Mapa -->
+            <div class="slide-content hidden" id="slide-6">
+                <h2 class="text-3xl font-bold text-blue-100 mb-6">2. Componentes Básicos del Mapa de Argumentos</h2>
+                <div class="space-y-4 text-blue-50">
+                    <div class="bg-blue-800 bg-opacity-40 p-4 rounded-lg">
+                        <h3 class="text-lg font-semibold text-yellow-300">Nodos (Cajas)</h3>
+                        <p class="text-sm">Representan afirmaciones individuales: premisas, conclusiones, evidencia</p>
+                    </div>
+                    <div class="bg-blue-800 bg-opacity-40 p-4 rounded-lg">
+                        <h3 class="text-lg font-semibold text-yellow-300">Flechas</h3>
+                        <p class="text-sm">Indican la dirección del apoyo lógico (de premisa a conclusión)</p>
+                    </div>
+                    <div class="bg-blue-800 bg-opacity-40 p-4 rounded-lg">
+                        <h3 class="text-lg font-semibold text-yellow-300">Colores/Símbolos</h3>
+                        <p class="text-sm">Distinguen entre tipos de afirmaciones (premisas, conclusiones, objeciones)</p>
+                    </div>
+                    <div class="bg-blue-800 bg-opacity-40 p-4 rounded-lg">
+                        <h3 class="text-lg font-semibold text-yellow-300">Agrupaciones</h3>
+                        <p class="text-sm">Muestran cómo múltiples premisas trabajan juntas para apovar una conclusión</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 7: Identificación de Entimemas -->
+            <div class="slide-content hidden" id="slide-7">
+                <h2 class="text-3xl font-bold text-blue-100 mb-6">Identificación de Premisas, Conclusiones y Entimemas</h2>
+                <p class="text-lg text-blue-50 leading-relaxed mb-4">El corazón del mapeo de argumentos es la clara distinción entre premisas y conclusiones. Un aspecto crucial que el mapeo ayuda a revelar son los <span class="font-bold text-yellow-300">entimemas</span>, o premisas ocultas.</p>
+                <p class="text-lg text-blue-50 leading-relaxed">El mapeo nos obliga a identificar estas suposiciones implícitas para que el argumento "tenga sentido" y para que su solidez pueda ser evaluada completamente. Si una flecha de apoyo parece débil o incompleta, a menudo es porque falta una premisa no declarada que necesita ser añadida al mapa.</p>
+            </div>
+
+            <!-- Slide 8: Ejemplo de Entimemas en Mapeo -->
+            <div class="slide-content hidden" id="slide-8">
+    <h2 class="text-3xl font-bold text-blue-100 mb-6">Ejemplo: Identificación de Entimemas</h2>
+    <div class="space-y-6 text-blue-50">
+        <div class="bg-blue-800 bg-opacity-40 p-4 rounded-lg">
+            <h3 class="text-xl font-semibold text-yellow-300 mb-2">✓ Pensamiento Crítico (Hacer Explícito el Entimema):</h3>
+            <p class="text-base leading-relaxed mb-2">Argumento: "No confiemos en ese político; es un abogado."</p>
+            <p class="text-base leading-relaxed mb-2">El pensador crítico identifica las partes:</p>
+            <ul class="text-sm space-y-1 list-disc ml-4">
+                <li>Conclusión: No confiar en el político.</li>
+                <li>Premisa Explícita: Es abogado.</li>
+                <li>Entimema (Premisa Oculta): Los abogados no son dignos de confianza.</li>
+            </ul>
+            <p class="text-base leading-relaxed">Al hacer explícito el entimema, se puede cuestionar directamente su validez y el prejuicio subyacente.</p>
+        </div>
+        <div class="bg-red-900 bg-opacity-40 p-4 rounded-lg">
+            <h3 class="text-xl font-semibold text-red-300 mb-2">✗ No-Pensamiento Crítico (Ignorar el Entimema):</h3>
+            <p class="text-base leading-relaxed">Una persona escucha el argumento y acepta o rechaza la conclusión superficialmente. Al no identificar la premisa oculta (el entimema), no puede desafiar la suposición que realmente impulsa el argumento.</p>
+        </div>
+    </div>
+</div>
+
+            <!-- Slide 9: Evaluación Visual -->
+            <div class="slide-content hidden" id="slide-9">
+                <h2 class="text-3xl font-bold text-blue-100 mb-6">3. Evaluación de la Solidez y Coherencia a Través de la Visualización</h2>
+                <p class="text-lg text-blue-50 leading-relaxed mb-4">Una vez que un argumento ha sido mapeado, su estructura se vuelve transparente, lo que facilita enormemente su evaluación. Podemos ver de un vistazo:</p>
+                <ul class="text-base text-blue-50 space-y-3 list-disc ml-6">
+                    <li><span class="font-bold text-yellow-300">La fuerza de las conexiones:</span> ¿Qué tan bien una premisa apoya a una conclusión?</li>
+                    <li><span class="font-bold text-yellow-300">La independencia de las premisas:</span> ¿Las premisas se apoyan mutuamente o son independientes?</li>
+                    <li><span class="font-bold text-yellow-300">Puntos débiles:</span> ¿Dónde hay premisas sin apoyo o apoyo insuficiente?</li>
+                    <li><span class="font-bold text-yellow-300">Contraargumentos:</span> ¿Dónde se podrían insertar objeciones o refutaciones?</li>
+                </ul>
+            </div>
+
+            <!-- Slide 10: Criterios ARS en Mapeo -->
+            <div class="slide-content hidden" id="slide-10">
+                <h2 class="text-3xl font-bold text-blue-100 mb-6">Aplicación de Criterios ARS en el Mapeo</h2>
+                <p class="text-lg text-blue-50 leading-relaxed mb-4">El mapeo de argumentos nos permite aplicar los criterios de evaluación de la "precisión, relevancia y suficiencia (ARS)" de las premisas de una manera mucho más sistemática.</p>
+                <div class="space-y-4 text-blue-50">
+                    <div class="bg-blue-800 bg-opacity-40 p-4 rounded-lg">
+                        <h3 class="text-lg font-semibold text-yellow-300">Precisión (Accuracy)</h3>
+                        <p class="text-sm">¿Es esta premisa factualmente correcta?</p>
+                    </div>
+                    <div class="bg-blue-800 bg-opacity-40 p-4 rounded-lg">
+                        <h3 class="text-lg font-semibold text-yellow-300">Relevancia (Relevance)</h3>
+                        <p class="text-sm">¿Es relevante para la conclusión que se supone que apoya?</p>
+                    </div>
+                    <div class="bg-blue-800 bg-opacity-40 p-4 rounded-lg">
+                        <h3 class="text-lg font-semibold text-yellow-300">Suficiencia (Sufficiency)</h3>
+                        <p class="text-sm">¿Hay suficiente evidencia para que esta premisa sea creíble?</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 11: Ejemplo de Evaluación Visual -->
+            <div class="slide-content hidden" id="slide-11">
+    <h2 class="text-3xl font-bold text-blue-100 mb-6">Ejemplo: Evaluación Visual Sistemática</h2>
+    <div class="space-y-6 text-blue-50">
+        <div class="bg-blue-800 bg-opacity-40 p-4 rounded-lg">
+            <h3 class="text-xl font-semibold text-yellow-300 mb-2">✓ Pensamiento Crítico (Visualización con Mapeo):</h3>
+            <p class="text-base leading-relaxed">Al mapear un argumento sobre inversión en energía renovable (sostenibilidad, viabilidad económica, empleo), la visualización revela rápidamente la debilidad. El pensador nota que la premisa de "viabilidad económica" tiene poco apoyo y evidencia desactualizada, identificando de inmediato el punto más vulnerable.</p>
+        </div>
+        <div class="bg-red-900 bg-opacity-40 p-4 rounded-lg">
+            <h3 class="text-xl font-semibold text-red-300 mb-2">✗ No-Pensamiento Crítico (Evaluación Superficial):</h3>
+            <p class="text-base leading-relaxed">Una persona que no mapea el argumento lo acepta o lo rechaza basándose en una impresión general, sin poder identificar o articular la debilidad específica (por ejemplo, la evidencia económica antigua). La falta de representación visual impide una evaluación precisa de las interconexiones.</p>
+        </div>
+    </div>
+</div>
+
+            <!-- Slide 12: Pasos para Crear un Mapa -->
+            <div class="slide-content hidden" id="slide-12">
+                <h2 class="text-3xl font-bold text-blue-100 mb-5">6 Pasos Clave para Mapear Argumentos</h2>
+    <div class="space-y-3 text-blue-50 text-left mx-auto max-w-md">
+
+        <div class="bg-blue-800 bg-opacity-40 p-2 rounded-lg">
+            <h3 class="text-base font-semibold text-yellow-300">1. Conclusión Principal</h3>
+            <p class="text-xs">¿Qué es lo que el autor quiere que creamos o hagamos?</p>
+        </div>
+
+        <div class="bg-blue-800 bg-opacity-40 p-2 rounded-lg">
+            <h3 class="text-base font-semibold text-yellow-300">2. Premisas Principales</h3>
+            <p class="text-xs">¿Cuáles son las razones principales que apoyan la conclusión?</p>
+        </div>
+
+        <div class="bg-blue-800 bg-opacity-40 p-2 rounded-lg">
+            <h3 class="text-base font-semibold text-yellow-300">3. Sub-premisas y Evidencia</h3>
+            <p class="text-xs">¿Qué apoya cada premisa principal?</p>
+        </div>
+
+        <div class="bg-blue-800 bg-opacity-40 p-2 rounded-lg">
+            <h3 class="text-base font-semibold text-yellow-300">4. Entimemas (Suposiciones)</h3>
+            <p class="text-xs">¿Qué suposiciones ocultas son necesarias para que el argumento funcione?</p>
+        </div>
+
+        <div class="bg-blue-800 bg-opacity-40 p-2 rounded-lg">
+            <h3 class="text-base font-semibold text-yellow-300">5. Dibujar Conexiones</h3>
+            <p class="text-xs">Usar flechas para mostrar cómo las premisas apoyan las conclusiones.</p>
+        </div>
+
+        <div class="bg-blue-800 bg-opacity-40 p-2 rounded-lg">
+            <h3 class="text-base font-semibold text-yellow-300">6. Evaluar la Solidez</h3>
+            <p class="text-xs">Aplicar criterios ARS a cada componente del mapa.</p>
+        </div>
+                </div>
+            </div>
+
+            <!-- Slide 13: Herramienta para Comunicación -->
+            <div class="slide-content hidden" id="slide-13">
+                <h2 class="text-3xl font-bold text-blue-100 mb-6">4. El Mapeo como Herramienta para la Comunicación y la Claridad Propia</h2>
+                <p class="text-lg text-blue-50 leading-relaxed mb-4">Aunque el mapeo de argumentos es principalmente una herramienta de análisis personal, el proceso de crearlo mejora drásticamente nuestra capacidad para comunicar nuestros propios argumentos con claridad y justificación.</p>
+                <div class="bg-blue-800 bg-opacity-40 p-4 rounded-lg">
+                    <h3 class="text-xl font-semibold text-yellow-300 mb-2">Beneficios para la Comunicación:</h3>
+                    <ul class="text-base space-y-2 list-disc ml-4">
+                        <li>Estructura lógica clara en presentaciones</li>
+                        <li>Identificación de todas las premisas necesarias</li>
+                        <li>Evita "prosa verbosa" innecesaria</li>
+                        <li>Facilita la anticipación de objeciones</li>
+                        <li>Mejora la persuasión basada en lógica</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Slide 14: Tipos de Mapas -->
+            <div class="slide-content hidden" id="slide-14">
+                <h2 class="text-3xl font-bold text-blue-100 mb-6">Tipos de Mapas de Argumentos</h2>
+                <div class="grid grid-cols-2 gap-4 text-blue-50">
+                    <div class="bg-blue-800 bg-opacity-40 p-4 rounded-lg">
+                        <h3 class="text-lg font-semibold text-yellow-300 mb-2">Mapas Simples</h3>
+                        <ul class="text-sm space-y-1 list-disc ml-4">
+                            <li>Una conclusión principal</li>
+                            <li>Pocas premisas de apoyo</li>
+                            <li>Estructura lineal</li>
+                        </ul>
+                    </div>
+                    <div class="bg-blue-800 bg-opacity-40 p-4 rounded-lg">
+                        <h3 class="text-lg font-semibold text-yellow-300 mb-2">Mapas Complejos</h3>
+                        <ul class="text-sm space-y-1 list-disc ml-4">
+                            <li>Múltiples conclusiones</li>
+                            <li>Cadenas de razonamiento</li>
+                            <li>Contraargumentos incluidos</li>
+                        </ul>
+                    </div>
+                    <div class="bg-blue-800 bg-opacity-40 p-4 rounded-lg">
+                        <h3 class="text-lg font-semibold text-yellow-300 mb-2">Mapas Colaborativos</h3>
+                        <ul class="text-sm space-y-1 list-disc ml-4">
+                            <li>Múltiples perspectivas</li>
+                            <li>Debate estructurado</li>
+                            <li>Consenso visual</li>
+                        </ul>
+                    </div>
+                    <div class="bg-blue-800 bg-opacity-40 p-4 rounded-lg">
+                        <h3 class="text-lg font-semibold text-yellow-300 mb-2">Mapas Analíticos</h3>
+                        <ul class="text-sm space-y-1 list-disc ml-4">
+                            <li>Evaluación crítica</li>
+                            <li>Identificación de falacias</li>
+                            <li>Fortalezas y debilidades</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 15: Conclusión -->
+            <div class="slide-content hidden" id="slide-15">
+                <h2 class="text-3xl font-bold text-blue-100 mb-6">Conclusión</h2>
+                <div class="h-full flex flex-col justify-center">
+                    <p class="text-xl text-blue-50 leading-relaxed text-center max-w-3xl mx-auto">El mapeo de argumentos es una habilidad que, una vez dominada, transforma la forma en que abordamos la información, permitiéndonos ver la estructura lógica donde otros solo ven un muro de texto.</p>
+                    <p class="text-xl text-blue-50 leading-relaxed text-center max-w-3xl mx-auto mt-8">Es una herramienta esencial para cualquier pensador crítico que busque la precisión y la profundidad en su comprensión y comunicación, convirtiendo argumentos complejos en mapas navegables de la razón.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Controles de Navegación -->
+        <div class="flex justify-end items-center gap-3 to-blue-700">
+            <button onclick="cargarLeccion('4.3')" 
+    class="flex items-center gap-1 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-bold hover:scale-105 transition-transform shadow-lg shadow-purple-500/20">
+    Saltar Lección ➔
+</button>
+            <button id="prevSlide" class="bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded-lg shadow transition-all duration-300 flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+                </svg>
+                Anterior
+            </button>
+            <span id="slideCounter" class="text-white font-semibold">1 / 15</span>
+            <button id="nextSlide" class="bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded-lg shadow transition-all duration-300 flex items-center gap-2">
+                Siguiente
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                </svg>
+            </button>
+        </div>
+    
+
+    <script>
+(function() {
+    'use strict';
+    
+    console.log('Script de lección cargado');
+    
+    // Esperar a que el contenido esté completamente renderizado
+    setTimeout(function() {
+        inicializarNavegacionLeccion();
+    }, 200);
+
+    function inicializarNavegacionLeccion() {
+        console.log('=== Iniciando navegación de lección ===');
+        
+        // Buscar slides dentro del contenedor de pizarra
+        const pizarraContent = document.getElementById('pizarra-content');
+        if (!pizarraContent) {
+            console.error('No se encontró pizarra-content');
+            return;
+        }
+        
+        const slides = pizarraContent.querySelectorAll('.slide-content');
+        const totalSlides = slides.length;
+        
+        console.log('Total de slides encontrados:', totalSlides);
+        
+        if (totalSlides === 0) {
+            console.error('No hay slides para mostrar');
+            return;
+        }
+        
+        // Usar variable local dentro de la función
+        var currentSlide = 1;
+
+        function showSlide(n) {
+            if (n < 1) n = 1;
+            if (n > totalSlides) n = totalSlides;
+            currentSlide = n;
+
+            slides.forEach(slide => slide.classList.add('hidden'));
+
+            const slideToShow = pizarraContent.querySelector('#slide-' + n);
+            if (slideToShow) {
+                slideToShow.classList.remove('hidden');
+                console.log('✓ Slide', n, 'visible');
+            }
+
+            const counter = document.getElementById('slideCounter');
+            if (counter) counter.textContent = n + ' / ' + totalSlides;
+
+            const prevBtn = document.getElementById('prevSlide');
+            const nextBtn = document.getElementById('nextSlide');
+            
+            if (prevBtn && nextBtn) {
+                prevBtn.disabled = n === 1;
+                nextBtn.disabled = n === totalSlides;
+                
+                if (n === 1) {
+                    prevBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                } else {
+                    prevBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                }
+                
+                if (n === totalSlides) {
+                    nextBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                } else {
+                    nextBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                }
+            }
+
+            // --- NUEVO CÓDIGO AQUÍ: CONTROLAR BOTÓN FINALIZAR ---
+            // Buscamos el botón por la clase marcadora 'js-finish-btn'
+            const finishBtn = document.querySelector('.js-finish-btn');
+            
+            if (finishBtn) {
+                // Si estamos en el último slide (n === totalSlides), mostramos el botón
+                if (n === totalSlides) {
+                    finishBtn.classList.remove('hidden');
+                } else {
+                    // Si NO estamos en el último, lo ocultamos
+                    finishBtn.classList.add('hidden');
+                }
+            }
+            // ----------------------------------------------------
+
+            if (pizarraContent) pizarraContent.scrollTop = 0;
+        }
+
+        const prevBtn = document.getElementById('prevSlide');
+        if (prevBtn) {
+            const newPrevBtn = prevBtn.cloneNode(true);
+            prevBtn.parentNode.replaceChild(newPrevBtn, prevBtn);
+            newPrevBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                if (currentSlide > 1) showSlide(currentSlide - 1);
+            });
+            console.log('✓ Botón Anterior configurado');
+        }
+
+        const nextBtn = document.getElementById('nextSlide');
+        if (nextBtn) {
+            const newNextBtn = nextBtn.cloneNode(true);
+            nextBtn.parentNode.replaceChild(newNextBtn, nextBtn);
+            newNextBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                if (currentSlide < totalSlides) showSlide(currentSlide + 1);
+            });
+            console.log('✓ Botón Siguiente configurado');
+        }
+
+        showSlide(1);
+        console.log('=== Navegación inicializada ===');
+    }
+})();
+</script>

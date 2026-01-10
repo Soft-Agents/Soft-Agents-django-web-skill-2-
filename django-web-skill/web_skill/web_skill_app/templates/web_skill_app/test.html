@@ -1,0 +1,74 @@
+{% extends 'web_skill_app/base.html' %}
+{% load static %}
+
+{% block title %}Creatividad - Proximamente{% endblock %}
+
+{% block content %}
+    {# Incluye las barras de navegación principales y secundarias #}
+    {% include 'web_skill_app/partials/navigation.html' with currentPage='creatividad' %}
+    {% include 'web_skill_app/partials/secondary_nav.html' with currentSection='knowledge' %}
+
+    <style>
+        /* CSS Personalizado para el botón de Regreso */
+        .btn-regreso-custom {
+            /* Estilos de fondo azul y letras blancas */
+            background-color: #007bff; 
+            color: white;
+            border: 2px solid #007bff;
+            padding: 15px 30px; /* Tamaño grande */
+            font-size: 1.25rem;
+            transition: all 0.3s ease; 
+            text-transform: uppercase;
+            font-weight: bold;
+            box-shadow: 0 0 0 rgba(0, 123, 255, 0.4); 
+            text-decoration: none; 
+            display: inline-flex; /* Para centrar mejor el contenido y el ícono */
+            align-items: center;
+        }
+
+        /* Estilos al pasar el mouse (hover) */
+        .btn-regreso-custom:hover,
+        .btn-regreso-custom:focus {
+            /* Fondo rojo */
+            background-color: #dc3545; 
+            color: white !important; 
+            border-color: #dc3545;
+
+            /* Efecto "brillo" en el borde (glow) */
+            box-shadow: 0 0 10px rgba(220, 53, 69, 0.8), 0 0 20px rgba(220, 53, 69, 0.4);
+            transform: scale(1.05); 
+        }
+        
+        /* Estilos para el texto "Próximamente Grande" */
+        .proximamente-text {
+            color: black;
+            font-size: 3.5rem; /* Tamaño grande, similar a display-3 */
+            font-weight: 800; /* Negrita */
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+
+    </style>
+
+    {# ASUMO que esta es la estructura que contiene el contenido de la página #}
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-12 text-center">
+                
+                {# Contenido "Próximamente Grande" con letras negras #}
+                <div class="proximamente-text mb-4">
+                    PRÓXIMAMENTE
+                </div>
+                
+                {# Botón de Regreso (Usando los estilos personalizados) #}
+                <a href="{% url 'presentacion' %}" class="btn btn-regreso-custom">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-arrow-left me-2" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5a.5.5 0 0 0 .5-.5z"/>
+                    </svg>
+                    REGRESAR
+                </a>
+
+            </div>
+        </div>
+    </div>
+{% endblock content %}

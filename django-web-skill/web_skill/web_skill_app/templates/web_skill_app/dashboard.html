@@ -1,0 +1,206 @@
+{% extends 'web_skill_app/base.html' %}
+   {%load static%} 
+{% block title %}Dashboard - Selecciona tu Asistente{% endblock %}
+{% block content %}
+    {% include 'web_skill_app/partials/navigation.html' with currentPage='dashboard' %}
+
+    <style>
+        .contenido-oculto{
+        display: none !important;
+        }
+        /* --- TUS ESTILOS DE SOFIA (SE MANTIENEN IGUAL) --- */
+        #avatar-flotante {
+            position: fixed; top: 50px; left: 50px; 
+            background-size: contain; background-repeat: no-repeat;
+            background-position: center bottom; z-index: 9999; cursor: grab;
+            user-select: none; transition: transform 0.2s ease, filter 0.2s ease; outline: none;
+        }
+        
+        @media (max-width: 768px) {
+            #avatar-flotante { width: 260px; height: 260px; top: 100px; left: 10px; }
+        }
+        #avatar-flotante:active { cursor: grabbing; transform: scale(1.02); filter: drop-shadow(0 8px 15px rgba(0, 0, 0, 0.4)); }
+        
+        #bocadillo-texto {
+            position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%) translateY(-10px);
+            width: 300px; height: 320px; padding: 0; background-color: #ffffff; color: #000000;
+            border: 2px solid #000000; border-radius: 12px; font-size: 0.95em;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3); opacity: 0; visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
+            pointer-events: none; z-index: 10000; display: flex; flex-direction: column;
+        }
+        #bocadillo-texto.visible { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); pointer-events: auto; }
+        #bocadillo-texto::after {
+            content: ''; position: absolute; left: 50%; top: 100%; transform: translateX(-50%);
+            border-width: 12px; border-style: solid; border-color: #000000 transparent transparent transparent;
+        }
+        #bocadillo-texto::before {
+            content: ''; position: absolute; left: 50%; top: calc(100% - 2px); transform: translateX(-50%);
+            border-width: 10px; border-style: solid; border-color: #ffffff transparent transparent transparent; z-index: 1;
+        }
+        #sofia-chat-history { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+        .sofia-message { padding: 8px 12px; border-radius: 10px; max-width: 90%; line-height: 1.4; }
+        .sofia-message.agent { background-color: #f1f1f1; border-bottom-left-radius: 2px; align-self: flex-start; }
+        .sofia-message.user { background-color: #d1e7fd; border-bottom-right-radius: 2px; align-self: flex-end; text-align: right; }
+        #sofia-input-area { display: flex; padding: 10px; border-top: 1px solid #ccc; }
+        #sofia-text-input { flex: 1; border: 1px solid #000000; border-radius: 20px; padding: 8px 12px; font-size: 0.9em; margin-right: 8px; }
+        #sofia-text-input:focus { outline: none; border-color: #667eea; box-shadow: 0 0 5px rgba(102,126,234,0.5); }
+        #sofia-send-btn { background: #667eea; color: white; border: none; border-radius: 50%; width: 38px; height: 38px; font-size: 1.5em; cursor: pointer; transition: background-color 0.2s; padding: 0; line-height: 38px; }
+        #sofia-send-btn:hover { background: #5a6fcf; }
+    </style>
+
+    <div class="min-h-screen bg-gray-900 text-gray-200 pt-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            
+            <div class="text-center mb-16 animate-fade-in-down">
+                <h1 class="text-4xl md:text-5xl font-bold text-white mb-6">
+                    ¡Bienvenido, <span class="text-blue-400">{% if user.is_authenticated %}{{ user.first_name }}{% else %}Usuario{% endif %}</span>!
+                </h1>
+                <p class="text-xl text-gray-300 max-w-3xl mx-auto">
+                    Elige tu asistente de IA especializado para comenzar a explorar y aprender
+                </p>
+                    <button id="btn-activar-sofia" class="inline-flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-6 rounded-full transition-all transform hover:scale-105 shadow-lg">
+                <span class="relative flex h-3 w-3">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-3 w-3 bg-blue-100"></span>
+                </span>
+                Hablar con Sofía ahora
+                </button>
+            </div>
+
+            <div class="grid md:grid-cols-4 gap-8 max-w-8xl mx-auto items-stretch">
+                
+                <div class="bg-gray-800 rounded-2xl shadow-xl overflow-hidden transform hover:-translate-y-2 transition-all duration-300 border border-gray-700 
+                            hover:border-purple-500 hover:shadow-[0_0_30px_rgba(168,85,247,0.6)] flex flex-col h-full group">
+                    <div class="p-8 flex flex-col h-full">
+                        <div class="flex items-center justify-center w-16 h-16 bg-purple-500/20 rounded-full mb-6 group-hover:bg-purple-500 transition-colors duration-300">
+                            <svg class="w-8 h-8 text-purple-400 group-hover:text-white transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.206 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.523 5.794 18 7.5 18s3.332.477 4.5 1.247m0-13V18m0-13C13.168 5.477 14.794 5 16.5 5s3.332.477 4.5 1.253v13C19.832 18.523 18.206 18 16.5 18s-3.332.477-4.5 1.247"/>
+                            </svg>
+                        </div>
+                        <h2 class="text-2xl font-bold text-white mb-3 group-hover:text-purple-400 transition-colors">Agente Yashay</h2>
+                        <p class="text-gray-400 mb-6 flex-grow text-sm leading-relaxed">
+                            Tu guía personal para dominar la teoría y las bases del pensamiento crítico mediante el aprendizaje profundo.
+                        </p>
+                        <div class="mt-auto pt-4 border-t border-gray-700/50">
+                            <a href="{% url 'chat_knowledge' %}" class="flex items-center justify-between w-full font-semibold px-4 py-3 rounded-lg bg-gray-700/50 text-purple-400 hover:bg-purple-600 hover:text-white transition-all duration-300 group-btn">
+                                <span>Iniciar Clase</span>
+                                <svg class="w-5 h-5 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gray-800 rounded-2xl shadow-xl overflow-hidden transform hover:-translate-y-2 transition-all duration-300 border border-gray-700 
+                            hover:border-blue-500 hover:shadow-[0_0_30px_rgba(59,130,246,0.6)] flex flex-col h-full group">
+                    <div class="p-8 flex flex-col h-full">
+                        <div class="flex items-center justify-center w-16 h-16 bg-blue-500/20 rounded-full mb-6 group-hover:bg-blue-500 transition-colors duration-300">
+                            <svg class="w-8 h-8 text-blue-400 group-hover:text-white transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m-5 4h-1a2 2 0 01-2-2V4a2 2 0 012-2h1m6 18h1a2 2 0 002-2V4a2 2 0 00-2-2h-1m-4 18h-2m-2-4h2m2-4h2m2-4h-2"/>
+                            </svg>
+                        </div>
+                        <h2 class="text-2xl font-bold text-white mb-3 group-hover:text-blue-400 transition-colors">Agente Criker</h2>
+                        <p class="text-gray-400 mb-6 flex-grow text-sm leading-relaxed">
+                            Entrena tu pensamiento crítico mediante casuísticas reales y la interacción con avatares de IA diseñados para desafiar tu razonamiento.
+                        </p>
+                        <div class="mt-auto pt-4 border-t border-gray-700/50">
+                            <a href="{% url 'skill' %}" class="flex items-center justify-between w-full font-semibold px-4 py-3 rounded-lg bg-gray-700/50 text-blue-400 hover:bg-blue-600 hover:text-white transition-all duration-300">
+                                <span>Iniciar Entrenamiento</span>
+                                <svg class="w-5 h-5 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gray-800 rounded-2xl shadow-xl overflow-hidden transform hover:-translate-y-2 transition-all duration-300 border border-gray-700 
+                            hover:border-green-500 hover:shadow-[0_0_30px_rgba(34,197,94,0.6)] flex flex-col h-full group">
+                    <div class="p-8 flex flex-col h-full">
+                        <div class="flex items-center justify-center w-16 h-16 bg-green-500/20 rounded-full mb-6 group-hover:bg-green-500 transition-colors duration-300">
+                            <svg class="w-8 h-8 text-green-400 group-hover:text-white transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+                            </svg>
+                        </div>
+                        <h2 class="text-2xl font-bold text-white mb-3 group-hover:text-green-400 transition-colors">Agente Kaway</h2>
+                        <p class="text-gray-400 mb-6 flex-grow text-sm leading-relaxed">
+                            Evalúa tus habilidades y conocimientos adquiridos en pensamiento crítico.
+                        </p>
+                        <div class="mt-auto pt-4 border-t border-gray-700/50">
+                            <a href="{% url 'chat_preguntas' %}" class="flex items-center justify-between w-full font-semibold px-4 py-3 rounded-lg bg-gray-700/50 text-green-400 hover:bg-green-600 hover:text-white transition-all duration-300">
+                                <span>Iniciar Evaluación</span>
+                                <svg class="w-5 h-5 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gray-800 rounded-2xl shadow-xl overflow-hidden transform hover:-translate-y-2 transition-all duration-300 border border-gray-700 
+                            hover:border-yellow-400 hover:shadow-[0_0_30px_rgba(250,204,21,0.6)] flex flex-col h-full group">
+                    <div class="p-8 flex flex-col h-full">
+                        <div class="flex items-center justify-center w-16 h-16 bg-yellow-400/20 rounded-full mb-6 group-hover:bg-yellow-400 transition-colors duration-300">
+                            <svg class="w-8 h-8 text-yellow-400 group-hover:text-white transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+                            </svg>
+                        </div>
+                        <h2 class="text-2xl font-bold text-white mb-3 group-hover:text-yellow-400 transition-colors">Déjanos tu opinión</h2>
+                        <p class="text-gray-400 mb-6 flex-grow text-sm leading-relaxed">
+                            ¿Qué es lo que más te gustó? ¿Qué podríamos mejorar?.
+                        </p>
+                        <div class="mt-auto pt-4 border-t border-gray-700/50">
+                            <a href="{% url 'feedback_page' %}" class="flex items-center justify-between w-full font-semibold px-4 py-3 rounded-lg bg-gray-700/50 text-yellow-400 hover:bg-yellow-400 hover:text-white transition-all duration-300">
+                                <span>Dejar Opinión</span>
+                                <svg class="w-5 h-5 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="mt-16 text-center">
+                <h2 class="text-2xl font-bold text-white mb-8 relative inline-block">
+                    Acceso Rápido
+                    <span class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full"></span>
+                </h2>
+                <div class="flex flex-wrap justify-center gap-6">
+                    <a href="{% url 'pensamiento-critico' %}" class="bg-gray-800 text-gray-200 px-8 py-4 rounded-xl text-lg font-semibold transition-all duration-300 border border-gray-600 hover:border-white hover:bg-white hover:text-gray-900 hover:scale-105 shadow-lg">
+                        Pensamiento Crítico
+                    </a>
+                    <a href="{% url 'creatividad' %}" class="bg-gray-800 text-gray-200 px-8 py-4 rounded-xl text-lg font-semibold transition-all duration-300 border border-gray-600 hover:border-white hover:bg-white hover:text-gray-900 hover:scale-105 shadow-lg">
+                        Creatividad
+                    </a>
+                    <a href="{% url 'colaboracion' %}" class="bg-gray-800 text-gray-200 px-8 py-4 rounded-xl text-lg font-semibold transition-all duration-300 border border-gray-600 hover:border-white hover:bg-white hover:text-gray-900 hover:scale-105 shadow-lg">
+                        Colaboración
+                    </a>
+                    <a href="{% url 'comunicacion' %}" class="bg-gray-800 text-gray-200 px-8 py-4 rounded-xl text-lg font-semibold transition-all duration-300 border border-gray-600 hover:border-white hover:bg-white hover:text-gray-900 hover:scale-105 shadow-lg">
+                        Comunicación
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="avatar-flotante" class="">
+        <img src='{% static "web_skill_app/img/sofia.png" %}' alt="" class="h-23 w-23">
+        <div id="bocadillo-texto">
+            <div id="sofia-chat-history">
+                <div class="sofia-message agent">
+                    ¡Hola! Soy Sofía. ¿En qué puedo ayudarte hoy?
+                </div>
+            </div>
+            
+            <div id="sofia-input-area">
+                <input type="text" id="sofia-text-input" placeholder="Escribe tu pregunta...">
+                <button id="sofia-send-btn" aria-label="Enviar">➔</button>
+            </div>
+        </div>
+    </div>
+<script src="{% static 'web_skill_app/js/sofia.js' %}?v=1.1"></script>
+{% endblock %}

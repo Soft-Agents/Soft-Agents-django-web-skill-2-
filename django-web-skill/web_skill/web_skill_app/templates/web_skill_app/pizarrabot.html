@@ -1,0 +1,114 @@
+{% extends 'web_skill_app/base.html' %}
+{% load static %}
+{% block title %}PizarraBot - Asistente Educativo{% endblock %}
+{% block content %}
+{% include 'web_skill_app/partials/navigation.html' with currentPage='pizarrabot' %}
+
+<div class="min-h-screen bg-gray-900 text-gray-200 flex flex-col relative">
+    <div class="pt-20 px-8 pb-4">
+        <!-- Navegación con el estilo de Knowledge (centrado y simple) -->
+        <nav class="flex items-center justify-between text-sm text-gray-400 max-w-4xl mx-auto">
+            <!-- Breadcrumb -->
+            <div class="flex items-center gap-2">
+                <a href="{% url 'dashboard' %}" class="hover:text-blue-400 transition-colors">Dashboard</a>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+                <!-- Color azul de PizarraBot -->
+                <span class="text-blue-400 font-medium">PizarraBot</span>
+            </div>
+
+            <!-- Botón de volver -->
+            <a href="{% url 'dashboard' %}"
+                class="flex items-center gap-1 text-sm text-gray-400 hover:text-blue-400 transition-colors">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M11 17l-5-5m0 0l5-5m-5 5h12" />
+                </svg>
+                Volver a Habilidades
+            </a>
+        </nav>
+    </div>
+
+    <!-- Contenedor principal con el padding de Knowledge (p-8) -->
+    <div class="flex-1 flex items-center justify-center p-8 pt-4">
+        <div class="bg-gray-800 rounded-3xl shadow-2xl p-8 w-full max-w-4xl relative">
+            <!-- Window controls -->
+            <div class="absolute top-4 left-4 flex space-x-2">
+                <div class="w-4 h-4 bg-red-600 rounded-full"></div>
+                <div class="w-4 h-4 bg-yellow-600 rounded-full"></div>
+                <div class="w-4 h-4 bg-green-600 rounded-full"></div>
+            </div>
+
+            <!-- Bloque de Cabecera Grande (tomado de Knowledge) -->
+            <div class="flex items-center gap-4 mb-6 mt-4">
+                <!-- Icono de Borde Azul y forma de Gorro de Graduación -->
+                <div
+                    class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <!-- Mortarboard / Gorro de Graduación -->
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 14l9-5-9-5-9 5 9 5zm0 1v8M18 7l-6-3-6 3M5 15l-1 1M19 15l1 1" />
+                    </svg>
+                </div>
+                <div>
+                    <h2 class="text-2xl font-bold text-white">Criker</h2>
+                    <p class="text-sm text-gray-400">Asistente Educativo y Agente Especializado</p>
+                </div>
+            </div>
+
+            <!-- Chat Content con el padding de Knowledge (p-6) -->
+            <div id="whiteboard-content"
+                class="mt-8 min-h-[300px] max-h-[500px] p-6 bg-gray-700 rounded-lg overflow-y-auto space-y-4">
+                {% for message in conversation_history %}
+                <!-- Contenedor de mensaje con mejor estructura -->
+                <div
+                    class="flex flex-col {% if message.role == 'user' %}items-end{% else %}items-start{% endif %} gap-1">
+                    <!-- Nombre del remitente y timestamp en la misma línea -->
+                    <div class="flex items-center gap-2 px-2">
+                        {% if message.role == 'user' %}
+                        <span class="text-xs font-semibold text-blue-300">Tú</span>
+                        {% else %}
+                        <span class="text-xs font-semibold text-green-300">Criker</span>
+                        {% endif %}
+                        <span class="text-xs text-gray-400">{{ message.formatted_timestamp }}</span>
+                    </div>
+
+                    <!-- Burbuja del mensaje -->
+                    <div class="text-gray-100 px-4 py-3 rounded-2xl shadow-md
+                                {% if message.role == 'user' %}
+                                    bg-blue-600 rounded-tr-sm
+                                {% else %}
+                                    bg-gray-600 rounded-tl-sm
+                                {% endif %}" style="max-width: 75%;">
+                        {{ message.message }}
+                    </div>
+                </div>
+                {% empty %}
+                <div class="text-center py-8">
+                    <div class="inline-block p-4 bg-gray-600 rounded-xl">
+                        <p class="text-gray-300 font-medium">👋 ¡Hola! Soy Criker, tu asistente educativo</p>
+                        <p class="text-gray-400 text-sm mt-2">Escribe tu primera pregunta para comenzar</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Formulario con el estilo de Knowledge (centrado y horizontal) -->
+            <form method="post" action="{% url 'pizarrabot' %}" class="mt-4 flex items-center gap-2">
+                {% csrf_token %}
+                <input type="text" name="user_message" placeholder="¿Cuál es tu pregunta?"
+                    class="flex-1 p-3 rounded-lg bg-gray-700 text-gray-200 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required />
+                <button type="submit" class="bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700 transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                    </svg>
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

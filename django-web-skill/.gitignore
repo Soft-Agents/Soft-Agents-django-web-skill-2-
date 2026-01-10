@@ -1,0 +1,39 @@
+Python / Django
+Ignora el entorno virtual (venv)
+venv/
+*.pyc
+pycache/
+*.egg-info/
+.pytest_cache/
+
+Archivos de base de datos
+db.sqlite3
+
+Archivos de logs
+*.log
+/tmp/
+
+Archivos estáticos generados (Whitenoise)
+# /staticfiles/
+# /media/
+
+Archivos específicos de entornos de desarrollo/edición local
+Ignora la carpeta de configuración de VS Code para que cada desarrollador use su propia configuración
+.vscode/
+
+Configuración de Windows (si se generan)
+Thumbs.db
+Desktop.ini
+
+Variables de Entorno y Claves Secretas
+Nunca subir la clave secreta o las credenciales de la DB
+Tu configuración actual lee la clave SECRETA de las variables de entorno, pero se incluye aquí por seguridad
+#.env
+secret.py
+local_settings.py
+
+Archivos de despliegue con información sensible (aunque env.yaml está bien, si contiene secretos DEBERÍA ignorarse)
+Si tu env.yaml solo tiene URLs públicas, puedes descomentar la línea de abajo.
+Sin embargo, si usas env.yaml para secretos (como tu captura de GCP sugiere con SECRET_KEY), ¡debe ser ignorado!
+env.yaml
+cloudrun.yaml

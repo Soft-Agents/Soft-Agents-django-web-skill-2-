@@ -1,0 +1,202 @@
+{% extends 'web_skill_app/base.html' %}
+{% load static %}
+
+{% block title %}Creatividad - Knowledge{% endblock %}
+
+{% block content %}
+    {% include 'web_skill_app/partials/navigation.html' with currentPage='creatividad' %}
+    {% include 'web_skill_app/partials/secondary_nav.html' with currentSection='knowledge' %}
+
+    <section id="knowledge" class="section-full bg-gradient-to-br from-purple-900 via-purple-800 to-pink-900 text-white pt-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div>
+                    <h1 class="text-5xl md:text-7xl font-black mb-8 leading-tight">
+                        <span class="text-purple-300">Creatividad</span> e Innovación
+                    </h1>
+                    <p class="text-xl md:text-2xl text-purple-100 mb-8 leading-relaxed">
+                        Desarrolla tu capacidad para generar ideas originales, resolver problemas de manera innovadora y crear soluciones únicas.
+                    </p>
+                    <div class="flex flex-wrap gap-4">
+                        <a href="#biblioteca" class="btn-primary">
+                            Explorar Recursos
+                        </a>
+                        <a href="#progreso" class="btn-secondary">
+                            Ver Progreso
+                        </a>
+                    </div>
+                                    <!-- Botones de acción -->
+                <div class="flex gap-4 mb-6">
+
+                </div>
+                </div>
+                <div class="relative">
+                    <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
+                        <div class="grid grid-cols-2 gap-6">
+                            <div class="text-center">
+                                <div class="w-16 h-16 bg-purple-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                                    </svg>
+                                </div>
+                                <h3 class="text-lg font-semibold mb-2">Ideación</h3>
+                                <p class="text-sm text-purple-200">Generación de ideas</p>
+                            </div>
+                            <div class="text-center">
+                                <div class="w-16 h-16 bg-fuchsia-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                                    </svg>
+                                </div>
+                                <h3 class="text-lg font-semibold mb-2">Innovación</h3>
+                                <p class="text-sm text-purple-200">Nuevas soluciones</p>
+                            </div>
+                            <div class="text-center">
+                                <div class="w-16 h-16 bg-pink-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                                    </svg>
+                                </div>
+                                <h3 class="text-lg font-semibold mb-2">Expresión</h3>
+                                <p class="text-sm text-purple-200">Manifestación de ideas</p>
+                            </div>
+                            <div class="text-center">
+                                <div class="w-16 h-16 bg-rose-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"/>
+                                    </svg>
+                                </div>
+                                <h3 class="text-lg font-semibold mb-2">Inspiración</h3>
+                                <p class="text-sm text-purple-200">Fuentes de creatividad</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="biblioteca" class="section-full bg-white text-gray-900 pt-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-6xl font-bold mb-6">
+                    Biblioteca de <span class="text-purple-600">Creatividad</span>
+                </h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    Recursos para impulsar la ideación, la innovación y la expresión creativa
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div class="bg-gradient-to-br from-red-50 to-red-100 p-8 rounded-xl hover:shadow-lg transition-shadow">
+                    <div class="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center mb-6 mx-auto">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-4 text-center">PDFs</h3>
+                    <p class="text-gray-600 text-center mb-6">Guías de ideación, técnicas de pensamiento lateral y manuales de innovación.</p>
+                    <button class="btn-primary w-full">Explorar PDFs</button>
+                </div>
+
+                <div class="bg-gradient-to-br from-purple-50 to-purple-100 p-8 rounded-xl hover:shadow-lg transition-shadow">
+                    <div class="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center mb-6 mx-auto">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-4 text-center">Imágenes</h3>
+                    <p class="text-gray-600 text-center mb-6">Infografías sobre el proceso creativo, mapas mentales y técnicas visuales.</p>
+                    <button class="btn-primary w-full">Ver Imágenes</button>
+                </div>
+
+                <div class="bg-gradient-to-br from-blue-50 to-blue-100 p-8 rounded-xl hover:shadow-lg transition-shadow">
+                    <div class="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mb-6 mx-auto">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-4 text-center">Textos</h3>
+                    <p class="text-gray-600 text-center mb-6">Artículos sobre creatividad, innovación disruptiva y el proceso creativo.</p>
+                    <button class="btn-primary w-full">Leer Textos</button>
+                </div>
+
+                <div class="bg-gradient-to-br from-pink-50 to-pink-100 p-8 rounded-xl hover:shadow-lg transition-shadow">
+                    <div class="w-16 h-16 bg-pink-600 rounded-full flex items-center justify-center mb-6 mx-auto">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-4 text-center">Libros</h3>
+                    <p class="text-gray-600 text-center mb-6">Accede a una selección de libros sobre el pensamiento creativo y el proceso creativo</p>
+                    <button class="btn-primary w-full">Comprar Libros</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="progreso" class="section-full bg-gray-100 text-gray-900 pt-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-6xl font-bold mb-6">
+                    Tu <span class="text-purple-600">Progreso</span>
+                </h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    Sigue tu avance en las lecciones de creatividad para dominar cada concepto
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-white rounded-xl p-8 shadow-md">
+                    <h3 class="text-2xl font-bold text-gray-900 mb-4">
+                        Fundamentos de la Creatividad
+                    </h3>
+                    <div class="w-full bg-gray-200 rounded-full h-2.5 mb-4">
+                        <div class="bg-blue-600 h-2.5 rounded-full" style="width: 75%"></div>
+                    </div>
+                    <p class="text-gray-600">
+                        Has completado el 75% de la lección.
+                    </p>
+                    <a href="#" class="text-blue-600 font-semibold hover:underline mt-4 inline-block">Continuar Lección</a>
+                </div>
+                <div class="bg-white rounded-xl p-8 shadow-md">
+                    <h3 class="text-2xl font-bold text-gray-900 mb-4">
+                        Técnicas de Ideación
+                    </h3>
+                    <div class="w-full bg-gray-200 rounded-full h-2.5 mb-4">
+                        <div class="bg-blue-600 h-2.5 rounded-full" style="width: 20%"></div>
+                    </div>
+                    <p class="text-gray-600">
+                        Has completado el 20% de la lección.
+                    </p>
+                    <a href="#" class="text-blue-600 font-semibold hover:underline mt-4 inline-block">Continuar Lección</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section-full bg-gradient-to-r from-purple-600 to-pink-600 text-white pt-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="text-4xl md:text-6xl font-bold mb-8">
+                Continúa tu <span class="text-purple-200">Aprendizaje</span>
+            </h2>
+            <p class="text-xl mb-12 max-w-3xl mx-auto">
+                Explora otras habilidades complementarias para desarrollar una creatividad integral
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <a href="/pensamiento-critico" class="bg-white/10 backdrop-blur-sm rounded-xl p-8 hover:bg-white/20 transition-colors">
+                    <h3 class="text-2xl font-bold mb-4">Pensamiento Crítico</h3>
+                    <p class="text-purple-100">Combina creatividad con análisis crítico</p>
+                </a>
+                <a href="/comunicacion" class="bg-white/10 backdrop-blur-sm rounded-xl p-8 hover:bg-white/20 transition-colors">
+                    <h3 class="text-2xl font-bold mb-4">Comunicación</h3>
+                    <p class="text-purple-100">Mejora tu capacidad de expresar ideas originales</p>
+                </a>
+                <a href="/colaboracion" class="bg-white/10 backdrop-blur-sm rounded-xl p-8 hover:bg-white/20 transition-colors">
+                    <h3 class="text-2xl font-bold mb-4">Colaboración</h3>
+                    <p class="text-purple-100">Aplica tu creatividad en un entorno de equipo</p>
+                </a>
+            </div>
+        </div>
+    </section>
+{% endblock %}

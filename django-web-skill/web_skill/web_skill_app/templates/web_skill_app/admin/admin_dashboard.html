@@ -1,0 +1,33 @@
+{% extends 'web_skill_app/base.html' %}
+{% load static %}
+
+{% block title %}Panel de Administrador{% endblock %}
+
+{% block content %}
+{% include 'web_skill_app/partials/navigation-admin.html' %}
+<div class="min-h-screen bg-gray-100 py-8 pt-20">
+    <div class="max-w-4xl mx-auto px-4">
+
+
+        <!-- Messages -->
+        {% if messages %}
+        <div class="mb-6">
+            {% for message in messages %}
+            <div class="p-4 rounded-lg {% if message.tags == 'error' %}bg-red-100 border border-red-400 text-red-700{% else %}bg-green-100 border border-green-400 text-green-700{% endif %}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Main Content -->
+        <div class="bg-white rounded-lg shadow-md p-8 text-center">
+            <h2 class="text-xl font-semibold text-gray-800 mb-6">Gestión de Evaluaciones</h2>
+            
+            <a href="{% url 'admin_users_list' %}" class="inline-block px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition duration-200">
+                Ver Evaluaciones
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

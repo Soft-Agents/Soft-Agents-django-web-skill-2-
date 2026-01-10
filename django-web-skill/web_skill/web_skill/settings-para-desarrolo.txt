@@ -1,0 +1,194 @@
+# ============================================================================
+# ======================== SETTINGS PARA DESARROLLO ==========================
+# ============================================================================
+# INSTRUCCIONES:
+# 1. Este archivo está configurado para desarrollo local (DEBUG=True)
+# 2. Usa SQLite como base de datos (los datos NO se perderán)
+# 3. Para cambiar a PRODUCCIÓN, ve a la línea 200 y sigue las instrucciones
+# ============================================================================
+
+from pathlib import Path
+import os
+import sys
+from dotenv import load_dotenv
+
+# Cargar variables de entorno desde archivo .env (solo en desarrollo)
+load_dotenv()
+
+# Build paths
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+# ===================== CONFIGURACIÓN DE DESARROLLO ======================
+DEBUG = True
+SECRET_KEY = "django-insecure-DEV-ONLY-2=g%9-k1+-8a36($%blla7++resx+u*_l^=0g-g31mcw7yi1oj"
+ALLOWED_HOSTS = ['*']
+
+# Sin SSL en desarrollo
+SECURE_SSL_REDIRECT = False
+SECURE_PROXY_SSL_HEADER = None
+
+# ===================== APLICACIONES ======================
+INSTALLED_APPS = [
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    'web_skill_app',
+    'theme',
+    'sslserver',  # Para desarrollo con HTTPS si lo necesitas
+]
+
+MIDDLEWARE = [
+    "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+]
+
+ROOT_URLCONF = "web_skill.urls"
+
+TEMPLATES = [
+    {
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
+                'web_skill_app.context_processors.user_context',
+            ],
+        },
+    },
+]
+
+WSGI_APPLICATION = "web_skill.wsgi.application"
+
+# ===================== BASE DE DATOS - DESARROLLO ======================
+# SQLite para desarrollo local
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
+    } 
+}
+
+# ===================== VALIDACIÓN DE CONTRASEÑAS ======================
+AUTH_PASSWORD_VALIDATORS = [
+    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
+    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
+    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
+    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
+]
+
+# ===================== INTERNACIONALIZACIÓN ======================
+LANGUAGE_CODE = "es-pe"
+TIME_ZONE = "America/Lima"
+USE_I18N = True
+USE_TZ = True
+
+# ===================== ARCHIVOS ESTÁTICOS - DESARROLLO ======================
+STATIC_URL = "static/"
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+STATICFILES_DIRS = [
+    BASE_DIR / 'web_skill_app' / 'static',
+    BASE_DIR / 'theme' / 'static',
+]
+
+# Sin compresión en desarrollo
+STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
+
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# ===================== CSRF - DESARROLLO ======================
+CSRF_TRUSTED_ORIGINS = [
+    'http://127.0.0.1:8000',
+    'http://127.0.0.1:8001',
+    'http://127.0.0.1',  # ✅ Ya lo tienes
+    'http://localhost:8000',
+    'http://localhost:8001',
+    'http://localhost',
+    'https://127.0.0.1:8000',
+    'https://127.0.0.1',  # ⭐ Agrega este
+    'https://localhost:8000',
+    'https://localhost',  # ⭐ Agrega este
+]
+CSRF_COOKIE_SECURE = False
+CSRF_COOKIE_SAMESITE = 'Lax'
+CSRF_COOKIE_HTTPONLY = False
+CSRF_USE_SESSIONS = False
+CSRF_COOKIE_AGE = 31449600
+CSRF_FAILURE_VIEW = 'django.views.csrf.csrf_failure'
+CSRF_HEADER_NAME = 'HTTP_X_CSRFTOKEN'
+CSRF_COOKIE_DOMAIN = None
+
+# ===================== CACHÉ - DESARROLLO ======================
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'dev-cache',
+    }
+}
+
+# ===================== LOGGING - DESARROLLO ======================
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '🔧 {levelname} | {asctime} | {module} | {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'stream': sys.stdout,
+            'formatter': 'verbose',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'django.server': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'web_skill_app': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+    },
+}
+
+# ===================== MONGODB - DESARROLLO ======================
+# MongoDB con valor por defecto (funciona sin .env)
+MONGO_DB_NAME = os.getenv('MONGO_DB_NAME', 'webSkill')
+MONGO_URI = os.getenv('MONGO_URI', 'mongodb+srv://diegocaso1988_db_user:BFFIoljgd3cAfqs2@webskill.hv6k6mh.mongodb.net/?retryWrites=true&w=majority&appName=webSkill')
+
+# ===================== URLs DE AGENTES ======================
+AGENT_PROFESOR = os.getenv('AGENT_PROFESOR', 'https://agente-profesor-redis-178017465262.us-central1.run.app/chat')
+AGENT_CRIKER_COACH = os.getenv('AGENT_CRIKER_COACH', 'https://agente-coach-redis-178017465262.us-central1.run.app/chat')
+AGENT_CRIKER_SKILL = os.getenv('AGENT_CRIKER_SKILL', 'https://agente-criker-redis2-178017465262.us-central1.run.app/chat')
+SOFIA_AGENT_URL = os.getenv('SOFIA_AGENT_URL', 'https://agente-sofia-redis-178017465262.us-central1.run.app/chat')
+AGENT_ENCUESTA_URL = os.getenv('AGENT_ENCUESTA_URL', 'https://agente-preguntas-redis-178017465262.us-central1.run.app/chat')
+AGENT_SCOUTER_URL = os.getenv('AGENT_SCOUTER_URL', 'https://agente-preguntas-redis-178017465262.us-central1.run.app/chat')
+STREAMLIT_SERVER_URL = os.getenv('STREAMLIT_SERVER_URL', 'http://localhost:8501')

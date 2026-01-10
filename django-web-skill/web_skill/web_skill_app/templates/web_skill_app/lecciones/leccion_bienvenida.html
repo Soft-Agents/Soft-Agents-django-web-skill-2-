@@ -1,0 +1,83 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bienvenida</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-blue-900 via-blue-800 to-blue-900 min-h-screen flex items-center justify-center p-4">
+    
+    <!-- Contenedor Principal de la Pizarra -->
+    <div class="max-w-4xl w-full bg-gradient-to-br from-slate-800 to-slate-900 rounded-3xl shadow-2xl p-8 md:p-12 border-4 border-amber-600 relative overflow-hidden">
+        
+        <!-- Efecto de textura de pizarra -->
+        <div class="absolute inset-0 opacity-5" style="background-image: url('data:image/svg+xml,%3Csvg width=\"100\" height=\"100\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cfilter id=\"noise\"%3E%3CfeTurbulence type=\"fractalNoise\" baseFrequency=\"0.9\" numOctaves=\"4\" /%3E%3C/filter%3E%3Crect width=\"100\" height=\"100\" filter=\"url(%23noise)\" opacity=\"0.4\"/%3E%3C/svg%3E');"></div>
+        
+        <!-- Contenido -->
+        <div class="relative z-10">
+            <!-- Icono de bienvenida -->
+            <div class="flex justify-center mb-6">
+                <div class="bg-blue-500 bg-opacity-20 p-6 rounded-full">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-16 h-16 text-yellow-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Título -->
+            <h1 class="text-4xl md:text-5xl font-bold text-center mb-6 bg-gradient-to-r from-yellow-200 via-yellow-300 to-yellow-200 bg-clip-text text-transparent drop-shadow-lg">
+                ¡Bienvenido!
+            </h1>
+
+            <!-- Subtítulo -->
+            <h2 class="text-xl md:text-2xl font-semibold text-center text-blue-200 mb-8">
+                Tu Plataforma de Desarrollo del Pensamiento Crítico
+            </h2>
+
+            <!-- Mensaje principal -->
+            <div class="bg-blue-900 bg-opacity-40 rounded-xl p-6 mb-8 border-l-4 border-yellow-300">
+                <p class="text-lg text-blue-50 leading-relaxed mb-4">
+                    Estás a punto de embarcarte en un viaje de <span class="font-bold text-yellow-300">transformación intelectual</span>. Aquí no solo aprenderás conceptos, sino que desarrollarás habilidades fundamentales para pensar de manera más clara, rigurosa y efectiva.
+                </p>
+                
+            </div>
+
+            
+
+        
+        </div>
+
+    <script>
+        function closeWelcome() {
+            // Aquí puedes agregar la lógica para cerrar el mensaje
+            // Por ejemplo, guardar en localStorage que ya vio la bienvenida
+            localStorage.setItem('welcomeShown', 'true');
+            
+            // Animación de salida
+            document.querySelector('.max-w-4xl').style.transform = 'scale(0.95)';
+            document.querySelector('.max-w-4xl').style.opacity = '0';
+            
+            setTimeout(() => {
+                // Aquí redirigirías a la página principal o cerrarías el modal
+                alert('¡Bienvenida cerrada! Ahora puedes redirigir al usuario a la página principal');
+                // window.location.href = '/inicio';
+            }, 300);
+        }
+
+        // Animación de entrada
+        window.addEventListener('load', function() {
+            const container = document.querySelector('.max-w-4xl');
+            container.style.transform = 'scale(0.9)';
+            container.style.opacity = '0';
+            container.style.transition = 'all 0.5s ease-out';
+            
+            setTimeout(() => {
+                container.style.transform = 'scale(1)';
+                container.style.opacity = '1';
+            }, 100);
+        });
+    </script>
+</body>
+</html>

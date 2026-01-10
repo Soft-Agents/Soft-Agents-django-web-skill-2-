@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test del Agente en Cloud Run</title>
+    <!-- Carga de Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Fuente Inter de Google Fonts */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Pequeña animación para el indicador de "escribiendo" */
+        .dot-flashing {
+            position: relative;
+            width: 8px;
+            height: 8px;
+            border-radius: 5px;
+            background-color: #9880ff;
+            color: #9880ff;
+            animation: dotFlashing 1s infinite linear alternate;
+            animation-delay: .5s;
+        }
+        .dot-flashing::before, .dot-flashing::after {
+            content: '';
+            display: inline-block;
+            position: absolute;
+            top: 0;
+        }
+        .dot-flashing::before {
+            left: -12px;
+            width: 8px;
+            height: 8px;
+            border-radius: 5px;
+            background-color: #9880ff;
+            color: #9880ff;
+            animation: dotFlashing 1s infinite alternate;
+            animation-delay: 0s;
+        }
+        .dot-flashing::after {
+            left: 12px;
+            width: 8px;
+            height: 8px;
+            border-radius: 5px;
+            background-color: #9880ff;
+            color: #9880ff;
+            animation: dotFlashing 1s infinite alternate;
+            animation-delay: 1s;
+        }
+        @keyframes dotFlashing {
+            0% { background-color: #a7a7a7; }
+            50%, 100% { background-color: #d1d1d1; }
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white flex flex-col h-screen">
+
+    <!-- Encabezado -->
+    <header class="bg-gray-800 p-4 text-center shadow-md border-b border-gray-700">
+        <h1 class="text-xl font-bold">Test de Agente en Cloud Run</h1>
+        <p class="text-sm text-gray-400">Probando: <code id="api-url-display" class="text-green-400">...</code></p>
+    </header>
+
+    <!-- Área de Mensajes del Chat -->
+    <main id="chat-messages" class="flex-1 p-4 space-y-4 overflow-y-auto flex flex-col">
+        <!-- Los mensajes se agregarán aquí -->
+        <div class="bg-gray-700 self-start rounded-lg rounded-tl-none p-3 max-w-xs md:max-w-md shadow">
+            <p>¡Hola! Ingresa tu <code class="bg-gray-800 px-1 rounded">user_id</code> y un mensaje para probar el agente.</p>
+        </div>
+    </main>
+
+    <!-- Área de Entrada -->
+    <footer class="bg-gray-800 p-4 shadow-md border-t border-gray-700">
+        <form id="chat-form" class="flex flex-col sm:flex-row gap-2">
+            <input 
+                type="text" 
+                id="user-id-input" 
+                placeholder="Tu User ID (ej: user_123)" 
+                class="w-full sm:w-1/4 bg-gray-700 border border-gray-600 rounded-lg p-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value="default_user"
+            >
+            <input 
+                type="text" 
+                id="message-input" 
+                placeholder="Escribe tu mensaje..." 
+                class="flex-1 bg-gray-700 border border-gray-600 rounded-lg p-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                autocomplete="off"
+            >
+            <button 
+                type="submit" 
+                class="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200">
+                Enviar
+            </button>
+        </form>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- CONFIGURACIÓN ---
+            // ¡Esta es la URL que proporcionaste!
+            const API_URL = 'https://agente-preguntas-redis-178017465262.us-central1.run.app/chat';
+            // ---------------------
+
+            const chatForm = document.getElementById('chat-form');
+            const messageInput = document.getElementById('message-input');
+            const userIdInput = document.getElementById('user-id-input');
+            const chatMessages = document.getElementById('chat-messages');
+            const apiUrlDisplay = document.getElementById('api-url-display');
+
+            apiUrlDisplay.textContent = API_URL;
+
+            chatForm.addEventListener('submit', handleSubmit);
+
+            async function handleSubmit(e) {
+                e.preventDefault();
+
+                const userMessage = messageInput.value.trim();
+                // Usamos 'default_user' si está vacío, como en tu api.py
+                const userId = userIdInput.value.trim() || 'default_user'; 
+
+                if (!userMessage) {
+                    return;
+                }
+
+                // 1. Mostrar el mensaje del usuario
+                addMessageToChat('user', userMessage);
+                messageInput.value = '';
+                messageInput.focus();
+
+                // 2. Mostrar indicador de "escribiendo"
+                const loadingIndicator = addMessageToChat('loading', '');
+
+                try {
+                    // 3. Enviar la solicitud a la API
+                    const response = await fetch(API_URL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            user_id: userId,
+                            message: userMessage
+                        })
+                    });
+                    
+                    // Quitar el indicador de "escribiendo"
+                    loadingIndicator.remove();
+
+                    if (!response.ok) {
+                        // Capturar errores de red o del servidor (ej: 500, 404)
+                        const errorText = await response.text();
+                        throw new Error(`Error HTTP ${response.status}: ${errorText}`);
+                    }
+
+                    const data = await response.json();
+
+                    // 4. Mostrar la respuesta del agente o el error
+                    if (data.response) {
+                        addMessageToChat('agent', data.response);
+                    } else if (data.error) {
+                        addMessageToChat('error', `Error de la API: ${data.error}`);
+                    } else {
+                        addMessageToChat('error', 'Respuesta inesperada de la API.');
+                    }
+
+                } catch (error) {
+                    // Quitar el indicador de "escribiendo" si aún existe
+                    loadingIndicator.remove();
+                    // 5. Mostrar errores de red o de 'fetch'
+                    console.error('Error en fetch:', error);
+                    addMessageToChat('error', `Error de conexión: ${error.message}`);
+                }
+            }
+
+            function addMessageToChat(sender, text) {
+                const messageElement = document.createElement('div');
+                messageElement.classList.add('p-3', 'rounded-lg', 'max-w-xs', 'md:max-w-md', 'shadow');
+
+                if (sender === 'user') {
+                    messageElement.classList.add('bg-blue-600', 'self-end', 'rounded-br-none');
+                    messageElement.innerHTML = `<p>${escapeHTML(text)}</p>`;
+                } else if (sender === 'agent') {
+                    messageElement.classList.add('bg-gray-700', 'self-start', 'rounded-bl-none');
+                    messageElement.innerHTML = `<p>${escapeHTML(text)}</p>`;
+                } else if (sender === 'error') {
+                    messageElement.classList.add('bg-red-600', 'self-start', 'rounded-bl-none');
+                    messageElement.innerHTML = `<p class="font-bold">Error:</p><p>${escapeHTML(text)}</p>`;
+                } else if (sender === 'loading') {
+                    messageElement.classList.add('bg-gray-700', 'self-start', 'rounded-bl-none', 'flex', 'items-center', 'justify-center', 'h-10');
+                    messageElement.innerHTML = `<div class="dot-flashing"></div>`;
+                    messageElement.id = 'loading-indicator';
+                }
+                
+                chatMessages.appendChild(messageElement);
+                
+                // Hacer scroll hasta el fondo
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+
+                return messageElement;
+            }
+
+            // Función simple para evitar XSS
+            function escapeHTML(str) {
+                return str.replace(/[&<>"']/g, function(m) {
+                    return {
+                        '&': '&amp;',
+                        '<': '&lt;',
+                        '>': '&gt;',
+                        '"': '&quot;',
+                        "'": '&#039;'
+                    }[m];
+                });
+            }
+        });
+    </script>
+</body>
+</html>

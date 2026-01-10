@@ -1,0 +1,133 @@
+/* Soporte adicional para bg-clip-text */
+.bg-clip-text {
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+  background-color: #1a202c;
+  color: #e2e8f0;
+}
+
+.btn-primary {
+  background-color: #2563eb;
+  color: white;
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  transition: background-color 0.2s;
+}
+
+.btn-primary:hover {
+  background-color: #1d4ed8;
+}
+
+.btn-secondary {
+  background-color: #e5e7eb;
+  color: #1f2937;
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  transition: background-color 0.2s;
+}
+
+.btn-secondary:hover {
+  background-color: #d1d5db;
+}
+
+.section-full {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+/* Links navbar */
+.nav-link {
+  color: #374151;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.nav-link:hover {
+  color: #2563eb;
+}
+
+.nav-link-active {
+  color: #2563eb;
+  font-weight: 600;
+}
+
+/* Ajustes responsivos */
+.container {
+  max-width: 100%;
+  padding: 1rem;
+}
+
+@media (min-width: 768px) {
+  .container {
+    max-width: 750px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    max-width: 960px;
+  }
+}
+
+/* Estilos responsivos para formato celular */
+@media (max-width: 768px) {
+  #professor-avatar {
+    width: 80px;
+    height: auto;
+    position: relative;
+    margin: 0 auto;
+  }
+
+  #chat-modal {
+    width: 90%;
+    bottom: 10px;
+    left: 5%;
+    transform: translateX(0);
+  }
+}
+
+/* Estilos para el cuadro grande (pizarra) */
+#whiteboard-content {
+  background-color: #2c3e50;
+  color: #ecf0f1;
+  font-family: 'Chalkboard', sans-serif;
+  border: 5px solid #8e44ad;
+  border-radius: 15px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  padding: 20px;
+  overflow-y: auto;
+  max-height: 400px;
+}
+
+#whiteboard-content div {
+  margin-bottom: 10px;
+}
+
+#whiteboard-content {
+  background-image: url('https://www.transparenttextures.com/patterns/black-linen.png');
+  background-size: cover;
+}
+
+/* Clase específica para el título gradiente */
+.gradient-knowledge {
+  background: linear-gradient(to right, #60a5fa, #a855f7);
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  color: transparent !important;
+  display: inline-block;
+}

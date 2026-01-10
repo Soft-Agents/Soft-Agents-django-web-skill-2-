@@ -1,0 +1,198 @@
+{% extends 'web_skill_app/base.html' %}
+{% load static %}
+
+{% block title %}Colaboración - Knowledge{% endblock %}
+
+{% block content %}
+	{% include 'web_skill_app/partials/navigation.html' with currentPage='colaboracion' %}
+	{% include 'web_skill_app/partials/secondary_nav.html' with currentSection='knowledge' %}
+
+	<section id="knowledge" class="section-full bg-gradient-to-br from-orange-900 via-orange-800 to-red-900 text-white pt-20">
+		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+			<div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+				<div>
+					<h1 class="text-5xl md:text-7xl font-black mb-8 leading-tight">
+						<span class="text-orange-300">Colaboración</span> Efectiva
+					</h1>
+					<p class="text-xl md:text-2xl text-orange-100 mb-8 leading-relaxed">
+						Desarrolla habilidades para trabajar eficazmente en equipo, liderar proyectos colaborativos y construir relaciones productivas.
+					</p>
+					<div class="flex flex-wrap gap-4">
+						<a href="#biblioteca" class="btn-primary">
+							Explorar Recursos
+						</a>
+						<a href="#progreso" class="btn-secondary">
+							Ver Progreso
+						</a>
+					</div>
+				</div>
+				<div class="relative">
+					<div class="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
+						<div class="grid grid-cols-2 gap-6">
+							<div class="text-center">
+								<div class="w-16 h-16 bg-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
+									<svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+									</svg>
+								</div>
+								<h3 class="text-lg font-semibold mb-2">Trabajo en Equipo</h3>
+								<p class="text-sm text-orange-200">Cooperación grupal</p>
+							</div>
+							<div class="text-center">
+								<div class="w-16 h-16 bg-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+									<svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+									</svg>
+								</div>
+								<h3 class="text-lg font-semibold mb-2">Liderazgo</h3>
+								<p class="text-sm text-orange-200">Dirigir equipos</p>
+							</div>
+							<div class="text-center">
+								<div class="w-16 h-16 bg-yellow-500 rounded-full flex items-center justify-center mx-auto mb-4">
+									<svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+									</svg>
+								</div>
+								<h3 class="text-lg font-semibold mb-2">Comunicación</h3>
+								<p class="text-sm text-orange-200">Interacción grupal</p>
+							</div>
+							<div class="text-center">
+								<div class="w-16 h-16 bg-amber-500 rounded-full flex items-center justify-center mx-auto mb-4">
+									<svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+									</svg>
+								</div>
+								<h3 class="text-lg font-semibold mb-2">Resolución</h3>
+								<p class="text-sm text-orange-200">Solucionar conflictos</p>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<section id="biblioteca" class="section-full bg-white text-gray-900 pt-20">
+		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+			<div class="text-center mb-16">
+				<h2 class="text-4xl md:text-6xl font-bold mb-6">
+					Biblioteca de <span class="text-orange-600">Colaboración</span>
+				</h2>
+				<p class="text-xl text-gray-600 max-w-3xl mx-auto">
+					Recursos especializados para mejorar tus habilidades de trabajo en equipo y colaboración
+				</p>
+			</div>
+			
+			<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+				<div class="bg-gradient-to-br from-red-50 to-red-100 p-8 rounded-xl hover:shadow-lg transition-shadow">
+					<div class="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center mb-6 mx-auto">
+						<svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+						</svg>
+					</div>
+					<h3 class="text-xl font-bold text-gray-900 mb-4 text-center">PDFs</h3>
+					<p class="text-gray-600 text-center mb-6">Guías de trabajo en equipo, liderazgo y gestión de proyectos colaborativos.</p>
+					<button class="btn-primary w-full">Explorar PDFs</button>
+				</div>
+
+				<div class="bg-gradient-to-br from-orange-50 to-orange-100 p-8 rounded-xl hover:shadow-lg transition-shadow">
+					<div class="w-16 h-16 bg-orange-600 rounded-full flex items-center justify-center mb-6 mx-auto">
+						<svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+						</svg>
+					</div>
+					<h3 class="text-xl font-bold text-gray-900 mb-4 text-center">Imágenes</h3>
+					<p class="text-gray-600 text-center mb-6">Infografías sobre dinámicas de equipo, liderazgo y colaboración efectiva.</p>
+					<button class="btn-primary w-full">Ver Imágenes</button>
+				</div>
+
+				<div class="bg-gradient-to-br from-blue-50 to-blue-100 p-8 rounded-xl hover:shadow-lg transition-shadow">
+					<div class="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mb-6 mx-auto">
+						<svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+						</svg>
+					</div>
+					<h3 class="text-xl font-bold text-gray-900 mb-4 text-center">Textos</h3>
+					<p class="text-gray-600 text-center mb-6">Artículos sobre colaboración, liderazgo y trabajo en equipo efectivo.</p>
+					<button class="btn-primary w-full">Leer Textos</button>
+				</div>
+
+				<div class="bg-gradient-to-br from-yellow-50 to-yellow-100 p-8 rounded-xl hover:shadow-lg transition-shadow">
+					<div class="w-16 h-16 bg-yellow-600 rounded-full flex items-center justify-center mb-6 mx-auto">
+						<svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+						</svg>
+					</div>
+					<h3 class="text-xl font-bold text-gray-900 mb-4 text-center">Libros</h3>
+					<p class="text-gray-600 text-center mb-6">Accede a una selección curada de libros sobre la unión de equipo exitosa</p>
+					<button class="btn-primary w-full">Comprar Libros</button>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<section id="progreso" class="section-full bg-gray-100 text-gray-900 pt-20">
+		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+			<div class="text-center mb-16">
+				<h2 class="text-4xl md:text-6xl font-bold mb-6">
+					Tu <span class="text-orange-600">Progreso</span>
+				</h2>
+				<p class="text-xl text-gray-600 max-w-3xl mx-auto">
+					Sigue tu avance en las lecciones de colaboración para dominar cada concepto
+				</p>
+			</div>
+			
+			<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+				<div class="bg-white rounded-xl p-8 shadow-md">
+					<h3 class="text-2xl font-bold text-gray-900 mb-4">
+						Fundamentos de la Colaboración
+					</h3>
+					<div class="w-full bg-gray-200 rounded-full h-2.5 mb-4">
+						<div class="bg-blue-600 h-2.5 rounded-full" style="width: 75%"></div>
+					</div>
+					<p class="text-gray-600">
+						Has completado el 75% de la lección.
+					</p>
+					<a href="#" class="text-blue-600 font-semibold hover:underline mt-4 inline-block">Continuar Lección</a>
+				</div>
+				<div class="bg-white rounded-xl p-8 shadow-md">
+					<h3 class="text-2xl font-bold text-gray-900 mb-4">
+						Liderazgo en Equipo
+					</h3>
+					<div class="w-full bg-gray-200 rounded-full h-2.5 mb-4">
+						<div class="bg-blue-600 h-2.5 rounded-full" style="width: 20%"></div>
+					</div>
+					<p class="text-gray-600">
+						Has completado el 20% de la lección.
+					</p>
+					<a href="#" class="text-blue-600 font-semibold hover:underline mt-4 inline-block">Continuar Lección</a>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<section class="section-full bg-gradient-to-r from-orange-600 to-red-600 text-white pt-20">
+		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+			<h2 class="text-4xl md:text-6xl font-bold mb-8">
+				Continúa tu <span class="text-orange-200">Aprendizaje</span>
+			</h2>
+			<p class="text-xl mb-12 max-w-3xl mx-auto">
+				Explora otras habilidades complementarias para desarrollar una colaboración integral
+			</p>
+			<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+				<a href="/pensamiento-critico" class="bg-white/10 backdrop-blur-sm rounded-xl p-8 hover:bg-white/20 transition-colors">
+					<h3 class="text-2xl font-bold mb-4">Pensamiento Crítico</h3>
+					<p class="text-orange-100">Combina colaboración con análisis crítico</p>
+				</a>
+				<a href="/comunicacion" class="bg-white/10 backdrop-blur-sm rounded-xl p-8 hover:bg-white/20 transition-colors">
+					<h3 class="text-2xl font-bold mb-4">Comunicación Efectiva</h3>
+					<p class="text-orange-100">Mejora la interacción grupal</p>
+				</a>
+				<a href="/creatividad" class="bg-white/10 backdrop-blur-sm rounded-xl p-8 hover:bg-white/20 transition-colors">
+					<h3 class="text-2xl font-bold mb-4">Creatividad e Innovación</h3>
+					<p class="text-orange-100">Fomenta ideas innovadoras en equipo</p>
+				</a>
+			</div>
+		</div>
+	</section>
+{% endblock %}
