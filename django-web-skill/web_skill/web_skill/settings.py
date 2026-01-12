@@ -47,10 +47,7 @@ try:
     logger.info(f"✅ ALLOWED_HOSTS: {ALLOWED_HOSTS}")
 
     # Aplicaciones
-<<<<<<< HEAD
-=======
     # Aplicaciones
->>>>>>> mickel
     INSTALLED_APPS = [
         "django.contrib.admin",
         "django.contrib.auth",
@@ -59,10 +56,7 @@ try:
         "django.contrib.messages",
         "django.contrib.staticfiles",
         'web_skill_app',
-<<<<<<< HEAD
-=======
         'tailwind',
->>>>>>> mickel
         'theme',
     ]
 
@@ -215,8 +209,6 @@ except Exception as e:
     logger.error("=" * 80)
     logger.error(traceback.format_exc())
     raise
-<<<<<<< HEAD
-=======
 
 # --- CONFIGURACIÓN DE TAILWIND ---
 # --- CONFIGURACIÓN DE TAILWIND ---
@@ -229,4 +221,3 @@ INTERNAL_IPS = [
 # ¡AGREGA ESTO! (Usa la ruta que copiaste en el paso 1)
 # La 'r' al principio es MUY importante en Windows
 NPM_BIN_PATH = r"C:\Program Files\nodejs\npm.cmd"
->>>>>>> mickel
