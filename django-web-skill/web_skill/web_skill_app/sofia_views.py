@@ -8,7 +8,7 @@ import requests # ¡Recuerda instalarlo! pip install requests
 
 # --- Configuración ---
 # Coloca aquí la URL real de tu agente Sofía desplegado
-SOFIA_AGENT_URL = "httpsIA://URL-DE-TU-AGENTE.com/api/ask" 
+SOFIA_AGENT_URL = "https://agente-sofia-redis-178017465262.us-central1.run.app/chat" 
 # ---------------------
 
 

@@ -1,18 +1,18 @@
 // En: web_skill_app/static/web_skill_app/sofia.js
 
 document.addEventListener('DOMContentLoaded', () => {
-    
+
     // --- SELECCIÓN DE ELEMENTOS ---
     const avatar = document.getElementById('avatar-flotante');
     const bocadillo = document.getElementById('bocadillo-texto');
     const chatHistory = document.getElementById('sofia-chat-history');
     const textInput = document.getElementById('sofia-text-input');
     const sendButton = document.getElementById('sofia-send-btn');
-    
-    // URL de nuestra API interna de Django
-    const chatApiUrl = 'https://agente-sofia-redis-178017465262.us-central1.run.app/chat';
 
-    
+    // URL de nuestra API interna de Django
+    const chatApiUrl = '/ask-sofia/';
+
+
     // ==========================================================
     // --- LÓGICA DE ARRASTRAR Y ABRIR/CERRAR EL BOCADILLO ---
     // ==========================================================
@@ -32,13 +32,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         isDragging = true;
         hasDragged = false;
-        
+
         const clientX = e.clientX || e.touches[0].clientX;
         const clientY = e.clientY || e.touches[0].clientY;
 
         offsetX = clientX - avatar.getBoundingClientRect().left;
         offsetY = clientY - avatar.getBoundingClientRect().top;
-        
+
         avatar.style.cursor = 'grabbing';
         if (e.type === 'mousedown') e.preventDefault();
     }
@@ -46,10 +46,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // Unifica 'mousemove' y 'touchmove'
     function dragMove(e) {
         if (!isDragging) return;
-        
+
         hasDragged = true;
-        
-        if (e.type === 'touchmove') e.preventDefault(); 
+
+        if (e.type === 'touchmove') e.preventDefault();
 
         const clientX = e.clientX || e.touches[0].clientX;
         const clientY = e.clientY || e.touches[0].clientY;
@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function dragEnd() {
         isDragging = false;
         avatar.style.cursor = 'grab';
-        
+
         setTimeout(() => {
             hasDragged = false;
         }, 0);
@@ -93,11 +93,11 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('touchend', dragEnd);
 
     // --- Lógica de Clic para Abrir/Cerrar ---
-    
+
     function toggleBocadillo() {
         const wasVisible = bocadillo.classList.contains('visible');
         bocadillo.classList.toggle('visible');
-        
+
         // ✅ MEJORA: Auto-focus en el input cuando se abre
         if (!wasVisible) {
             setTimeout(() => {
@@ -112,7 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (bocadillo.contains(e.target)) {
             return;
         }
-        
+
         if (!hasDragged) {
             toggleBocadillo();
         }
@@ -123,7 +123,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const clickedInsideAvatar = avatar.contains(e.target);
         const clickedInsideBocadillo = bocadillo.contains(e.target);
         const isBocadilloVisible = bocadillo.classList.contains('visible');
-        
+
         // Solo cerrar si está visible y el clic fue completamente fuera
         if (isBocadilloVisible && !clickedInsideAvatar && !clickedInsideBocadillo) {
             bocadillo.classList.remove('visible');
@@ -173,7 +173,7 @@ document.addEventListener('DOMContentLoaded', () => {
         'Pregúntame lo que quieras...',
         'Cuéntame, ¿qué necesitas?'
     ];
-    
+
     let placeholderIndex = 0;
     textInput.addEventListener('focus', () => {
         if (textInput.value === '') {
@@ -202,28 +202,28 @@ document.addEventListener('DOMContentLoaded', () => {
     function addMessageToHistory(message, type) {
         const messageElement = document.createElement('div');
         messageElement.classList.add('sofia-message', type);
-        
+
         // ✅ MEJORA: Soporte para HTML en respuestas (negrita, listas, etc)
         if (type === 'agent') {
             messageElement.innerHTML = formatAgentMessage(message);
         } else {
             messageElement.textContent = message;
         }
-        
+
         chatHistory.appendChild(messageElement);
-        
+
         // ✅ MEJORA: Animación suave al aparecer
         setTimeout(() => {
             messageElement.style.opacity = '0';
             messageElement.style.transform = 'translateY(10px)';
             messageElement.style.transition = 'opacity 0.3s, transform 0.3s';
-            
+
             requestAnimationFrame(() => {
                 messageElement.style.opacity = '1';
                 messageElement.style.transform = 'translateY(0)';
             });
         }, 10);
-        
+
         chatHistory.scrollTop = chatHistory.scrollHeight;
         return messageElement;
     }
@@ -248,14 +248,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         if (show) {
             const typingElement = addMessageToHistory('Sofía está escribiendo...', 'agent-typing');
-            
+
             // ✅ MEJORA: Animación de puntos suspensivos
             let dots = 0;
             const typingInterval = setInterval(() => {
                 dots = (dots + 1) % 4;
                 typingElement.textContent = 'Sofía está escribiendo' + '.'.repeat(dots);
             }, 500);
-            
+
             // Guardar el intervalo para poder limpiarlo después
             typingElement.dataset.interval = typingInterval;
         }
@@ -291,7 +291,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const data = await response.json();
-            
+
             if (data.response) {
                 addMessageToHistory(data.response, 'agent');
             } else if (data.error) {
@@ -304,7 +304,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 clearInterval(parseInt(typingElement.dataset.interval));
             }
             showTypingIndicator(false);
-            
+
             console.error('Error en fetch:', error);
             addMessageToHistory('❌ Error de conexión. Por favor, intenta de nuevo.', 'agent');
         }
@@ -316,7 +316,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.key === 'Escape' && bocadillo.classList.contains('visible')) {
             bocadillo.classList.remove('visible');
         }
-        
+
         // Ctrl/Cmd + K para abrir el chat
         if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
             e.preventDefault();
@@ -330,7 +330,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateWelcomeMessage() {
         const hour = new Date().getHours();
         let greeting = '¡Hola!';
-        
+
         if (hour >= 5 && hour < 12) {
             greeting = '¡Buenos días!';
         } else if (hour >= 12 && hour < 19) {
@@ -338,19 +338,19 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             greeting = '¡Buenas noches!';
         }
-        
+
         const firstMessage = chatHistory.querySelector('.sofia-message.agent');
         if (firstMessage && firstMessage.textContent.includes('¡Hola!')) {
             firstMessage.textContent = `${greeting} Soy Sofía. ¿En qué puedo ayudarte hoy?`;
         }
     }
-    
-    updateWelcomeMessage();
-   
-    const btnOcultar= document.getElementById("btn-activar-sofia")
-    const contenido= document.getElementById("avatar-flotante")
 
-    btnOcultar.addEventListener("click", ()=>{
+    updateWelcomeMessage();
+
+    const btnOcultar = document.getElementById("btn-activar-sofia")
+    const contenido = document.getElementById("avatar-flotante")
+
+    btnOcultar.addEventListener("click", () => {
         contenido.classList.toggle("contenido-oculto")
     })
 }); // Fin de DOMContentLoaded
