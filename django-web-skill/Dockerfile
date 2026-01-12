@@ -6,11 +6,19 @@ ENV PORT=8080
 
 WORKDIR /app
 
+
+
+# --- AQUÍ ESTÁ EL CAMBIO IMPORTANTE ---
+# Agregamos 'ffmpeg' a la lista de programas que se instalan
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     build-essential \
     libpq-dev \
+    ffmpeg \
     && rm -rf /var/lib/apt/lists/*
+# --------------------------------------
+
+
 
 COPY web_skill/requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip && \

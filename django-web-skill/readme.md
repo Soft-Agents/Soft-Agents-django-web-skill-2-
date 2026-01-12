@@ -1,85 +1,109 @@
-Proyecto Django  Web Skill
-Este proyecto es una aplicación web construida con Django, Tailwind CSS y MongoDB Atlas. Permite a los usuarios registrarse y guardar sus datos en una base de datos NoSQL.
+# Soft Agents - Django Web Skill
 
-Características Principales
-Autenticación de Usuarios: Los usuarios pueden registrarse y sus datos se guardan directamente en una colección de MongoDB.
+Aplicación web construida con Django, Tailwind CSS y MongoDB Atlas. Integra Agentes de IA y funcionalidad de transcripción de voz a texto (STT) para interactuar con los usuarios.
 
-Conexión Directa a MongoDB: Utiliza el driver pymongo para una conexión segura y directa, evitando problemas de compatibilidad.
+---
 
-Interfaz Moderna: El diseño está impulsado por Tailwind CSS.
+## 🚀 Características Principales
 
-Guía de Instalación y Ejecución
-Sigue estos pasos en orden para poner el proyecto en marcha.
+- **Autenticación de Usuarios:** Registro y login con almacenamiento directo en MongoDB.
+- **Conexión Directa a MongoDB:** Uso del driver `pymongo` para alta compatibilidad.
+- **Agentes de IA:** Integración con microservicios de IA (Profesor, Coach, Criker, Scouter).
+- **Transcripción de Audio:** Funcionalidad para grabar voz en el navegador, convertirla y transcribirla a texto usando FFmpeg y SpeechRecognition.
+- **Interfaz Moderna:** Diseño responsivo impulsado por Tailwind CSS.
 
-Paso 1: Prerrequisitos
-Asegúrate de que estos programas estén instalados en tu sistema:
+---
 
-Python 3.11+: Esencial para Django.
+## 📋 Guía de Instalación y Ejecución
 
-Node.js y npm: Necesarios para compilar los estilos de Tailwind CSS.
+Sigue estos pasos estrictamente en orden para evitar errores de dependencias.
 
-Paso 2: Clonar el Repositorio
-Intento
+### Paso 1: Prerrequisitos del Sistema
 
-git clone https:
-cd nombre-del-repo
-Paso 3: Configurar el Entorno Virtual
-Crea y activa un entorno virtual para manejar las dependencias del proyecto de forma segura.
+Asegúrate de tener instalado:
 
-Crear: python -m venv venv
+1.  **Python 3.11+**: Lenguaje base.
+2.  **Node.js y npm**: Necesarios para compilar Tailwind CSS.
+3.  **FFmpeg (CRÍTICO)**: Necesario para que funcione el audio.
 
-Activar (Windows): venv\Scripts\activate
+#### ⚠️ Configuración de FFmpeg (Obligatorio)
 
-Activar (macOS/Linux): source venv/bin/activate
+Sin esto, la grabación de voz lanzará error.
 
-Paso 4: Instalar Dependencias
-Instala todas las bibliotecas de Python y Node.js que el proyecto necesita.
+- **En Windows:**
+  1.  Descarga FFmpeg (versión essentials o full).
+  2.  Extrae y copia los archivos `.exe` (`ffmpeg.exe`, `ffprobe.exe`) en una carpeta, por ejemplo: `C:\ffmpeg\bin`.
+  3.  **IMPORTANTE:** Agrega `C:\ffmpeg\bin` a las **Variables de Entorno (PATH)** de tu sistema.
+  4.  Reinicia tu terminal/editor para aplicar cambios.
+- **En Linux/Mac:**
+  - Ejecuta: `sudo apt-get install ffmpeg`
 
-Dependencias de Python:
+---
 
-Intento
+### Paso 2: Clonar el Repositorio
 
-pip install -r requirements.txt
-Dependencias de Node.js :
+```bash
+git clone <URL_DEL_REPOSITORIO>
+cd soft-agents-django
 
-Intento
 
+### Paso 3: Configurar el Entorno Virtual
+
+# Crear entorno
+python -m venv venv
+
+# Activar (Windows)
+venv\Scripts\activate
+
+# Activar (macOS/Linux)
+source venv/bin/activate
+
+### Paso 4: Instalar Dependencias
+
+#Backend (Python): Incluye Django, PyMongo, Pydub y SpeechRecognition.
+pip install -r web_skill/requirements.txt
+
+#Frontend (Tailwind):
 npm install
-Paso 5: Configuración de la Base de Datos
-Obtener la URL de Conexión:
 
-Crea un clúster enAtlas de MongoDB.
+### Paso 5: Configuración de Variables de Entorno (.env)
+# Configuración General
+DEBUG=True
+SECRET_KEY=tu_clave_secreta_aqui
+ALLOWED_HOSTS_PROD=localhost,127.0.0.1
 
-Crea un usuario de base de datos (diegocaso1988_db_user).
+# Base de Datos (MongoDB Atlas)
+MONGO_URI=mongodb+srv://diegocaso1988_db_user:<password>@weskill.hv6k6mh.mongodb.net/?retryWrites=true&w=majority&appName=weskill
+MONGO_DB_NAME=webSkill
 
-Obtén la cadena de conexión (SRV) desde el panel de Atlas.
+# URLs de los Agentes de IA (Cloud Run)
+# Si no se definen, el sistema usará las URLs por defecto configuradas en settings.py
+AGENT_PROFESOR=[https://agente-profesor-redis-178017465262.us-central1.run.app/chat](https://agente-profesor-redis-178017465262.us-central1.run.app/chat)
+AGENT_CRIKER_COACH=[https://agente-coach-redis-178017465262.us-central1.run.app/chat](https://agente-coach-redis-178017465262.us-central1.run.app/chat)
+AGENT_CRIKER_SKILL=[https://agente-criker-redis2-178017465262.us-central1.run.app/chat](https://agente-criker-redis2-178017465262.us-central1.run.app/chat)
+SOFIA_AGENT_URL=[https://agente-sofia-redis-178017465262.us-central1.run.app/chat](https://agente-sofia-redis-178017465262.us-central1.run.app/chat)
 
-Crear el archivo .env:
-En la raíz del proyecto, crea un archivo llamado .env y pega tu cadena de conexión, reemplazando <password> por la tuya.
-
-Fragmento de código
-
-DATABASE_URL=mongodb+srv://diegocaso1988_db_user:<password>@weskill.hv6k6mh.mongodb.net/?retryWrites=true&w=majority&appName=weskill
-Paso 6: Ejecutar Migraciones
-Django usa su base de datos interna de SQLite para el panel de administración y otras funciones. Ejecuta estos comandos para prepararla.
-
-Intento
+### Paso 6: Ejecutar Migraciones
 
 python manage.py makemigrations
 python manage.py migrate
 
-Paso 7: Ejecutar la Aplicación
-Abre dos terminales separadas para ejecutar el proyecto.
+### Paso 7: Ejecutar la Aplicación
 
-Terminal 1 (para Tailwind):
-Este comando compila tus estilos de forma automática cada vez que haces un cambio.
-
-Intento
+#Terminal 1 (Compilador de Tailwind):
 
 python manage.py tailwind start
-Terminal 2 (para Django):
-Este comando inicia el servidor web de Django.
 
-Intento
-
+#Terminal 2 (Servidor Django):
 python manage.py runserver
+
+#Otra opcion de ejecucion:
+python manage.py runserver --noreload
+
+
+### Despliegue con docker: Comandos para probar Docker localmente
+docker build -t web-skill-app .
+docker run -p 8080:8080 web-skill-app
+
+
+```
