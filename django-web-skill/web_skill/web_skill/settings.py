@@ -46,8 +46,6 @@ try:
     ALLOWED_HOSTS.extend(['localhost', '127.0.0.1', '.run.app', '.googleapis.com'])
     logger.info(f"✅ ALLOWED_HOSTS: {ALLOWED_HOSTS}")
 
-    # Aplicaciones
-    # Aplicaciones
     INSTALLED_APPS = [
         "django.contrib.admin",
         "django.contrib.auth",
@@ -210,7 +208,6 @@ except Exception as e:
     logger.error(traceback.format_exc())
     raise
 
-# --- CONFIGURACIÓN DE TAILWIND ---
 # --- CONFIGURACIÓN DE TAILWIND ---
 TAILWIND_APP_NAME = 'theme'
 
