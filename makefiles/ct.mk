@@ -7,17 +7,14 @@
 		ct.cleanup
 
 copy_package:
-	@echo "Copiando requirements.txt..."
-	@cp $(PROJECT_DIR)/requirements.txt docker/local/requirements.txt
+	@echo "Verificando requirements.txt..."
 
 ct.copy.dev:
-	@echo "Copiando archivos..."
-	@cp $(PROJECT_DIR)/requirements.txt docker/dev/requirements.txt
+	@echo "Verificando archivos para dev..."
 
-ct.build.image: copy_package ## Build image for development.
-	@cd docker/local && \
-		docker build -f Dockerfile -t $(IMAGE) . --no-cache && \
-		rm -f db.sqlite3
+ct.build.image: ## Build image for development.
+	@echo "Construyendo imagen desde $(PROJECT_DIR)..."
+	@docker build -f $(PROJECT_DIR)/Dockerfile -t $(IMAGE) $(PROJECT_DIR) --no-cache
 
 ct.destroy.image: 
 	@echo "Destruyendo imagen de Docker..."

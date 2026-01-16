@@ -63,7 +63,6 @@ jobs:
       - name: Run make ct.copy.dev
         run: |
           make -f makefiles/ct.mk ct.copy.dev PROJECT_DIR=django-web-skill
-          ls -l docker/dev
 
       - name: Build and tag the docker image
         run: |-
