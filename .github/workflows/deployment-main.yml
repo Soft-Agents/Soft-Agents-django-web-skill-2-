@@ -66,16 +66,20 @@ jobs:
 
       - name: Build and tag the docker image
         run: |-
+          REPO_NAME="${{ steps.repo-name.outputs.repository-name }}"
+          IMAGE_NAME="${REPO_NAME%-}"
           docker build \
            --build-arg NODE_ENV=dev \
            --build-arg REQUIREMENTS_PATH=requirements.txt \
            -f django-web-skill/Dockerfile \
-           --tag $REGION-docker.pkg.dev/$PROJECT_ID/$REGISTRY_NAME/${{ steps.repo-name.outputs.repository-name }}:$GITHUB_SHA \
+           --tag $REGION-docker.pkg.dev/$PROJECT_ID/$REGISTRY_NAME/$IMAGE_NAME:$GITHUB_SHA \
            django-web-skill
 
       - name: Push the image to the Google Artifact Registry (GAR)
         run: |-
-          docker push $REGION-docker.pkg.dev/$PROJECT_ID/$REGISTRY_NAME/${{ steps.repo-name.outputs.repository-name }}:$GITHUB_SHA
+          REPO_NAME="${{ steps.repo-name.outputs.repository-name }}"
+          IMAGE_NAME="${REPO_NAME%-}"
+          docker push $REGION-docker.pkg.dev/$PROJECT_ID/$REGISTRY_NAME/$IMAGE_NAME:$GITHUB_SHA
 
   deploy:
     name: deploy in cloud run (dev)
@@ -122,9 +126,11 @@ jobs:
 
       - name: Deploy
         run: |-
-          gcloud run deploy ${{ steps.repo-name.outputs.repository-name }}$PREFIX_SERVICE \
+          REPO_NAME="${{ steps.repo-name.outputs.repository-name }}"
+          IMAGE_NAME="${REPO_NAME%-}"
+          gcloud run deploy $IMAGE_NAME$PREFIX_SERVICE \
             --region $REGION \
-            --image $REGION-docker.pkg.dev/$PROJECT_ID/$REGISTRY_NAME/${{ steps.repo-name.outputs.repository-name }}:$GITHUB_SHA \
+            --image $REGION-docker.pkg.dev/$PROJECT_ID/$REGISTRY_NAME/$IMAGE_NAME:$GITHUB_SHA \
             --platform "managed" \
             --service-account $SERVICE_ACCOUNT_EMAIL \
             --port $HTTP_PORT \
@@ -134,7 +140,9 @@ jobs:
 
       - name: Hacer el servicio público (Permitir invocaciones no autenticadas)
         run: |-
-          gcloud run services add-iam-policy-binding ${{ steps.repo-name.outputs.repository-name }}$PREFIX_SERVICE \
+          REPO_NAME="${{ steps.repo-name.outputs.repository-name }}"
+          IMAGE_NAME="${REPO_NAME%-}"
+          gcloud run services add-iam-policy-binding $IMAGE_NAME$PREFIX_SERVICE \
           --region $REGION \
           --member="allUsers" \
           --role="roles/run.invoker"
