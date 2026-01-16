@@ -1,19 +1,20 @@
-.PHONY: ct.copy				\
-		ct.set.project.name \
-		ct.print.pname		\
-		ct.build.image		\
-		ct.destroy.image	\
-		ct.run				\
-		
+.PHONY: copy_package \
+		ct.copy.dev \
+		ct.build.image \
+		ct.destroy.image \
+		ct.run \
+		ct.test \
+		ct.cleanup
 
 copy_package:
-	cp $(PROJECT_DIR)/requirements.txt docker/local/requirements.txt
+	@echo "Copiando requirements.txt..."
+	@cp $(PROJECT_DIR)/requirements.txt docker/local/requirements.txt
 
 ct.copy.dev:
 	@echo "Copiando archivos..."
 	@cp $(PROJECT_DIR)/requirements.txt docker/dev/requirements.txt
 
-ct.build.image: copy_package ## Build image for development.:
+ct.build.image: copy_package ## Build image for development.
 	@cd docker/local && \
 		docker build -f Dockerfile -t $(IMAGE) . --no-cache && \
 		rm -f db.sqlite3
@@ -31,10 +32,11 @@ ct.run: ## Run container
 	export APP_ENV="$(APP_ENV)" && \
 	docker compose up --remove-orphans
 
-ct.test: ## Ejecutar
+ct.test: ## Ejecutar pruebas
 	@echo "Ejecutando pruebas..."
 	@docker exec -it $(PROJECT_NAME) python3 $(PROJECT_DIR)/manage.py test
 
-ct.cleanup: ## Detener contenedor
-	docker stop $(PROJECT_NAME)
-	docker rm $(PROJECT_NAME)
+ct.cleanup: ## Detener y eliminar contenedor
+	@echo "Limpiando contenedor..."
+	@docker stop $(PROJECT_NAME) || true
+	@docker rm $(PROJECT_NAME) || true
