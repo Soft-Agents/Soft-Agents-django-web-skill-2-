@@ -23,7 +23,7 @@ env:
   SOFIA_AGENTE_URL: ${{ secrets.SOFIA_AGENTE_SKILL }}
   AGENTE_CRIKER_COACH: ${{ secrets.AGENTE_CRIKER_COACH }}
   MONGO_URI: ${{ secrets.MONGO_URI }}
-  MONGO_DB_NAME: ${${ secrets.MONGO_DB_NAME }}
+  MONGO_DB_NAME: ${{ secrets.MONGO_DB_NAME }}
   SECURE_SSL_REDIRECT: ${{ secrets.SECURE_SSL_REDIRECT }}
   SECURE_HSTS_SECONDS: ${{ secrets.SECURE_HSTS_SECONDS }}
   SECURE_HSTS_INCLUDE_SUBDOMAINS: ${{ secrets.SECURE_HSTS_INCLUDE_SUBDOMAINS }}
@@ -69,9 +69,9 @@ jobs:
           docker build \
            --build-arg NODE_ENV=dev \
            --build-arg REQUIREMENTS_PATH=requirements.txt \
-           -f django-web-skill/Dockerfile \ 
+           -f django-web-skill/Dockerfile \
+           --tag $REGION-docker.pkg.dev/$PROJECT_ID/$REGISTRY_NAME/${{ steps.repo-name.outputs.repository-name }}:$GITHUB_SHA \
            django-web-skill
-           --tag $REGION-docker.pkg.dev/$PROJECT_ID/$REGISTRY_NAME/${{ steps.repo-name.outputs.repository-name }}:$GITHUB_SHA
 
       - name: Push the image to the Google Artifact Registry (GAR)
         run: |-
