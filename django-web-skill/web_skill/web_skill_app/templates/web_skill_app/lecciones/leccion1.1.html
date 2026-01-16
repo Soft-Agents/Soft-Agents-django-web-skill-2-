@@ -257,6 +257,17 @@
                 nextBtn.classList.toggle('cursor-not-allowed', n === totalSlides);
             }
 
+            // --- LÓGICA NUEVA: MOSTRAR BOTÓN FINALIZAR SOLO EN EL ÚLTIMO SLIDE ---
+            const finishBtn = document.querySelector('.js-finish-btn');
+            if (finishBtn) {
+                if (n === totalSlides) {
+                    finishBtn.classList.remove('hidden'); // Mostrar si es el último
+                } else {
+                    finishBtn.classList.add('hidden'); // Ocultar en los demás
+                }
+            }
+            // ---------------------------------------------------------------------
+
             if (pizarraContent) pizarraContent.scrollTop = 0;
         }
 

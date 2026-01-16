@@ -338,6 +338,22 @@
                 }
             }
 
+            
+            // --- NUEVO CÓDIGO AQUÍ: CONTROLAR BOTÓN FINALIZAR ---
+            // Buscamos el botón por la clase marcadora 'js-finish-btn'
+            const finishBtn = document.querySelector('.js-finish-btn');
+            
+            if (finishBtn) {
+                // Si estamos en el último slide (n === totalSlides), mostramos el botón
+                if (n === totalSlides) {
+                    finishBtn.classList.remove('hidden');
+                } else {
+                    // Si NO estamos en el último, lo ocultamos
+                    finishBtn.classList.add('hidden');
+                }
+            }
+            // ----------------------------------------------------
+
             if (pizarraContent) pizarraContent.scrollTop = 0;
         }
 

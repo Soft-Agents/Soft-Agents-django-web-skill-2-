@@ -70,21 +70,49 @@ def get_conversation_history_knowledge(user_id):
 def get_agent_response_knowledge(user_id, user_message):
     """
     Gets a response from the Knowledge agent.
-    It first checks the cache for a similar message, and if not found,
-    calls the agent and caches the response.
+    It injects the user's completed lessons into the prompt so the Agent knows the progress.
     """
-    message_hash = hashlib.md5(user_message.strip().lower().encode()).hexdigest()
+    # 1. Recuperamos el documento del usuario PRIMERO para ver sus lecciones
+    try:
+        users_collection = get_db_collection()
+        user_doc, user_object_id = _get_user_doc(users_collection, user_id)
+        
+        # --- NUEVA LÓGICA: OBTENER PROGRESO ---
+        completed_lessons = user_doc.get('lecciones_completadas', [])
+        context_instruction = ""
+        
+        if completed_lessons:
+            lista_lecciones = ", ".join(completed_lessons)
+            # Creamos una instrucción oculta para el agente
+            context_instruction = (
+                f"\n\n[SYSTEM CONTEXT: El usuario ya ha completado y aprobado las siguientes lecciones: {lista_lecciones}. "
+                "Si pregunta qué sigue, guíalo a la siguiente. Felicítalo si acaba de terminar una.]"
+            )
+        # --------------------------------------
+
+    except Exception as e:
+        logger.error(f"Error recuperando usuario en knowledge service: {e}")
+        # Si falla la DB, seguimos con el mensaje normal sin contexto para no romper el chat
+        completed_lessons = []
+        context_instruction = ""
+        user_object_id = user_id
+
+    # Usamos el mensaje + contexto para generar el hash del caché (así si avanza, la respuesta cambia)
+    full_message_for_agent = f"{user_message} {context_instruction}"
+    
+    message_hash = hashlib.md5(full_message_for_agent.strip().lower().encode()).hexdigest()
     cache_key = f"agent_knowledge_response:{message_hash}"
 
     cached_response = cache.get(cache_key)
+    
+    # --- SI ESTÁ EN CACHÉ ---
     if cached_response:
         logger.info(f"Cache HIT for key {cache_key}")
         try:
-            users_collection = get_db_collection()
-            user_doc, user_object_id = _get_user_doc(users_collection, user_id)
             conversation_history = user_doc.get('conversation_history_knowledge', [])
             
             current_time = datetime.datetime.now()
+            # Guardamos solo el mensaje original del usuario (sin el texto oculto del sistema)
             conversation_history.append({'role': 'user', 'message': user_message, 'timestamp': current_time.isoformat()})
             conversation_history.append({'role': 'agent', 'message': cached_response, 'timestamp': (current_time + datetime.timedelta(seconds=1)).isoformat()})
             
@@ -93,22 +121,22 @@ def get_agent_response_knowledge(user_id, user_message):
                 {'$set': {'conversation_history_knowledge': conversation_history}}
             )
             logger.debug(f"Knowledge history updated for {user_object_id} with CACHED response.")
-        except (ConnectionError, ValueError) as e:
-            logger.error(f"Error updating history with cached response for {user_id}: {e}")
+        except Exception as e:
+            logger.error(f"Error updating history with cached response: {e}")
         
         return cached_response
 
+    # --- SI NO ESTÁ EN CACHÉ (LLAMAR AL AGENTE) ---
     logger.info(f"Cache MISS for key {cache_key}. Calling agent.")
     try:
-        users_collection = get_db_collection()
-        user_doc, user_object_id = _get_user_doc(users_collection, user_id)
         conversation_history = user_doc.get('conversation_history_knowledge', [])
 
         agent_url = settings.AGENT_PROFESOR
         if not agent_url:
             raise ValueError("AGENT_PROFESOR URL not configured.")
             
-        payload = {'user_id': str(user_object_id), 'message': user_message}
+        # AQUÍ ENVIAMOS EL MENSAJE CONTEXTUALIZADO (Mensaje + Lista de lecciones)
+        payload = {'user_id': str(user_object_id), 'message': full_message_for_agent}
         
         response = requests.post(
             agent_url, json=payload, headers={'Content-Type': 'application/json'}, timeout=120
@@ -125,6 +153,9 @@ def get_agent_response_knowledge(user_id, user_message):
         logger.info(f"Saved new response to cache with key {cache_key}")
 
         current_time = datetime.datetime.now()
+        
+        # IMPORTANTE: Al guardar en el historial, guardamos 'user_message' (lo que escribió el humano),
+        # NO 'full_message_for_agent' (que tiene las instrucciones raras del sistema).
         conversation_history.append({'role': 'user', 'message': user_message, 'timestamp': current_time.isoformat()})
         conversation_history.append({'role': 'agent', 'message': agent_response, 'timestamp': (current_time + datetime.timedelta(seconds=1)).isoformat()})
         
@@ -396,16 +427,7 @@ def get_agent_response_scouter(user_id, user_message):
 def get_user_survey_history(user_id):
     """
     Returns list of survey dashboards for sidebar from MongoDB.
-    Returns: [
-        {
-            'id': str,
-            'timestamp': str,
-            'nivel': str,
-            'promedio': float,
-            'contexto': str
-        },
-        ...
-    ]
+    CORREGIDO: Devuelve claves compatibles con ambos templates (Admin y Usuario).
     """
     try:
         from .db import mongo_client
@@ -415,15 +437,22 @@ def get_user_survey_history(user_id):
         db = mongo_client[getattr(settings, 'MONGO_DB_NAME', 'webSkill')]
         survey_collection = db['survey_results']
         
-        # Buscar todas las evaluaciones del usuario, ordenadas por fecha descendente
+        # Búsqueda híbrida (String y ObjectId) para asegurar que encuentre los datos
+        criteria = []
+        criteria.append({'user_id': str(user_id)}) 
+        try:
+            criteria.append({'user_id': ObjectId(str(user_id))})
+        except:
+            pass
+            
         surveys = survey_collection.find(
-            {'user_id': user_id}
-        ).sort('timestamp', -1)  # Más recientes primero
+            {'$or': criteria}
+        ).sort('timestamp', -1)
         
         historial = []
         for doc in surveys:
             try:
-                # Formatear timestamp para display
+                # Formatear timestamp
                 timestamp_str = doc.get('timestamp', '')
                 try:
                     if 'T' in timestamp_str:
@@ -434,12 +463,28 @@ def get_user_survey_history(user_id):
                 except:
                     formatted_date = timestamp_str
                 
+                # Extraer valores seguros
+                nivel_val = doc.get('nivel_evaluado', 'N/A')
+                promedio_val = doc.get('promedio_global', 0)
+                if isinstance(promedio_val, float):
+                    promedio_val = int(promedio_val) # Convertir a entero para visualización limpia
+
                 historial.append({
-                    'id': str(doc['_id']),
+                    'id': str(doc['_id']), 
+                    'dashboard_id': str(doc['_id']),
                     'timestamp': formatted_date,
-                    'nivel': doc.get('nivel_evaluado', 'N/A'),
-                    'promedio': doc.get('promedio_global', 0),
-                    'contexto': doc.get('contexto_usuario', '')
+                    
+                    # --- AQUÍ ESTÁ LA SOLUCIÓN MÁGICA ---
+                    # Enviamos con AMBOS nombres para que funcione en todos tus HTMLs
+                    'nivel': nivel_val,              # Para sidebar_historial.html
+                    'nivel_evaluado': nivel_val,     # Para admin_user_evaluations.html
+                    
+                    'promedio': promedio_val,        # Para sidebar_historial.html
+                    'promedio_global': promedio_val, # Para admin_user_evaluations.html
+                    # ------------------------------------
+                    
+                    'contexto': doc.get('contexto_usuario', ''),         # Para sidebar
+                    'contexto_usuario': doc.get('contexto_usuario', '')  # Para admin
                 })
             except Exception as e:
                 logger.warning(f"Error procesando survey {doc.get('_id')}: {e}")
