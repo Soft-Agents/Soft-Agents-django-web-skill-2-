@@ -9,7 +9,7 @@ on:
       - main
 
 env:
-  PROJECT_ID: ${{ secrets.PROYECT_ID }}
+  PROJECT_ID: ${{ secrets.PROJECT_ID }}
   REGION: us-central1
   REGISTRY_NAME: se-arc-softgents
   SERVICE_ACCOUNT_EMAIL: ${{ secrets.SERVICE_ACCOUNT_EMAIL }}
@@ -116,7 +116,7 @@ jobs:
           SECRET_JSON=$(gcloud secrets versions access latest --secret=$SECRET)
 
           # Parsear cada clave y convertirlas en --set-env-vars
-          SECRET_ENVS=$(echo $SECRET_JSON | jq -r 'to_entries | map("\(.key)=\(.value|tostring)") | join(",")')
+          SECRET_ENVS=$(echo "$SECRET_JSON" | jq -r 'to_entries | map("\(.key)=\(.value|tostring)") | join(",")')
 
           # Variables normales (no secretas)
           ENVS="NODE_ENV=dev,PROJECT_ID=$PROJECT_ID,REGION=$REGION,ENVIRONMENT=$ENVIRONMENT"
