@@ -237,9 +237,18 @@ def get_agent_response_coach(user_id, user_message):
         agent_url = settings.AGENT_CRIKER_COACH 
         if not agent_url:
             raise ValueError("AGENT_CRIKER_COACH URL not configured.")
-            
-        payload = {'user_id': str(user_object_id), 'message': user_message}
         
+        #parte para que diga que es yashai
+
+        instruccion_yashay = "SYSTEM: Tu identidad AHORA es 'Yashay' (Agente de Teoría). OLVIDA que eres Coach. Eres académico y sabio."
+        
+        payload = {
+            'user_id': str(user_object_id), 
+            'message': f"{instruccion_yashay}\n\nPregunta del usuario: {user_message}"
+        }
+        
+        # ------------------------------------------------------------
+
         response = requests.post(
             agent_url, json=payload, headers={'Content-Type': 'application/json'}, timeout=120
         )
