@@ -115,6 +115,20 @@ def transcribe_audio(request):
 
 def home(request):
     context = {'timestamp': int(time.time())}
+    
+    # --- CORRECCIÓN: Cargar usuario y puntos en la Home ---
+    if request.user.is_authenticated:
+        user_id = request.user.get('user_id')
+        if user_id:
+            try:
+                users_collection = get_db_collection()
+                fresh_user = users_collection.find_one({'_id': ObjectId(user_id)})
+                if fresh_user:
+                    fresh_user['is_authenticated'] = True 
+                    context['user'] = fresh_user
+            except Exception as e:
+                logger.error(f"Error en home: {e}")
+
     return render(request, 'web_skill_app/index.html', context)
 
 def pensamiento_critico(request):
@@ -133,8 +147,31 @@ def colaboracion(request):
     context = {'timestamp': int(time.time())}
     return render(request, 'web_skill_app/colaboracion.html', context)
 
+# En web_skill_app/core_views.py
+
 def presentacion(request):
     context = {'timestamp': int(time.time())}
+    
+    # --- CORRECCIÓN: USAR request.session EN LUGAR DE request.user ---
+    # Al ser una vista pública, request.user puede no tener los datos.
+    # Pero la sesión SIEMPRE tiene el user_id si ya te logueaste.
+    user_id_str = request.session.get('user_id')
+    
+    if user_id_str:
+        try:
+            users_collection = get_db_collection()
+            fresh_user = users_collection.find_one({'_id': ObjectId(user_id_str)})
+            
+            if fresh_user:
+                # 1. Le decimos al HTML que sí está logueado
+                fresh_user['is_authenticated'] = True 
+                
+                # 2. Pasamos el usuario fresco (con los puntos XP correctos)
+                context['user'] = fresh_user
+                
+        except Exception as e:
+            logger.error(f"Error recuperando usuario en presentacion: {e}")
+
     return render(request, 'web_skill_app/presentacion.html', context)
 
 def skill(request):
@@ -162,7 +199,19 @@ def preguntas(request):
 # --- VISTA DEL DASHBOARD (sin cambios) ---
 @login_required
 def dashboard_view(request):
-    context = {'user': request.user} 
+    # Recuperamos el ID de la sesión
+    user_id = request.user.get('user_id')
+    
+    # Buscamos los datos actualizados en MongoDB
+    users_collection = get_db_collection()
+    fresh_user = users_collection.find_one({'_id': ObjectId(user_id)})
+    
+    # --- CORRECCIÓN IMPORTANTE ---
+    # Si encontramos al usuario, le ponemos la etiqueta manualmente
+    if fresh_user:
+        fresh_user['is_authenticated'] = True 
+    
+    context = {'user': fresh_user}
     return render(request, 'web_skill_app/dashboard.html', context)
 
 @login_required # <-- Añadido si la página requiere login
@@ -264,14 +313,20 @@ def knowledge_view(request):
         messages.error(request, f"Error al cargar historial: {str(e)}")
         conversation_history = []
     
-    # 3. Renderizar la plantilla
+    # --- CORRECCIÓN AQUÍ TAMBIÉN ---
+    users_collection = get_db_collection()
+    fresh_user_data = users_collection.find_one({'_id': ObjectId(user_id_str)})
+
+    if fresh_user_data:
+        fresh_user_data['is_authenticated'] = True  # <--- AGREGAR ESTA LÍNEA
+
+    # Renderizar la plantilla
     return render(
         request, 
         'web_skill_app/knowledge.html', 
         {
-            'user': user,
+            'user': fresh_user_data,
             'conversation_history': conversation_history,
-            # Convertimos a JSON string para que JS lo lea fácil
             'completed_lessons_json': json.dumps(completed_lessons),
         }
     )
