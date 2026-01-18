@@ -1,0 +1,148 @@
+name: Build and Deploy to Google Cloud (Development)
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+env:
+  PROJECT_ID: ${{ secrets.PROJECT_ID }}
+  REGION: us-central1
+  REGISTRY_NAME: se-arc-softgents
+  SERVICE_ACCOUNT_EMAIL: ${{ secrets.SERVICE_ACCOUNT_EMAIL }}
+  GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
+  HTTP_PORT: 8080
+  SECRET: core-secret-softAgents
+  DEBUG: ${{ secrets.DEBUG }}
+  SECRET_KEY: ${{ secrets.SECRET_KEY }}
+  AGENTE_PROFESOR: ${{ secrets.AGENTE_PROFESOR }}
+  AGENTE_CRIKER_SKILL: ${{ secrets.AGENTE_CRIKER_SKILL }}
+  SOFIA_AGENTE_URL: ${{ secrets.SOFIA_AGENTE_SKILL }}
+  AGENTE_CRIKER_COACH: ${{ secrets.AGENTE_CRIKER_COACH }}
+  MONGO_URI: ${{ secrets.MONGO_URI }}
+  MONGO_DB_NAME: ${{ secrets.MONGO_DB_NAME }}
+  SECURE_SSL_REDIRECT: ${{ secrets.SECURE_SSL_REDIRECT }}
+  SECURE_HSTS_SECONDS: ${{ secrets.SECURE_HSTS_SECONDS }}
+  SECURE_HSTS_INCLUDE_SUBDOMAINS: ${{ secrets.SECURE_HSTS_INCLUDE_SUBDOMAINS }}
+  SECURE_HSTS_PRELOAD: ${{ secrets.SECURE_HSTS_PRELOAD }}
+  ENVIRONMENT: dev
+  PREFIX_SERVICE: -dev
+
+jobs:
+  package:
+    name: register image (dev)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup dependencies
+        run: sudo apt-get install -y jq make
+
+      - name: Get repository name
+        id: repo-name
+        uses: MariachiBear/get-repo-name-action@v1.1.0
+        with:
+          with-owner: "false"
+          string-case: "lowercase"
+
+      - id: "auth"
+        uses: google-github-actions/auth@v1.1.1
+        with:
+          credentials_json: "${{ secrets.GCP_SA_KEY }}"
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+
+      - name: Authorize Docker push
+        run: gcloud auth configure-docker $REGION-docker.pkg.dev
+
+      - name: Run make ct.copy.dev
+        run: |
+          make -f makefiles/ct.mk ct.copy.dev PROJECT_DIR=django-web-skill
+
+      - name: Build and tag the docker image
+        run: |-
+          REPO_NAME="${{ steps.repo-name.outputs.repository-name }}"
+          IMAGE_NAME="${REPO_NAME%-}"
+          docker build \
+           --build-arg NODE_ENV=dev \
+           --build-arg REQUIREMENTS_PATH=requirements.txt \
+           -f django-web-skill/Dockerfile \
+           --tag $REGION-docker.pkg.dev/$PROJECT_ID/$REGISTRY_NAME/$IMAGE_NAME:$GITHUB_SHA \
+           django-web-skill
+
+      - name: Push the image to the Google Artifact Registry (GAR)
+        run: |-
+          REPO_NAME="${{ steps.repo-name.outputs.repository-name }}"
+          IMAGE_NAME="${REPO_NAME%-}"
+          docker push $REGION-docker.pkg.dev/$PROJECT_ID/$REGISTRY_NAME/$IMAGE_NAME:$GITHUB_SHA
+
+  deploy:
+    name: deploy in cloud run (dev)
+    runs-on: ubuntu-latest
+    needs: package
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup dependencies
+        run: |
+          sudo apt-get install -y jq make
+          sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/download/v4.43.1/yq_linux_amd64 && sudo chmod +x /usr/local/bin/yq
+
+      - name: Get repository name
+        id: repo-name
+        uses: MariachiBear/get-repo-name-action@v1.1.0
+        with:
+          with-owner: "false"
+          string-case: "lowercase"
+
+      - id: "auth"
+        uses: google-github-actions/auth@v1.1.1
+        with:
+          credentials_json: "${{ secrets.GCP_SA_KEY }}"
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+
+      - name: Parse secrets and envs
+        id: envs
+        run: |
+          # Descargar el secreto JSON desde Secret Manager
+          SECRET_JSON=$(gcloud secrets versions access latest --secret=$SECRET)
+
+          # Parsear cada clave y convertirlas en --set-env-vars
+          SECRET_ENVS=$(echo "$SECRET_JSON" | jq -r 'to_entries | map("\(.key)=\(.value|tostring)") | join(",")')
+
+          # Variables normales (no secretas)
+          ENVS="NODE_ENV=dev,PROJECT_ID=$PROJECT_ID,REGION=$REGION,ENVIRONMENT=$ENVIRONMENT"
+
+          echo "SECRET_ENVS=$SECRET_ENVS" >> $GITHUB_ENV
+          echo "ENVS=$ENVS" >> $GITHUB_ENV
+
+      - name: Deploy
+        run: |-
+          REPO_NAME="${{ steps.repo-name.outputs.repository-name }}"
+          IMAGE_NAME="${REPO_NAME%-}"
+          gcloud run deploy $IMAGE_NAME$PREFIX_SERVICE \
+            --region $REGION \
+            --image $REGION-docker.pkg.dev/$PROJECT_ID/$REGISTRY_NAME/$IMAGE_NAME:$GITHUB_SHA \
+            --platform "managed" \
+            --service-account $SERVICE_ACCOUNT_EMAIL \
+            --port $HTTP_PORT \
+            --memory 4Gi \
+            --update-env-vars $ENVS,$SECRET_ENVS \
+            --quiet
+
+      - name: Hacer el servicio público (Permitir invocaciones no autenticadas)
+        run: |-
+          REPO_NAME="${{ steps.repo-name.outputs.repository-name }}"
+          IMAGE_NAME="${REPO_NAME%-}"
+          gcloud run services add-iam-policy-binding $IMAGE_NAME$PREFIX_SERVICE \
+          --region $REGION \
+          --member="allUsers" \
+          --role="roles/run.invoker"

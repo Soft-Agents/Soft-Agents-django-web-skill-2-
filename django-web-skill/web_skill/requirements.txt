@@ -1,7 +1,7 @@
 # Django Core
 Django==4.2.26
 djangorestframework==3.16.1
-
+django-tailwind==3.8.0
 # Base de datos
 # Ya no necesitamos djongo ni psycopg2-binary
 # Nos conectamos directamente con el driver oficial
