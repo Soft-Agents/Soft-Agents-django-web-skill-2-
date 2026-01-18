@@ -177,9 +177,33 @@
         .typing-dot:nth-child(3) { animation-delay: 0.4s; }
         @keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
 
-        /* ESTILOS PARA CHECKBOX MARCADO */
-        .lesson-checkbox.checked { background-color: #10b981; border-color: #10b981; } /* Verde */
-        .lesson-checkbox.checked .check-icon { display: block; }
+        /* ESTILOS PARA EL CHECKBOX (MODIFICADO) */
+        .lesson-checkbox { 
+            display: none; /* <--- Oculto por defecto (adiós caja vacía) */
+        }
+
+        /* Cuando JS agrega la clase .checked, lo hacemos visible y verde */
+        .lesson-checkbox.checked { 
+            display: flex; 
+            align-items: center;
+            justify-content: center;
+            background-color: #10b981; 
+            border: 1px solid #10b981; 
+        }
+        
+        .lesson-checkbox.checked .check-icon { 
+            display: block; 
+        }
+
+        /* --- ANIMACIÓN PARA EL POPUP DE XP --- */
+@keyframes slideUpFade {
+    0% { opacity: 0; transform: translate(-50%, 20px) scale(0.9); }
+    100% { opacity: 1; transform: translate(-50%, 0) scale(1); }
+}
+
+.animate-xp-entry {
+    animation: slideUpFade 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
     </style>
 
     <script>
@@ -317,43 +341,96 @@
                 });
         }
 
-        // --- FINALIZAR LECCIÓN ---
-        function finalizarLeccion(codigo) {
-            const btn = document.getElementById(`btn-finish-${codigo}`);
-            const originalText = btn.innerHTML;
-            btn.innerHTML = "Guardando...";
-            btn.disabled = true;
+        // --- FUNCIÓN ACTUALIZADA: FINALIZAR LECCIÓN CON XP ---
+function finalizarLeccion(codigo) {
+    const btn = document.getElementById(`btn-finish-${codigo}`);
+    const originalText = btn.innerHTML;
+    // Efecto de carga visual en el botón
+    btn.innerHTML = '<span class="typing-dot bg-white"></span> Guardando...';
+    btn.disabled = true;
 
-            fetch("{% url 'marcar_leccion_completada' %}", {
-                method: 'POST',
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': csrfToken 
-                },
-                body: JSON.stringify({ leccion_id: codigo })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.status === 'ok') {
-                    markCheckboxVisual(codigo);
-                    btn.innerHTML = "✅ Lección Completada";
-                    btn.classList.remove('bg-gradient-to-r', 'from-purple-600', 'to-pink-600', 'hover:opacity-90', 'hover:scale-105');
-                    btn.classList.add('bg-green-600', 'cursor-default', 'opacity-80');
-                    if (!completedLessons.includes(codigo)) completedLessons.push(codigo);
-                    addMessage('agent', `¡Felicidades! Has completado la lección ${codigo}. 🚀`);
-                } else {
-                    btn.innerHTML = originalText;
-                    btn.disabled = false;
-                    addMessage('agent', '⚠️ Hubo un problema al guardar el progreso.');
+    fetch("{% url 'marcar_leccion_completada' %}", {
+        method: 'POST',
+        headers: { 
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken 
+        },
+        body: JSON.stringify({ leccion_id: codigo })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.status === 'ok') {
+            // 1. Marcar visualmente el checkbox verde (función que ya tenías)
+            markCheckboxVisual(codigo);
+            
+            // 2. Actualizar estado del botón
+            btn.innerHTML = "✅ Lección Completada";
+            btn.classList.remove('bg-gradient-to-r', 'from-purple-600', 'to-pink-600', 'hover:opacity-90', 'hover:scale-105');
+            btn.classList.add('bg-green-600', 'cursor-default', 'opacity-80');
+            
+            // Agregar al array local para que no se pierda al navegar
+            if (!completedLessons.includes(codigo)) completedLessons.push(codigo);
+            
+            // --- AQUÍ ESTÁ LA MAGIA DE LA GAMIFICACIÓN ---
+            
+            // Si el backend dice que ganó puntos (puntos_ganados > 0)
+            if (data.puntos_ganados > 0) {
+                // A. Mostrar Popup
+                const popup = document.getElementById('xp-notification');
+                if(popup) {
+                    popup.classList.remove('hidden');
+                    // Ocultar popup automáticamente después de 4 segundos
+                    setTimeout(() => { popup.classList.add('hidden'); }, 4000);
                 }
-            })
-            .catch(err => {
-                console.error(err);
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-                addMessage('agent', '⚠️ Error de conexión.');
-            });
+
+                // B. Actualizar Navbar con animación de números
+                const navCounter = document.getElementById('nav-xp-counter');
+                // También intentamos buscar el móvil por si acaso
+                const navCounterMobile = document.getElementById('nav-xp-counter-mobile'); 
+
+                if (navCounter) {
+                    const startVal = parseInt(navCounter.innerText) || 0;
+                    animateValue(navCounter, startVal, data.new_total_xp, 1500);
+                }
+                
+                // C. El agente te felicita en el chat
+                addMessage('agent', `¡Excelente trabajo! Has completado la lección y ganado <strong>+${data.puntos_ganados} XP</strong>. 🌟`);
+            } else {
+                // Si ya la había hecho antes (repaso)
+                addMessage('agent', `Has repasado la lección ${codigo} con éxito. ¡El conocimiento se refuerza!`);
+            }
+
+        } else {
+            // Error del servidor
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+            addMessage('agent', '⚠️ Hubo un problema al guardar el progreso.');
         }
+    })
+    .catch(err => {
+        console.error(err);
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+        addMessage('agent', '⚠️ Error de conexión.');
+    });
+}
+
+// --- FUNCIÓN AUXILIAR: ANIMAR NÚMEROS (Efecto tragamonedas) ---
+function animateValue(obj, start, end, duration) {
+    let startTimestamp = null;
+    const step = (timestamp) => {
+        if (!startTimestamp) startTimestamp = timestamp;
+        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+        // Calcula el número intermedio
+        const currentVal = Math.floor(progress * (end - start) + start);
+        obj.innerHTML = currentVal; // Si tienes texto extra como " XP", agrégalo aquí: currentVal + " XP"
+        
+        if (progress < 1) {
+            window.requestAnimationFrame(step);
+        }
+    };
+    window.requestAnimationFrame(step);
+}
 
         // --- CHAT FORM SUBMIT ---
         chatForm.addEventListener('submit', async function(e) {
@@ -558,4 +635,20 @@
             }
         }
     </script>
+    <div id="xp-notification" class="fixed bottom-10 left-1/2 transform -translate-x-1/2 z-50 hidden pointer-events-none">
+    <div class="bg-white rounded-2xl shadow-2xl p-4 flex items-center gap-4 border-2 border-yellow-400 animate-xp-entry">
+        <div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center shadow-md">
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+        </div>
+        
+        <div class="flex flex-col">
+            <span class="text-blue-900 font-bold text-[10px] uppercase tracking-wider">LECCIÓN COMPLETADA</span>
+            <div class="flex items-center gap-1">
+                <span class="text-2xl font-black text-slate-800">+5</span>
+                <span class="text-sm font-bold text-slate-600 mt-1">XP</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-yellow-400 fill-yellow-400 ml-1" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

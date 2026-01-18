@@ -369,7 +369,8 @@ def leccion_view(request, leccion_id):
     # Simplemente renderizamos la plantilla. Django se encargará de la herencia.
     return render(request, template_name)
 
-# --- NUEVA VISTA PARA GUARDAR EL PROGRESO ---
+# --- REEMPLAZA ESTO AL FINAL DE web_skill_app/core_views.py ---
+
 @login_required
 def marcar_leccion_completada(request):
     if request.method != 'POST':
@@ -378,26 +379,55 @@ def marcar_leccion_completada(request):
     try:
         data = json.loads(request.body)
         leccion_id = data.get('leccion_id')
-        user_id_str = request.user.get('user_id')
+        # Tu lógica de autenticación usa request.user como dict
+        user_id_str = request.user.get('user_id') 
 
         if not leccion_id or not user_id_str:
             return JsonResponse({'error': 'Faltan datos'}, status=400)
 
         users_collection = get_db_collection()
         
-        # Usamos $addToSet para que no se dupliquen si el usuario le da click varias veces
-        users_collection.update_one(
-            {'_id': ObjectId(user_id_str)},
-            {'$addToSet': {'lecciones_completadas': leccion_id}}
-        )
+        # 1. Buscamos al usuario para ver qué lecciones ya tiene
+        user = users_collection.find_one({'_id': ObjectId(user_id_str)})
+        
+        if not user:
+            return JsonResponse({'error': 'Usuario no encontrado'}, status=404)
 
-        return JsonResponse({'status': 'ok', 'leccion_id': leccion_id})
+        lecciones_previas = user.get('lecciones_completadas', [])
+        current_xp = user.get('experience_points', 0)
+        
+        puntos_ganados = 0
+        new_total_xp = current_xp
+
+        # 2. Lógica de Gamificación:
+        # Solo damos puntos si el ID de la lección NO está en su lista
+        if leccion_id not in lecciones_previas:
+            puntos_ganados = 5 # <--- Puntos por lección (Experience Points)
+            
+            # Actualizamos BD: Agregamos lección E incrementamos puntos en una sola operación atómica
+            users_collection.update_one(
+                {'_id': ObjectId(user_id_str)},
+                {
+                    '$push': {'lecciones_completadas': leccion_id},
+                    '$inc': {'experience_points': puntos_ganados}
+                }
+            )
+            new_total_xp += puntos_ganados
+        else:
+            # Si ya la completó antes, no hacemos nada en la BD (o podrías usar $addToSet si quisieras asegurar)
+            # Pero para ahorrar escritura, si ya está, solo retornamos ok con 0 puntos.
+            pass
+
+        return JsonResponse({
+            'status': 'ok', 
+            'leccion_id': leccion_id,
+            'puntos_ganados': puntos_ganados, # Frontend usará esto para saber si mostrar el popup
+            'new_total_xp': new_total_xp      # Frontend usará esto para actualizar el navbar
+        })
 
     except Exception as e:
         logger.error(f"Error marcando lección: {e}")
         return JsonResponse({'error': str(e)}, status=500)
-    
-# --- FIN DEL CÓDIGO ---
 
 
 
